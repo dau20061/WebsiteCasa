@@ -1,0 +1,14 @@
+﻿{
+  "users": {
+    "admin": {
+      "uid": "admin",
+      "email": "admin@casatea.vn",
+      "password": "admin123456",
+      "displayName": "Super Admin",
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-05T08:00:00.000Z",
+      "updatedAt": "2026-09-05T08:00:00.000Z"
+    }
+  }
+}

@@ -1,0 +1,279 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // AUTHENTICATION & ROLE HELPER FUNCTIONS
+    // =========================================================================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function currentUserDoc() {
+      return userDoc(request.auth.uid);
+    }
+
+    function currentUserData() {
+      return currentUserDoc().data;
+    }
+
+    function isActive() {
+      return signedIn() && currentUserData().status == "ACTIVE";
+    }
+
+    function isSuperAdmin() {
+      return isActive() && currentUserData().role == "SUPER_ADMIN";
+    }
+
+    function isAdmin() {
+      return isActive() && (
+        currentUserData().role == "SUPER_ADMIN" ||
+        currentUserData().role == "ADMIN"
+      );
+    }
+
+    function isEditor() {
+      return isActive() && (
+        currentUserData().role == "SUPER_ADMIN" ||
+        currentUserData().role == "ADMIN" ||
+        currentUserData().role == "EDITOR"
+      );
+    }
+
+    function isViewer() {
+      return isActive() && (
+        currentUserData().role == "SUPER_ADMIN" ||
+        currentUserData().role == "ADMIN" ||
+        currentUserData().role == "EDITOR" ||
+        currentUserData().role == "VIEWER"
+      );
+    }
+
+    // =========================================================================
+    // USERS COLLECTION: users/{uid}
+    // Chống leo thang đặc quyền (Anti-Privilege Escalation)
+    // =========================================================================
+
+    match /users/{uid} {
+      // 1. Read: User xem chính mình, hoặc ADMIN & SUPER_ADMIN xem danh sách
+      allow read: if isSuperAdmin() || isAdmin() || (signedIn() && request.auth.uid == uid);
+
+      // 2. Create: Chỉ SUPER_ADMIN mới có quyền tạo user profile trực tiếp
+      allow create: if isSuperAdmin()
+        && request.resource.data.role in ['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'VIEWER']
+        && request.resource.data.status in ['ACTIVE', 'INACTIVE', 'SUSPENDED']
+        && request.resource.data.uid == uid;
+
+      // 3. Update:
+      // - SUPER_ADMIN: Toàn quyền cập nhật
+      // - ADMIN: Được cập nhật user khác, nhưng KHÔNG được sửa SUPER_ADMIN, KHÔNG được nâng bất kỳ ai lên SUPER_ADMIN, và KHÔNG được tự sửa role/status của chính mình
+      // - USER THƯỜNG: Chỉ được sửa thông tin cá nhân (displayName, phone, photoURL), KHÔNG được sửa role, status, uid
+      allow update: if isSuperAdmin()
+        || (
+          isAdmin()
+          // Mục tiêu không phải là SUPER_ADMIN
+          && resource.data.role != "SUPER_ADMIN"
+          // Không được nâng quyền mục tiêu lên SUPER_ADMIN
+          && request.resource.data.role != "SUPER_ADMIN"
+          // Không được tự nâng quyền hoặc đổi status của chính mình
+          && (request.auth.uid != uid || (
+            request.resource.data.role == resource.data.role &&
+            request.resource.data.status == resource.data.status
+          ))
+          // Không được đổi uid
+          && request.resource.data.uid == resource.data.uid
+        )
+        || (
+          signedIn() && request.auth.uid == uid
+          // User tự sửa profile nhưng TUYỆT ĐỐI không được đổi role
+          && request.resource.data.role == resource.data.role
+          // TUYỆT ĐỐI không được đổi status
+          && request.resource.data.status == resource.data.status
+          // TUYỆT ĐỐI không được đổi uid
+          && request.resource.data.uid == resource.data.uid
+        );
+
+      // 4. Delete: Chỉ SUPER_ADMIN được xóa user, và không được tự xóa chính mình nếu là SUPER_ADMIN duy nhất
+      allow delete: if isSuperAdmin() && request.auth.uid != uid;
+    }
+
+    // =========================================================================
+    // PRODUCTS & CATEGORIES
+    // =========================================================================
+
+    match /products/{productId} {
+      // Public chỉ đọc sản phẩm có status == "PUBLISHED"
+      // Admin/Editor/Viewer đọc được tất cả (kể cả DRAFT, ARCHIVED)
+      allow read: if resource.data.status == "PUBLISHED" || isViewer();
+
+      // Create: EDITOR, ADMIN, SUPER_ADMIN
+      allow create: if isEditor()
+        && request.resource.data.status in ['DRAFT', 'PUBLISHED', 'ARCHIVED']
+        && request.resource.data.createdAt == request.time;
+
+      // Update: EDITOR, ADMIN, SUPER_ADMIN (không được sửa createdAt hoặc createdBy gốc)
+      allow update: if isEditor()
+        && request.resource.data.status in ['DRAFT', 'PUBLISHED', 'ARCHIVED']
+        && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt);
+
+      // Delete: EDITOR, ADMIN, SUPER_ADMIN
+      allow delete: if isEditor();
+    }
+
+    match /productCategories/{categoryId} {
+      allow read: if resource.data.status == "ACTIVE" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    // =========================================================================
+    // NEWS & CATEGORIES
+    // =========================================================================
+
+    match /news/{newsId} {
+      allow read: if resource.data.status == "PUBLISHED" || isViewer();
+
+      allow create: if isEditor()
+        && request.resource.data.status in ['DRAFT', 'PUBLISHED', 'ARCHIVED']
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isEditor()
+        && request.resource.data.status in ['DRAFT', 'PUBLISHED', 'ARCHIVED']
+        && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt);
+
+      allow delete: if isEditor();
+    }
+
+    match /newsCategories/{categoryId} {
+      allow read: if resource.data.status == "ACTIVE" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    // =========================================================================
+    // FAQS & CATEGORIES
+    // =========================================================================
+
+    match /faqs/{faqId} {
+      allow read: if resource.data.status == "PUBLISHED" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    match /faqCategories/{categoryId} {
+      allow read: if resource.data.status == "ACTIVE" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    // =========================================================================
+    // MACHINERY & CERTIFICATIONS
+    // =========================================================================
+
+    match /machinery/{machineryId} {
+      allow read: if resource.data.status == "PUBLISHED" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    match /certifications/{certificationId} {
+      allow read: if resource.data.status == "PUBLISHED" || isViewer();
+      allow create, update, delete: if isEditor();
+    }
+
+    // =========================================================================
+    // CONTACTS (B2B Leads & Mẫu thử)
+    // Cực kỳ quan trọng: Public CHỈ CREATE, cấm tuyệt đối READ/UPDATE/DELETE
+    // =========================================================================
+
+    match /contacts/{contactId} {
+      // 1. Create: Public hoặc Authenticated đều được tạo form liên hệ
+      allow create: if
+        // Chỉ chấp nhận các field hợp lệ trong Whitelist
+        request.resource.data.keys().hasOnly([
+          'name', 'company', 'phone', 'email', 'subject', 'message',
+          'businessType', 'productInterest', 'requestSample',
+          'status', 'createdAt', 'updatedAt', 'notes', 'source'
+        ])
+        // Bắt buộc phải có các trường thiết yếu
+        && request.resource.data.keys().hasAll(['name', 'phone', 'status', 'createdAt'])
+        // Khách public KHÔNG được tự gán trạng thái khác ngoài "NEW"
+        && request.resource.data.status == "NEW"
+        // Timestamp phải chuẩn xác từ server
+        && request.resource.data.createdAt == request.time
+        // Kiểm tra kiểu dữ liệu cơ bản
+        && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 120
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() <= 20
+        // Chặn hoàn toàn mọi field leo thang quyền hoặc injection
+        && !('role' in request.resource.data)
+        && !('isAdmin' in request.resource.data)
+        && !('uid' in request.resource.data)
+        && !('verified' in request.resource.data)
+        && !('approvedBy' in request.resource.data);
+
+      // 2. Read: CHỈ Dashboard Users (isViewer trở lên) mới được đọc contact
+      // Public TUYỆT ĐỐI KHÔNG ĐƯỢC ĐỌC
+      allow read: if isViewer();
+
+      // 3. Update:
+      // - ADMIN & SUPER_ADMIN: toàn quyền cập nhật
+      // - EDITOR: được cập nhật status xử lý (ví dụ: CONTACTED, PROCESSING) và ghi chú notes, nhưng KHÔNG được đổi createdAt
+      allow update: if isAdmin()
+        || (
+          isEditor()
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.status in ['NEW', 'IN_PROGRESS', 'CONTACTED', 'COMPLETED', 'CANCELLED']
+        );
+
+      // 4. Delete: CHỈ ADMIN và SUPER_ADMIN mới được xóa contact. EDITOR và VIEWER KHÔNG được xóa.
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================================
+    // SITE CONTENT (HOMEPAGE, ABOUT, SETTINGS)
+    // =========================================================================
+
+    match /siteContent/homepage {
+      // Public đọc được
+      allow read: if true;
+      // Chỉ ADMIN và SUPER_ADMIN được sửa. EDITOR KHÔNG được sửa.
+      allow create, update: if isAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /siteContent/about {
+      // Public đọc được
+      allow read: if true;
+      // Chỉ ADMIN và SUPER_ADMIN được sửa. EDITOR KHÔNG được sửa.
+      allow create, update: if isAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /siteContent/settings {
+      // Public chỉ đọc cấu hình website công khai (hotline, social links...)
+      // TUYỆT ĐỐI KHÔNG LƯU API secret, private key trong Firestore!
+      allow read: if true;
+      // Chỉ ADMIN và SUPER_ADMIN được sửa. EDITOR KHÔNG được sửa.
+      allow create, update: if isAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // ACTIVITY LOGS (Tùy chọn)
+    // =========================================================================
+
+    match /activityLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isEditor();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // DEFAULT DENY FOR UNKNOWN COLLECTIONS
+    // =========================================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

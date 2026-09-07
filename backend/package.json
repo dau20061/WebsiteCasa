@@ -1,0 +1,22 @@
+{
+  "name": "casa-tea-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API Server, Database Services, and Schema Configuration for CASA TEA",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch-path=src src/server.js",
+    "test": "node tests/security-rules-validation.test.js",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "deploy:firestore": "firebase deploy --only firestore:rules",
+    "deploy:storage": "firebase deploy --only storage"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.4.0"
+  }
+}

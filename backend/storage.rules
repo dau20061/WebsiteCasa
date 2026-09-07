@@ -1,0 +1,107 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // =========================================================================
+    // HELPER FUNCTIONS
+    // =========================================================================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isActive() {
+      return signedIn() && getUserData().status == "ACTIVE";
+    }
+
+    function isSuperAdmin() {
+      return isActive() && getUserData().role == "SUPER_ADMIN";
+    }
+
+    function isAdmin() {
+      return isActive() && (
+        getUserData().role == "SUPER_ADMIN" ||
+        getUserData().role == "ADMIN"
+      );
+    }
+
+    function isEditor() {
+      return isActive() && (
+        getUserData().role == "SUPER_ADMIN" ||
+        getUserData().role == "ADMIN" ||
+        getUserData().role == "EDITOR"
+      );
+    }
+
+    // Kiểm tra định dạng ảnh hợp lệ (chỉ cho phép JPEG, PNG, WebP)
+    function isValidImage() {
+      return request.resource.contentType.matches('image/jpeg') ||
+             request.resource.contentType.matches('image/png') ||
+             request.resource.contentType.matches('image/webp');
+    }
+
+    // Giới hạn kích thước file ảnh tối đa 5MB
+    function isValidSize() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // =========================================================================
+    // CONTENT ASSETS: /products, /news, /machinery, /certifications
+    // =========================================================================
+
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if isEditor() && isValidImage() && isValidSize();
+    }
+
+    match /news/{fileName} {
+      allow read: if true;
+      allow write: if isEditor() && isValidImage() && isValidSize();
+    }
+
+    match /machinery/{fileName} {
+      allow read: if true;
+      allow write: if isEditor() && isValidImage() && isValidSize();
+    }
+
+    match /certifications/{fileName} {
+      allow read: if true;
+      allow write: if isEditor() && isValidImage() && isValidSize();
+    }
+
+    // =========================================================================
+    // SITE ASSETS: /site (Logo, Hero Banners, Global assets)
+    // EDITOR KHÔNG được upload vào /site. Chỉ ADMIN & SUPER_ADMIN.
+    // =========================================================================
+
+    match /site/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidImage() && isValidSize();
+    }
+
+    // =========================================================================
+    // USER AVATARS: /users/{uid}/{fileName}
+    // Chỉ chính chủ uid hoặc SUPER_ADMIN mới được upload
+    // =========================================================================
+
+    match /users/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if (
+        (signedIn() && request.auth.uid == uid) ||
+        isSuperAdmin()
+      ) && isValidImage() && isValidSize();
+    }
+
+    // =========================================================================
+    // DEFAULT DENY ALL OTHER PATHS
+    // =========================================================================
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

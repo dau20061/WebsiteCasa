@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    @apply bg-tea-cream text-gray-800 dark:bg-[#0B130E] dark:text-gray-100 antialiased overflow-x-hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Form control text visibility safeguard */
+  input, textarea, select {
+    color: #111827;
+  }
+  .dark input:not(.bg-white),
+  .dark textarea:not(.bg-white),
+  .dark select:not(.bg-white) {
+    color: #f3f4f6;
+  }
+  .bg-white input,
+  .bg-white textarea,
+  .bg-white select {
+    color: #111827 !important;
+  }
+}
+
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar-track {
+  background: #0B130E;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #1F3827;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #2F593E;
+}
+
+@layer utilities {
+  .bg-glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .bg-glass-dark {
+    background: rgba(14, 34, 24, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .bg-tea-gradient {
+    background: linear-gradient(135deg, #DFF5E1 0%, #BFE8D0 50%, #FFFFFF 100%);
+  }
+
+  .bg-tea-hero {
+    background: radial-gradient(circle at 80% 20%, rgba(223, 245, 225, 0.6) 0%, rgba(250, 249, 245, 1) 65%);
+  }
+
+  .text-gradient-tea {
+    background: linear-gradient(135deg, #183B2B 0%, #2F7A59 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .dark .text-gradient-tea {
+    background: linear-gradient(135deg, #69C496 0%, #A8E6CF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-mint {
+    background: linear-gradient(135deg, #2F7A59 0%, #69C496 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF9F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #BFE8D0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #489D73;
+}
+
+/* Floating Contact Pulse Waves */
+@keyframes sonar-wave {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+.animate-sonar {
+  animation: sonar-wave 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
