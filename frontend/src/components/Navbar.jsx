@@ -49,7 +49,6 @@ export default function Navbar({ onOpenSampleModal }) {
             : 'bg-white/90 dark:bg-[#0B130E]/90 backdrop-blur-md py-4 border-b border-tea-border/50 dark:border-white/10'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 xl:gap-4">
           {/* Logo Brand */}
           <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none">
@@ -72,14 +71,12 @@ export default function Navbar({ onOpenSampleModal }) {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-2">
           <nav className="hidden xl:flex items-center gap-0.5 2xl:gap-1.5 shrink-0">
             {NAV_LINKS.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `px-2.5 2xl:px-3.5 py-2 rounded-xl text-xs 2xl:text-sm font-semibold transition-all duration-200 relative whitespace-nowrap ${
                   `px-2.5 2xl:px-3 py-1.5 rounded-xl text-[13px] 2xl:text-sm font-semibold transition-all duration-200 relative whitespace-nowrap ${
                     isActive
                       ? 'text-tea-primary dark:text-tea-mint bg-tea-soft/60 dark:bg-tea-green/20'
@@ -115,11 +112,9 @@ export default function Navbar({ onOpenSampleModal }) {
             {/* Quick Hotline (Desktop only >= 1600px) */}
             <a
               href={`tel:${COMPANY_INFO.hotline.replace(/\s/g, '')}`}
-              className="hidden 2xl:flex items-center gap-1.5 text-xs font-bold text-tea-primary dark:text-tea-mint hover:text-tea-green px-2 py-2 transition-colors whitespace-nowrap"
               title={`Hotline tư vấn: ${COMPANY_INFO.hotline}`}
               className="hidden min-[1600px]:flex items-center gap-1.5 h-9 px-2.5 rounded-xl text-xs font-bold text-tea-primary dark:text-tea-mint hover:text-tea-green border border-tea-border/60 dark:border-white/10 bg-white/80 dark:bg-[#132018]/90 shadow-sm transition-all whitespace-nowrap"
             >
-              <PhoneCall className="w-3.5 h-3.5 text-tea-leaf" />
               <PhoneCall className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint shrink-0" />
               <span>{COMPANY_INFO.hotline}</span>
             </a>
@@ -128,10 +123,8 @@ export default function Navbar({ onOpenSampleModal }) {
             {onOpenSampleModal && (
               <button
                 onClick={() => onOpenSampleModal()}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 2xl:px-3.5 py-2 rounded-xl bg-tea-soft dark:bg-tea-green/25 hover:bg-tea-mint/30 text-tea-primary dark:text-tea-mint text-xs font-bold transition-all border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md whitespace-nowrap"
                 className="hidden sm:inline-flex items-center justify-center gap-1.5 h-9 px-3 2xl:px-3.5 rounded-xl bg-tea-soft dark:bg-tea-green/25 hover:bg-tea-mint/30 text-tea-primary dark:text-tea-mint text-xs font-bold transition-all border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md whitespace-nowrap"
               >
-                <Sparkles className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" />
                 <Sparkles className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint shrink-0" />
                 <span>{t('nav_sample_btn', 'Nhận Mẫu Thử')}</span>
               </button>
@@ -140,7 +133,6 @@ export default function Navbar({ onOpenSampleModal }) {
             {/* CTA Button: Liên hệ ngay */}
             <Link
               to="/contact"
-              className="hidden sm:inline-flex items-center justify-center px-3.5 2xl:px-4 py-2 rounded-xl bg-tea-primary dark:bg-tea-green hover:bg-tea-emerald text-white text-xs font-bold shadow-tea-sm transition-all hover:shadow-tea-md hover:-translate-y-0.5 whitespace-nowrap"
               className="hidden sm:inline-flex items-center justify-center h-9 px-3.5 2xl:px-4 rounded-xl bg-tea-primary dark:bg-tea-green hover:bg-tea-emerald text-white text-xs font-bold shadow-tea-sm transition-all hover:shadow-tea-md hover:-translate-y-0.5 whitespace-nowrap"
             >
               {t('nav_contact_btn', 'Liên hệ ngay')}
@@ -150,10 +142,8 @@ export default function Navbar({ onOpenSampleModal }) {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Mở menu"
-              className="xl:hidden p-2.5 rounded-xl bg-tea-mist dark:bg-[#132018] text-tea-dark dark:text-gray-200 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-transparent dark:border-white/10 transition-colors"
               className="xl:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-tea-mist dark:bg-[#132018] text-tea-dark dark:text-gray-200 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-transparent dark:border-white/10 transition-colors"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
