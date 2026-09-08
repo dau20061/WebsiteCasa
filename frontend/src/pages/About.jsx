@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -13,17 +13,163 @@ import {
   CheckCircle2,
   ArrowRight,
   MapPin,
-  Calendar
+  Calendar,
+  Globe,
+  Building2,
+  Factory,
+  Cpu,
+  Boxes,
+  Package,
+  Coffee,
+  FlaskConical,
+  ExternalLink
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import SEO from '../components/SEO';
 import { TIMELINE, TEA_REGIONS, CORE_VALUES, COMPANY_INFO } from '../constants/company';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
+import contactInfographicImg from '../img/contact.jpg';
+
+const SERVICES_8 = [
+  {
+    icon: Cpu,
+    titleVi: 'Máy Pha Trà Viên Nang Thông Minh',
+    titleZh: '智能膠囊茶機',
+    en: 'Smart Tea Capsule Machine',
+    descVi: 'Hệ thống thiết bị pha chế tự động bằng viên nén thông minh, chuẩn hóa nhiệt độ và thời gian chiết xuất chính xác tại quầy bar.',
+    descZh: '專業智能吧台萃茶設備，精準控制水溫、壓力與萃茶秒數，完美還原鮮泡原葉精華。',
+  },
+  {
+    icon: Boxes,
+    titleVi: 'Gia Công Trà Viên Nang (Capsule OEM)',
+    titleZh: '茶膠囊代工 / 品牌合作',
+    en: 'Tea Capsule OEM / Brand Partnerships',
+    descVi: 'Sản xuất viên nén trà mộc và thảo mộc theo thương hiệu riêng, công nghệ đóng gói kín khí giữ trọn hương vị tươi mới dài lâu.',
+    descZh: '提供茶葉專利膠囊配方調配、充氮保鮮與品牌客製化膠囊代工生產一條龍服務。',
+  },
+  {
+    icon: Package,
+    titleVi: 'Gia Công & Đóng Gói Thương Hiệu (OEM)',
+    titleZh: '品牌代工包裝',
+    en: 'Brand OEM Packaging',
+    descVi: 'Giải pháp gia công bao bì trọn gói: túi zipper, hộp quà tặng, lon thiếc cao cấp và đóng gói công nghiệp xuất khẩu.',
+    descZh: '涵蓋真空包裝、食品級夾鏈立袋、精美禮品鐵罐等各式包裝型態，全方位賦能品牌價值。',
+  },
+  {
+    icon: Award,
+    titleVi: 'Trà Túi Lọc Khách Sạn & Resort (Amenities)',
+    titleZh: '飯店備品茶包',
+    en: 'Hotel Tea Bag Amenities',
+    descVi: 'Chuyên cung cấp dòng trà túi lọc vuông và túi tam giác pyramid cao cấp cho hệ thống khách sạn 4-5 sao, nhà hàng và resort.',
+    descZh: '專為五星級飯店、連鎖餐飲及航空商務艙客製單包裝原葉茶包與迎賓禮賓茶點。',
+  },
+  {
+    icon: Factory,
+    titleVi: 'Sản Xuất & Nghiền Bột Pha Chế',
+    titleZh: '粉類產品代工製造',
+    en: 'Powder Product Manufacturing',
+    descVi: 'Dây chuyền phối trộn và xay nghiền bột siêu mịn: bột trà xanh matcha, bột frappe, bột sữa thực vật, bột béo và bột cacao.',
+    descZh: '引進低溫超微粉體研磨與全自動均質混拌產線，研發抹茶粉、特調調味粉與植脂末。',
+  },
+  {
+    icon: Coffee,
+    titleVi: 'Gia Công & Đóng Gói Cà Phê (Coffee OEM)',
+    titleZh: '咖啡產品代工製造',
+    en: 'Coffee OEM Manufacturing',
+    descVi: 'Xử lý rang xay mộc hạt Robusta, Arabica cao nguyên, sản xuất cà phê túi lọc drip bag và cà phê hòa tan chuẩn vị.',
+    descZh: '專業莊園級咖啡豆烘焙、研磨及濾掛式掛耳咖啡包、即溶咖啡三合一配方代工生產。',
+  },
+  {
+    icon: FlaskConical,
+    titleVi: 'Phát Triển Hương Vị & Nguyên Liệu Trà',
+    titleZh: '茶飲原料供應 / 風味開發',
+    en: 'Tea Ingredient Supply / Flavor Development',
+    descVi: 'R&D công thức độc quyền cho các chuỗi đồ uống, tối ưu hóa độ đậm cốt trà TDS > 2.8% và cập nhật xu hướng F&B hiện đại.',
+    descZh: '針對大型手搖飲品牌提供專屬茶湯配方研發、風味疊加調校與標準化吧台 SOP。',
+  },
+  {
+    icon: Globe,
+    titleVi: 'Xuất Khẩu Quốc Tế & Kiểm Nghiệm Thực Phẩm',
+    titleZh: '國際出口業務 / 食安檢驗',
+    en: 'International Export Business & Inspection',
+    descVi: 'Dịch vụ xuất khẩu thương mại trọn gói, cung cấp COA, kiểm định SGS không dư lượng thuốc BVTV, chuẩn ISO 22000 & HACCP.',
+    descZh: '具備完備跨國進出口資質，通過 SGS 嚴格無農殘多重檢驗，提供產地證明與報關文件。',
+  },
+];
+
+const PRODUCTION_BASES = [
+  {
+    id: 'taiwan',
+    countryVi: 'Đài Loan',
+    countryZh: '台灣 (Taiwan)',
+    count: '11 Cơ Sở',
+    flag: '🇹🇼',
+    descVi: 'Cái nôi công nghệ trà tự động hóa, viện công nghệ sinh học và trung tâm điều hành tập đoàn.',
+    descZh: '全自動化製茶科技搖籃、生物科技研發中心與企業全球營運總部。',
+    bases: [
+      { id: 1, nameVi: 'Trung tâm điều hành doanh nghiệp Long Đàm', nameZh: '龍潭營運中心', en: 'Longtan Corporate Headquarters' },
+      { id: 2, nameVi: 'Nhà máy chế biến trà tự động hóa Long Đàm', nameZh: '桔揚自動化製茶廠', en: 'Longtan Automated Tea Factory' },
+      { id: 3, nameVi: 'Nhà máy đóng gói trà Đại Khê', nameZh: '桔揚大溪包裝廠', en: 'Daxi Tea Packing Factory' },
+      { id: 4, nameVi: 'Hợp tác xã sản xuất trà thành phố Đào Viên', nameZh: '桃園市茶葉生產合作社', en: 'Taoyuan Tea Industry Cooperative Society' },
+      { id: 5, nameVi: 'Bảo tàng văn hóa trà Khách Gia Đài Loan', nameZh: '臺灣客家茶文化館', en: 'Taoyuan Hakka Tea Culture Museum' },
+      { id: 6, nameVi: 'Nông trang thảo mộc Tú Viên Long Đàm', nameZh: '龍潭秀園農場', en: 'Longtan Show Yuan Herb Farm' },
+      { id: 7, nameVi: 'Trung tâm hoạch định & trải nghiệm ẩm thực Vĩnh Ninh', nameZh: '永寧餐飲策畫體驗中心', en: 'Catering Planning and Experience Center' },
+      { id: 8, nameVi: 'Nhà máy nguyên liệu thực phẩm Melisun Thổ Thành', nameZh: '土城美力香食品廠', en: 'Tucheng Melisun Food Raw Material Factory' },
+      { id: 9, nameVi: 'Nhà máy công nghệ sinh học Vĩnh Ninh', nameZh: '永寧生技廠', en: 'Young Ning Bio-Tech Factory' },
+      { id: 10, nameVi: 'Công ty TNHH Nông nghiệp GEELY Nam Đầu', nameZh: '南投大吉農業', en: 'Nantou GEELY TEA Co., Ltd.' },
+      { id: 11, nameVi: 'Nhà máy chế biến trà Cao Đỉnh Nam Đầu', nameZh: '南投高頂廠', en: 'Nantou Gao Ding Tea Factory' },
+    ],
+  },
+  {
+    id: 'vietnam',
+    countryVi: 'Việt Nam',
+    countryZh: '越南 (Vietnam)',
+    count: '5 Cơ Sở',
+    flag: '🇻🇳',
+    descVi: 'Mạng lưới nhà máy và nông trường phủ khắp miền Bắc, miền Nam cung ứng sỉ hỏa tốc cho chuỗi F&B toàn quốc.',
+    descZh: '布局北越與南越之現代化工廠與高山農場，為全國手搖飲通路提供即時批發配送。',
+    bases: [
+      { id: 13, nameVi: 'Nhà máy Casa Hà Nội', nameZh: '越南河內廠', en: 'Vietnam Ha Noi Casa LLC.' },
+      { id: 14, nameVi: 'Nhà máy Casa Hưng Yên', nameZh: '越南興安廠', en: 'Vietnam Hung Yen Casa LLC.' },
+      { id: 15, nameVi: 'Nông trường thảo mộc Tú Viên Đồng Nai', nameZh: '越南同奈秀園農場', en: 'Vietnam Dong Nai Tu Vien Herb Farm' },
+      { id: 16, nameVi: 'Nhà máy Casa KCN Sóng Thần 1 (Bình Dương / TP.HCM)', nameZh: '越南平陽廠', en: 'Vietnam HCMC Song Than 1 Industrial Park Casa LLC.' },
+      { id: 17, nameVi: 'Nhà máy thực phẩm Melisun KCN Lợi Bình Nhơn (Long An)', nameZh: '越南隆安食品廠', en: 'Vietnam Tay Ninh Loi Binh Nhon Industrial Park Melisun Co., LTD.' },
+    ],
+  },
+  {
+    id: 'china',
+    countryVi: 'Trung Quốc',
+    countryZh: '中國 (China)',
+    count: '4 Cơ Sở',
+    flag: '🇨🇳',
+    descVi: 'Hệ thống nhà máy chế biến chuyên sâu tại các tỉnh trọng điểm trồng chè và trung tâm thương mại Thượng Hải.',
+    descZh: '深耕各茶葉核心原產地省份，並於上海設立對外貿易與跨國採購調配樞紐。',
+    bases: [
+      { id: 12, nameVi: 'Nhà máy trà huyện Hoành, Quảng Tây', nameZh: '廣西橫縣茶廠', en: 'China Guangxi Heng County Factory' },
+      { id: 18, nameVi: 'Công ty TNHH Thực phẩm Quảng Đức Thành Tứ Xuyên', nameZh: '四川廣德成食品有限公司', en: 'Sichuan Province Guang De Cheng Co., Ltd' },
+      { id: 19, nameVi: 'Nhà máy chế biến thực phẩm Giang Tây', nameZh: '江西食品廠', en: 'Jiangxi Province Jiangxi Factory' },
+      { id: 20, nameVi: 'Công ty Thương mại Vĩnh Trấn Thượng Hải', nameZh: '上海永鎮貿易公司', en: 'Shanghai Everjen Co., Ltd' },
+    ],
+  },
+  {
+    id: 'japan',
+    countryVi: 'Nhật Bản',
+    countryZh: '日本 (Japan)',
+    count: '1 Cơ Sở',
+    flag: '🇯🇵',
+    descVi: 'Trụ sở công nghệ tại Shizuoka – trung tâm hợp tác công nghệ bột matcha và trà xanh danh tiếng.',
+    descZh: '坐落於日本綠茶重鎮靜岡，專注於頂級抹茶加工工藝與日式原茶研發合作。',
+    bases: [
+      { id: 21, nameVi: 'Công ty Good Young Shizuoka Nhật Bản', nameZh: '日本靜岡桔揚公司', en: 'Good Young Japan (Shizuoka)' },
+    ],
+  },
+];
 
 export default function About() {
-  const { openSampleModal } = useAppUI();
+  const { openSampleModal, openLightbox } = useAppUI();
   const { t, isChinese } = useLanguage();
+  const [selectedRegion, setSelectedRegion] = useState('all');
 
   return (
     <div className="overflow-hidden pb-20">
@@ -132,6 +278,261 @@ export default function About() {
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* 2.5 QUY MÔ TOÀN CẦU & HỆ SINH THÁI DỊCH VỤ TOÀN DIỆN (INFOGRAPHIC & ARTICLE) */}
+      <section className="py-24 bg-gradient-to-b from-[#FAF9F5] via-[#EBF8EE]/40 to-white dark:from-[#0B130E] dark:via-[#102317]/50 dark:to-[#0B130E] border-t border-tea-border/60 dark:border-white/10 transition-colors relative overflow-hidden">
+        {/* Background glow auras */}
+        <div className="absolute top-20 right-10 w-[600px] h-[600px] bg-tea-mint/10 dark:bg-tea-mint/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-tea-leaf/10 dark:bg-tea-leaf/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <SectionHeading
+            badge={isChinese ? '全球布局與製造能量' : 'Năng Lực Sản Xuất & Quy Mô Quốc Tế'}
+            title={isChinese ? '21 大跨國生產基地與一站式全方位服務' : 'Hệ Thống 21 Cơ Sở Toàn Cầu & Giải Pháp F&B Trọn Gói'}
+            subtitle={isChinese ? '整合智慧茶飲機研發、自動化深加工產線、草本農場及生物科技，為全球餐飲品牌提供全產業鏈後盾。' : 'Tích hợp R&D máy pha trà thông minh, dây chuyền chế biến tự động hóa, nông trường thảo mộc và mạng lưới nhà máy chuẩn quốc tế.'}
+          />
+
+          {/* MAIN ARTICLE & INFOGRAPHIC SHOWCASE */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center mb-16">
+            {/* Left Column: Corporate Editorial Article */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-[#132018] text-tea-primary dark:text-tea-mint border border-tea-leaf/30 dark:border-tea-mint/30 text-xs font-bold uppercase tracking-wider shadow-sm">
+                <Globe className="w-4 h-4 text-tea-leaf" />
+                <span>{isChinese ? '全產業鏈跨國閉環體系' : 'Chuỗi Giá Trị Khép Kín Đa Quốc Gia'}</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-snug">
+                {isChinese
+                  ? '立足源頭，鏈接全球：為連鎖品牌打造堅固的供應鏈護城河'
+                  : 'Từ Vùng Trồng Đến Ly Đồ Uống: Nền Tảng Cung Ứng Bền Vững Cho Chuỗi F&B'}
+              </h3>
+
+              <div className="space-y-4 text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
+                <p>
+                  {isChinese
+                    ? 'CASA 不僅僅是一家原料供應商，更是跨越台灣、越南、中國及日本的綜合性茶飲原料深加工與智慧設備製造集團。我們在全球擁有 21 座現代化生產基地、草本農場與生物科技體驗中心，構建起從品種選育、半有機友善耕作、自動化製茶、微粉研磨到跨國合規出口的全產業鏈閉環。'
+                    : 'CASA không đơn thuần là đơn vị cung ứng nguyên liệu rời, mà là tập đoàn sản xuất và giải pháp F&B tích hợp đa quốc gia. Với hệ thống 21 cơ sở sản xuất, nông trường thảo mộc và viện công nghệ sinh học trải rộng khắp Đài Loan, Việt Nam, Trung Quốc và Nhật Bản, chúng tôi kiểm soát 100% chuỗi cung ứng từ chọn giống, canh tác sạch, chế biến sâu đến kho vận và xuất khẩu.'}
+                </p>
+
+                <p>
+                  {isChinese
+                    ? '憑藉強大的 OEM / ODM 代工能量，我們提供一站式全方位解決方案：從客製化品牌包裝設計、原料拼配、智能膠囊茶機研發、茶膠囊充氮封裝、飯店專用立體茶包，到粉體微粉研磨、咖啡烘焙代工與 SGS 國際食安檢驗，一應俱全。這讓各大連鎖茶飲與餐飲集團能夠以最具競爭力的成本，擁有品質終年如一的特色專屬原料。'
+                    : 'Chúng tôi cung cấp giải pháp toàn diện, trọn gói bao gồm: gia công và đóng gói thương hiệu (OEM), tùy chỉnh nguyên liệu trà mộc và trà túi lọc, máy pha trà viên nang thông minh (Smart Tea Capsule Machine), sản xuất gia công trà viên nang, dây chuyền phối trộn và xay nghiền bột pha chế, nhà máy gia công đóng gói cà phê, trà túi lọc amenities cho hệ thống khách sạn và hỗ trợ kiểm nghiệm an toàn thực phẩm xuất khẩu.'}
+                </p>
+              </div>
+
+              {/* 4 Key Stat Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
+                  <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">21</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                    {isChinese ? '跨國生產基地' : 'Cơ Sở Sản Xuất'}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
+                  <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">04</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                    {isChinese ? '國家與地區' : 'Quốc Gia & Vùng'}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
+                  <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">08</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                    {isChinese ? '核心服務項目' : 'Dịch Vụ Trọn Gói'}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
+                  <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">100%</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                    {isChinese ? '國際食安檢驗' : 'Kiểm Định An Toàn'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Infographic Image Showcase */}
+            <div className="lg:col-span-6">
+              <div className="relative mx-auto">
+                {/* Backlight Aura */}
+                <div className="absolute -inset-4 bg-gradient-to-tr from-tea-mint/30 via-tea-leaf/25 to-amber-500/20 rounded-[2.5rem] blur-2xl opacity-75 pointer-events-none" />
+
+                {/* Glass Card Housing */}
+                <div
+                  onClick={() => openLightbox({ title: isChinese ? 'CASA 全球 21 大生產基地與服務項目全圖' : 'Hệ Thống 21 Cơ Sở Sản Xuất & Dịch Vụ Toàn Cầu CASA', image: contactInfographicImg })}
+                  className="relative p-2.5 sm:p-3.5 rounded-[2rem] sm:rounded-[2.5rem] bg-white/85 dark:bg-white/10 border-2 border-white/80 dark:border-white/20 shadow-2xl backdrop-blur-xl group cursor-pointer transition-all duration-500 hover:shadow-tea-glow"
+                  title={isChinese ? "點擊全螢幕放大檢視" : "Bấm để xem ảnh phóng to toàn màn hình"}
+                >
+                  <div className="relative rounded-[1.6rem] sm:rounded-[2rem] overflow-hidden bg-[#0A1A12] shadow-inner">
+                    <img
+                      src={contactInfographicImg}
+                      alt={isChinese ? "CASA 21 Production Bases & Service" : "CASA 21 Cơ Sở Sản Xuất & Dịch Vụ Toàn Cầu"}
+                      className="w-full h-auto object-cover transform scale-100 group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+                    />
+
+                    {/* Shimmer light sweep */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
+
+                    {/* Hover expand button */}
+                    <div className="absolute bottom-3 right-3 z-10 px-3.5 py-1.5 rounded-xl bg-black/65 hover:bg-black/85 backdrop-blur-md text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all shadow-lg border border-white/20">
+                      <ExternalLink className="w-3.5 h-3.5 text-tea-mint" />
+                      <span>{isChinese ? '放大檢視全圖' : 'Bấm xem ảnh lớn'}</span>
+                    </div>
+
+                    {/* Corner Badge */}
+                    <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 text-xs font-bold shadow-md">
+                      <span className="flex h-2 w-2 rounded-full bg-tea-mint animate-ping" />
+                      <span>{isChinese ? '21 大全球生產基地' : '21 Cơ Sở Toàn Cầu'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 font-medium">
+                  {isChinese ? '▲ 點擊圖片可全螢幕高清縮放檢視 21 大工廠與服務地圖' : '▲ Nhấp vào hình để phóng to xem chi tiết bản đồ và 21 nhà máy'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 8 CORE SERVICES BREAKDOWN */}
+          <div className="mb-20">
+            <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-tea-soft dark:bg-[#132018] text-tea-primary dark:text-tea-mint text-xs font-bold uppercase tracking-wider">
+                {isChinese ? '全方位服務項目' : 'Dịch Vụ & Năng Lực Cung Ứng'}
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-tea-dark dark:text-white tracking-tight">
+                {isChinese ? '一站式 OEM / ODM 全方位解決方案' : '8 Giải Pháp Dịch Vụ Sản Xuất & Chế Biến Toàn Diện'}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                {isChinese
+                  ? '從品牌代工、茶飲研發到跨國檢驗，為您的飲品品牌提供無縫銜接的一條龍支持。'
+                  : 'Đáp ứng mọi yêu cầu khắt khe từ đóng gói thương hiệu riêng, máy pha trà thông minh đến xuất khẩu quốc tế.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {SERVICES_8.map((srv, idx) => {
+                const IconComponent = srv.icon;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    className="p-6 rounded-3xl bg-white dark:bg-[#132018] border border-tea-border/80 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 flex flex-col justify-between group"
+                  >
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                        <IconComponent className="w-6 h-6" />
+                      </div>
+                      <span className="text-[11px] font-mono font-bold text-tea-leaf dark:text-tea-mint block uppercase tracking-wider mb-1">
+                        {srv.en}
+                      </span>
+                      <h4 className="text-base sm:text-lg font-bold text-tea-dark dark:text-white mb-2 leading-snug">
+                        {isChinese ? srv.titleZh : srv.titleVi}
+                      </h4>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        {isChinese ? srv.descZh : srv.descVi}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 21 GLOBAL PRODUCTION BASES DIRECTORY */}
+          <div className="rounded-4xl p-6 sm:p-10 bg-white/90 dark:bg-[#132018]/90 border border-tea-border dark:border-white/10 shadow-tea-md backdrop-blur-md">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-tea-border/60 dark:border-white/10">
+              <div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-tea-leaf dark:text-tea-mint">
+                  <Building2 className="w-4 h-4" />
+                  {isChinese ? '全球布局明細' : 'Danh Sách Cơ Sở Toàn Cầu'}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-tea-dark dark:text-white mt-1">
+                  {isChinese ? '21 大生產研發與運營基地' : 'Chi Tiết 21 Cơ Sở Sản Xuất & Nông Trường'}
+                </h3>
+              </div>
+
+              {/* Region Selector Tabs */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedRegion('all')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedRegion === 'all'
+                      ? 'bg-tea-primary text-white shadow-tea-sm'
+                      : 'bg-tea-mist dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-tea-soft'
+                  }`}
+                >
+                  {isChinese ? '全部 (21)' : 'Tất cả (21)'}
+                </button>
+                {PRODUCTION_BASES.map((reg) => (
+                  <button
+                    key={reg.id}
+                    onClick={() => setSelectedRegion(reg.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      selectedRegion === reg.id
+                        ? 'bg-tea-primary text-white shadow-tea-sm'
+                        : 'bg-tea-mist dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-tea-soft'
+                    }`}
+                  >
+                    <span>{reg.flag}</span>
+                    <span>{isChinese ? reg.countryZh : reg.countryVi}</span>
+                    <span className="text-[10px] opacity-75">({reg.bases.length})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bases Grid per Country */}
+            <div className="pt-8 space-y-8">
+              {PRODUCTION_BASES.filter(
+                (reg) => selectedRegion === 'all' || selectedRegion === reg.id
+              ).map((reg) => (
+                <div key={reg.id} className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{reg.flag}</span>
+                    <div>
+                      <h4 className="text-lg font-extrabold text-tea-dark dark:text-white flex items-center gap-2">
+                        <span>{isChinese ? reg.countryZh : reg.countryVi}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-tea-soft dark:bg-[#1C2F23] text-tea-primary dark:text-tea-mint text-xs font-bold">
+                          {reg.count}
+                        </span>
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {isChinese ? reg.descZh : reg.descVi}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                    {reg.bases.map((base) => (
+                      <div
+                        key={base.id}
+                        className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0E1711] border border-tea-border/70 dark:border-white/5 hover:border-tea-leaf/40 transition-all flex items-start gap-3.5 group"
+                      >
+                        <div className="w-8 h-8 rounded-xl bg-tea-primary text-white dark:bg-tea-mint dark:text-tea-dark font-black text-xs flex items-center justify-center shrink-0 shadow-sm">
+                          {base.id}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h5 className="text-sm font-bold text-tea-dark dark:text-white group-hover:text-tea-primary dark:group-hover:text-tea-mint transition-colors truncate">
+                            {isChinese ? base.nameZh : base.nameVi}
+                          </h5>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                            {base.en}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

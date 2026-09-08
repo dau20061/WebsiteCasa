@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   Droplets,
   ExternalLink,
+  ChevronLeft,
   ChevronRight,
   TrendingUp,
   FlaskConical,
@@ -29,11 +30,91 @@ import { PRODUCTION_STEPS } from '../constants/categories';
 import { STATS, CORE_VALUES, PARTNERS_FEEDBACK, COMPANY_INFO } from '../constants/company';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
+import heroBannerImg from '../img/imgmain.jpg';
+import heroCapsuleImg from '../img/capsule.jpg';
+import heroMatchaImg from '../img/matcha.jpg';
+import heroToppingImg from '../img/topping.jpg';
+
+const HERO_SLIDES = [
+  {
+    id: 'tea-bags',
+    image: heroBannerImg,
+    badgeVi: 'CASA TEA & TEA BAGS • PREMIUM QUALITY',
+    badgeZh: 'CASA TEA & TEA BAGS • 頂級原茶系列',
+    titleVi: 'Cốt Trà Nguyên Lá & Túi Lọc Pyramid Tam Giác',
+    titleZh: '原葉茶湯與三角立體茶包工藝',
+    tagVi: '100% Nguyên Liệu Tự Nhiên',
+    tagZh: '100% 精選茶葉原料',
+  },
+  {
+    id: 'matcha',
+    image: heroMatchaImg,
+    badgeVi: 'PREMIUM MATCHA & POWDER • NGUYÊN LIỆU BỘT CHUYÊN DỤNG',
+    badgeZh: '頂級抹茶與專業調飲粉料系列',
+    titleVi: 'Bột Trà Xanh Matcha & Bột Pha Chế Chuẩn Vị',
+    titleZh: '日式極致抹茶與專業飲品專用粉',
+    tagVi: 'Matcha Tuyển Chọn',
+    tagZh: '頂級抹茶原料',
+  },
+  {
+    id: 'topping',
+    image: heroToppingImg,
+    badgeVi: 'SIGNATURE TOPPING • BỘ SƯU TẬP TOPPING CAO CẤP',
+    badgeZh: '獨家風味配料與晶球寒天系列',
+    titleVi: 'Bộ Sưu Tập Topping & Thạch Dẻo Đa Tầng Cảm Xúc',
+    titleZh: '嚴選手搖飲特色配料與豐富口感',
+    tagVi: 'Topping Chuẩn Chuỗi',
+    tagZh: '連鎖專用配料',
+  },
+  {
+    id: 'capsule',
+    image: heroCapsuleImg,
+    badgeVi: 'INNOVATIVE CAPSULE TEA • CÔNG NGHỆ CHIẾT XUẤT MỚI',
+    badgeZh: '創新膠囊萃茶與現代提取科技',
+    titleVi: 'Viên Nén Trà Capsule – Chiết Xuất Nhanh Chuẩn Vị',
+    titleZh: '新型茶膠囊系列 – 極速精準萃取',
+    tagVi: 'Công Nghệ Tiên Tiến',
+    tagZh: '尖端萃取科技',
+  },
+];
 
 export default function Home() {
-  const { openSampleModal, openLightbox } = useAppUI();
+  const { openSampleModal } = useAppUI();
   const { t, isChinese } = useLanguage();
   const [activeStep, setActiveStep] = useState(0);
+
+  // Auto-sliding Hero Carousel State (4 flagship images)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  };
+
+  const goToSlide = (idx) => {
+    setCurrentSlide(idx);
+  };
+
+  // Preload all 4 banner images in browser memory to eliminate image decoding lag
+  useEffect(() => {
+    HERO_SLIDES.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
+
+  // Auto-slide effect (changes image every 3.8 seconds with instant 0ms trigger)
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [isAutoPlay, currentSlide]);
 
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('casa_admin_products');
@@ -70,189 +151,305 @@ export default function Home() {
       />
 
       {/* 1. HERO SECTION */}
-      <section className="relative min-h-[92vh] flex items-center pt-24 pb-16 lg:pt-32 lg:pb-24 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E]">
+      <section className="relative min-h-[92vh] flex items-center pt-24 pb-20 lg:pt-32 lg:pb-28 bg-gradient-to-b from-[#EBF8EE]/80 via-[#DCF3E4]/30 to-[#FAF9F5] dark:from-[#0D1D13] dark:via-[#09140D] dark:to-[#070D09]">
         {/* Subtle Ambient Background Gradients */}
-        <div className="absolute top-10 right-10 w-[500px] h-[500px] bg-tea-mint/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-tea-mint/15 dark:bg-tea-mint/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-36 right-10 w-[450px] h-[450px] bg-tea-leaf/10 dark:bg-tea-leaf/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 left-10 w-[450px] h-[450px] bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
-            {/* Left Column: Copywriting & CTAs */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-              {/* Pill Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-slate-900/80 border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm backdrop-blur-md"
-              >
-                <span className="flex h-2 w-2 rounded-full bg-tea-leaf animate-ping" />
-                <span className="text-xs font-bold text-tea-primary dark:text-tea-mint tracking-wide uppercase">
-                  {t('hero_pill', 'Giải Pháp Trà Nguyên Liệu B2B Hàng Đầu')}
-                </span>
-              </motion.div>
+          {/* Top Intro Section: Centered Headings & CTAs */}
+          <div className="text-center max-w-4xl mx-auto space-y-6 sm:space-y-7">
+            {/* Pill Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full bg-white/85 dark:bg-slate-900/85 border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm backdrop-blur-md"
+            >
+              <span className="flex h-2.5 w-2.5 rounded-full bg-tea-leaf animate-ping" />
+              <span className="text-xs sm:text-sm font-bold text-tea-primary dark:text-tea-mint tracking-wider uppercase">
+                {isChinese ? 'CASA 專業商用茶葉原料與茶包供應商' : t('hero_pill', 'Giải Pháp Trà Nguyên Liệu & Túi Lọc B2B Hàng Đầu')}
+              </span>
+            </motion.div>
 
-              {/* Main Heading */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-[1.15]"
-              >
-                {isChinese ? (
-                  <>
-                    茶之精華 –{' '}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
-                      成就頂級飲品的基石
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Tinh Hoa Trà –{' '}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
-                      Nền Tảng Cho Những Ly Đồ Uống
-                    </span>{' '}
-                    Tuyệt Hảo
-                  </>
-                )}
-              </motion.h1>
+            {/* Main Heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-[1.14]"
+            >
+              {isChinese ? (
+                <>
+                  茶之精華 –{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
+                    成就頂級飲品的基石
+                  </span>
+                </>
+              ) : (
+                <>
+                  Tinh Hoa Trà CASA –{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
+                    Nền Tảng Cho Những Ly Đồ Uống
+                  </span>{' '}
+                  Tuyệt Hảo
+                </>
+              )}
+            </motion.h1>
 
-              {/* Subheading */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-2xl font-normal"
-              >
-                {t('hero_desc', 'Cung cấp trà nguyên liệu và giải pháp nguyên liệu pha chế chuyên nghiệp cho trà sữa, trà trái cây và đồ uống hiện đại. Đạt chuẩn chất lượng ISO 22000, HACCP và xuất khẩu quốc tế.')}
-              </motion.p>
+            {/* Subheading */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto font-normal"
+            >
+              {isChinese
+                ? '專注研發高品質商用原葉茶、三角立體茶包與專業拼配方案。國際標準 ISO 22000、HACCP 認證，助力手搖飲與餐飲連鎖打造爆款特色飲品。'
+                : t('hero_desc', 'Cung cấp trà nguyên liệu tuyển chọn, trà túi lọc tam giác pyramid cao cấp và giải pháp R&D pha chế chuyên sâu. Tiêu chuẩn ISO 22000, HACCP – Đồng hành cùng hơn 2.000+ chuỗi F&B toàn quốc.')}
+            </motion.p>
 
-              {/* CTA Group */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-wrap items-center gap-3.5 sm:gap-4 pt-2"
+            {/* CTA Group */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 pt-2"
+            >
+              <Link
+                to="/products"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-tea-primary to-tea-green hover:from-tea-emerald hover:to-tea-primary text-white text-sm sm:text-base font-bold shadow-tea-md hover:shadow-tea-lg transition-all hover:-translate-y-0.5 group"
               >
-                <Link
-                  to="/products"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl bg-tea-primary dark:bg-tea-green hover:bg-tea-emerald text-white text-sm font-bold shadow-tea-md hover:shadow-tea-lg transition-all hover:-translate-y-0.5 group"
-                >
-                  <span>{isChinese ? '探索精選產品' : 'Khám phá sản phẩm'}</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                </Link>
+                <span>{isChinese ? '探索精選產品' : 'Khám phá sản phẩm'}</span>
+                <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
+              </Link>
 
+              <button
+                onClick={() => openSampleModal()}
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-white/90 dark:bg-[#132018]/90 hover:bg-tea-soft/60 dark:hover:bg-[#1C2F23] text-tea-primary dark:text-tea-mint text-sm sm:text-base font-bold border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-0.5 backdrop-blur-md"
+              >
+                <Sparkles className="w-5 h-5 text-tea-leaf dark:text-tea-mint animate-pulse" />
+                <span>{isChinese ? '免費索取茶樣套件' : 'Đăng ký nhận mẫu thử'}</span>
+              </button>
+
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center px-7 py-4 rounded-2xl text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint hover:bg-black/5 dark:hover:bg-white/5 text-sm sm:text-base font-bold transition-all"
+              >
+                {isChinese ? '即刻聯絡諮詢' : 'Liên hệ tư vấn B2B'}
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Panoramic Flagship Banner Showcase (Auto-sliding Carousel) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.35, ease: 'easeOut' }}
+            className="relative w-full max-w-6xl xl:max-w-7xl mx-auto mt-10 sm:mt-14"
+            onMouseEnter={() => setIsAutoPlay(false)}
+            onMouseLeave={() => setIsAutoPlay(true)}
+          >
+            {/* Ambient Backlight Glow Aura */}
+            <div className="absolute -inset-4 sm:-inset-8 bg-gradient-to-r from-tea-mint/35 via-tea-leaf/30 to-amber-500/25 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+            {/* Master Glass Frame */}
+            <div
+              className="relative p-2.5 sm:p-4 rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-b from-white/90 via-white/50 to-white/20 dark:from-white/15 dark:via-white/5 dark:to-white/5 border-2 border-white/80 dark:border-white/20 shadow-[0_30px_90px_-20px_rgba(15,46,26,0.35)] dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] backdrop-blur-2xl group transition-all duration-700 hover:shadow-tea-glow select-none"
+            >
+              {/* Inner High-Definition Image Holder */}
+              <div className="relative rounded-[1.6rem] sm:rounded-[2.4rem] overflow-hidden aspect-[16/10.3] bg-[#0E2218] shadow-inner">
+                {/* Stacked Pre-rendered Slides for Instant 0ms Latency Crossfade */}
+                {HERO_SLIDES.map((slide, idx) => {
+                  const isActive = idx === currentSlide;
+                  return (
+                    <div
+                      key={slide.id}
+                      className={`absolute inset-0 w-full h-full transition-opacity duration-300 ease-out will-change-[opacity] ${
+                        isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                      }`}
+                    >
+                      <img
+                        src={slide.image}
+                        alt={isChinese ? slide.titleZh : slide.titleVi}
+                        loading="eager"
+                        decoding="sync"
+                        className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Shimmer Light Sweep on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10" />
+
+                {/* Subtle Cinematic Vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none z-10" />
+
+                {/* Live Top Tag */}
+                <div className="absolute top-3.5 left-3.5 sm:top-5 sm:left-5 z-20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm font-bold shadow-xl">
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-tea-mint animate-ping" />
+                  <span>
+                    {isChinese ? HERO_SLIDES[currentSlide].badgeZh : HERO_SLIDES[currentSlide].badgeVi}
+                  </span>
+                </div>
+
+                {/* Live Corner Tag */}
+                <div className="hidden sm:flex absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white items-center gap-2 text-xs font-bold shadow-lg">
+                  <span className="text-amber-400">★</span>
+                  <span>{isChinese ? HERO_SLIDES[currentSlide].tagZh : HERO_SLIDES[currentSlide].tagVi}</span>
+                </div>
+
+                {/* Navigation Arrow: Previous */}
                 <button
-                  onClick={() => openSampleModal()}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white dark:bg-[#132018] hover:bg-tea-soft/60 dark:hover:bg-[#1C2F23] text-tea-primary dark:text-tea-mint text-sm font-bold border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-0.5"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevSlide();
+                  }}
+                  aria-label="Previous image"
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-2xl opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
                 >
-                  <Sparkles className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                  <span>{isChinese ? '免費索取茶樣套件' : 'Đăng ký nhận mẫu thử'}</span>
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
 
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center px-6 py-4 rounded-2xl text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint hover:bg-black/5 dark:hover:bg-white/5 text-sm font-bold transition-all"
+                {/* Navigation Arrow: Next */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                  }}
+                  aria-label="Next image"
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-2xl opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
                 >
-                  {isChinese ? '即刻聯絡諮詢' : 'Liên hệ với chúng tôi'}
-                </Link>
-              </motion.div>
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
 
-              {/* Trust badges footer in hero */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.7, delay: 0.4 }}
-                className="pt-6 border-t border-tea-border/80 dark:border-white/10 flex flex-wrap items-center gap-6 text-xs text-gray-600 dark:text-gray-400 font-medium"
-              >
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-tea-leaf" />
-                  <span>{isChinese ? 'ISO 22000 & HACCP 國際標準' : 'Tiêu chuẩn ISO 22000 & HACCP'}</span>
+                {/* Bottom Center Dots & Slide Indicators */}
+                <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/55 backdrop-blur-md border border-white/20 shadow-xl">
+                  {HERO_SLIDES.map((slide, idx) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToSlide(idx);
+                      }}
+                      className={`transition-all duration-300 rounded-full ${
+                        idx === currentSlide
+                          ? 'w-7 sm:w-9 h-2.5 bg-tea-mint shadow-[0_0_12px_rgba(105,196,150,0.8)]'
+                          : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/80'
+                      }`}
+                      title={isChinese ? slide.titleZh : slide.titleVi}
+                    />
+                  ))}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Droplets className="w-4 h-4 text-tea-leaf" />
-                  <span>{isChinese ? 'TDS 高濃度穩定萃取' : 'Chiết xuất TDS đậm đặc & ổn định'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-tea-leaf" />
-                  <span>{isChinese ? '全系列原物料批發直送' : 'Giao hàng sỉ toàn quốc'}</span>
-                </div>
-              </motion.div>
-            </div>
 
-            {/* Right Column: Hero Visual Composite with Floating Cards */}
-            <div className="lg:col-span-5 relative">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-                className="relative mx-auto max-w-md lg:max-w-none"
-              >
-                {/* Main Hero Visual Card */}
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5] bg-tea-mist">
-                  <img
-                    src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1200&q=80"
-                    alt={isChinese ? "CASA 頂級商用茶品原料" : "Trà nguyên liệu CASA cao cấp"}
-                    className="w-full h-full object-cover"
+                {/* Bottom Left Slide Counter */}
+                <div className="hidden sm:flex absolute bottom-5 left-5 z-20 px-3 py-1.5 rounded-xl bg-black/55 backdrop-blur-md border border-white/15 text-white/90 text-xs font-mono font-bold items-center gap-1.5 shadow-lg">
+                  <span className="text-tea-mint font-extrabold">0{currentSlide + 1}</span>
+                  <span className="text-white/40">/</span>
+                  <span className="text-white/60">0{HERO_SLIDES.length}</span>
+                </div>
+
+
+                {/* Auto-Slide Progress Bar along bottom edge */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20 overflow-hidden">
+                  <motion.div
+                    key={`${currentSlide}-${isAutoPlay}`}
+                    initial={{ width: '0%' }}
+                    animate={{ width: isAutoPlay ? '100%' : '0%' }}
+                    transition={{ duration: 3.8, ease: 'linear' }}
+                    className="h-full bg-gradient-to-r from-tea-leaf via-tea-mint to-tea-green"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-tea-dark/70 via-transparent to-transparent" />
-
-                  {/* Caption overlay */}
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                    <span className="px-3 py-1 rounded-full bg-tea-mint/90 text-tea-dark text-xs font-bold uppercase tracking-wider inline-block mb-2">
-                      {isChinese ? '嚴選高山產區' : 'Vùng Trồng Chọn Lọc'}
-                    </span>
-                    <h3 className="text-xl font-bold leading-tight">
-                      {isChinese ? '海拔 1,100m 半有機茶園鮮嫩原葉' : 'Búp Trà Xanh Bán Hữu Cơ Cao Nguyên 1.100m'}
-                    </h3>
-                    <p className="text-xs text-white/80 mt-1">
-                      {isChinese ? '密閉循環熱風烘焙 完整鎖住精華香氣' : 'Sao sấy tầng sôi khép kín lưu giữ trọn vẹn hương vị tinh túy'}
-                    </p>
-                  </div>
                 </div>
-
-                {/* Floating Card 1: Sensory TDS Note */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="absolute -top-6 -left-6 sm:-left-8 bg-white/95 dark:bg-[#132018]/95 backdrop-blur-md p-4 rounded-2xl shadow-tea-lg border border-tea-border dark:border-white/10 flex items-center gap-3.5 z-20 max-w-[240px] animate-float-slow"
-                >
-                  <div className="w-11 h-11 rounded-xl bg-tea-soft dark:bg-tea-green/30 flex items-center justify-center text-tea-emerald dark:text-tea-mint shrink-0">
-                    <FlaskConical className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 block">
-                      {isChinese ? '茶湯濃郁醇厚度' : 'Độ Đậm Cốt Trà'}
-                    </span>
-                    <span className="text-sm font-extrabold text-tea-dark dark:text-white">
-                      {isChinese ? 'TDS > 2.8% 連鎖標準' : 'TDS > 2.8% Chuẩn Chuỗi'}
-                    </span>
-                  </div>
-                </motion.div>
-
-                {/* Floating Card 2: 100% Consistent Flavor */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="absolute -bottom-6 -right-4 sm:-right-8 bg-white/95 dark:bg-[#132018]/95 backdrop-blur-md p-4 rounded-2xl shadow-tea-lg border border-tea-border dark:border-white/10 flex items-center gap-3.5 z-20 max-w-[260px] animate-float-delayed"
-                >
-                  <div className="w-11 h-11 rounded-xl bg-tea-mint/30 dark:bg-tea-green/30 flex items-center justify-center text-tea-dark dark:text-tea-mint shrink-0">
-                    <Sliders className="w-6 h-6 text-tea-emerald dark:text-tea-mint" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 block">
-                      {isChinese ? '四季風味穩定性' : 'Độ Ổn Định Hương Vị'}
-                    </span>
-                    <span className="text-sm font-extrabold text-tea-dark dark:text-white">
-                      {isChinese ? '1,000 批次始終如一' : '1.000 Lô Như Một Quanh Năm'}
-                    </span>
-                  </div>
-                </motion.div>
-              </motion.div>
+              </div>
             </div>
+          </motion.div>
+
+          {/* Docked 4-Column Luxury Feature Bar (Below the Banner, Clean & Symmetrical) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-10 max-w-6xl xl:max-w-7xl mx-auto">
+            {/* Card 1: 3 Dòng Cốt Trà */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
+            >
+              <div className="w-12 h-12 rounded-xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-3.5 shadow-sm">
+                <Leaf className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+                {isChinese ? '三大經典原茶基底' : '3 Dòng Cốt Trà Chuẩn Vị'}
+              </h4>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {isChinese
+                  ? '綠茶 (Green) • 紅茶 (Black) • 烏龍茶 (Oolong) 香氣濃郁飽滿，完美支撐各式手搖特調。'
+                  : 'Trà Xanh (Green) • Trà Đen (Black) • Trà Ô Long (Oolong) đậm đà, chuẩn gu người tiêu dùng hiện đại.'}
+              </p>
+            </motion.div>
+
+            {/* Card 2: Túi Lọc Pyramid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
+            >
+              <div className="w-12 h-12 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-300 mb-3.5 shadow-sm">
+                <Award className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+                {isChinese ? '三角立體茶包工藝' : 'Túi Lọc Tam Giác Pyramid'}
+              </h4>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {isChinese
+                  ? '食品級玉米纖維 PLA 環保網布，不吸附茶香，讓原葉在立體空間中完全舒展釋放。'
+                  : 'Màng lưới bắp sinh học tự phân hủy, không gian bung tỏa tối đa cho búp trà nguyên bản.'}
+              </p>
+            </motion.div>
+
+            {/* Card 3: Chiết xuất TDS > 2.8% */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
+            >
+              <div className="w-12 h-12 rounded-xl bg-tea-mint/30 dark:bg-tea-mint/20 flex items-center justify-center text-tea-emerald dark:text-tea-mint mb-3.5 shadow-sm">
+                <FlaskConical className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+                {isChinese ? '高濃度萃取 TDS > 2.8%' : 'Chiết Xuất TDS > 2.8%'}
+              </h4>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {isChinese
+                  ? '茶湯醇厚回甘，加奶加冰不易淡味，1,000 批次風味始終穩定如一。'
+                  : 'Cốt trà sánh đậm đặc biệt, không nhạt vị khi kết hợp đá hoặc sữa, 1.000 lô đồng nhất quanh năm.'}
+              </p>
+            </motion.div>
+
+            {/* Card 4: Chứng nhận ISO & HACCP */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
+            >
+              <div className="w-12 h-12 rounded-xl bg-blue-100/80 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-300 mb-3.5 shadow-sm">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+                {isChinese ? 'ISO 22000 & HACCP' : 'Chứng Nhận Quốc Tế'}
+              </h4>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {isChinese
+                  ? '嚴格遵循國際食安管理體系，SGS 多項無農殘檢驗，提供合規合法的批發證明文件。'
+                  : 'Đạt chuẩn ISO 22000, HACCP, kiểm nghiệm khắt khe không dư lượng BVTV, an toàn tuyệt đối.'}
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
