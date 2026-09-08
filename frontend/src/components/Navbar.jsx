@@ -108,7 +108,6 @@ export default function Navbar({ onOpenSampleModal }) {
             {/* Theme Toggle (Desktop & Tablet) */}
             <ThemeToggle variant="dropdown" />
 
-            {/* Quick Hotline (Desktop only, 2xl) */}
             {/* Quick Hotline (Desktop only >= 1600px) */}
             <a
               href={`tel:${COMPANY_INFO.hotline.replace(/\s/g, '')}`}
@@ -125,6 +124,7 @@ export default function Navbar({ onOpenSampleModal }) {
                 onClick={() => onOpenSampleModal()}
                 className="hidden sm:inline-flex items-center justify-center gap-1.5 h-9 px-3 2xl:px-3.5 rounded-xl bg-tea-soft dark:bg-tea-green/25 hover:bg-tea-mint/30 text-tea-primary dark:text-tea-mint text-xs font-bold transition-all border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md whitespace-nowrap"
               >
+                <Sparkles className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" />
                 <Sparkles className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint shrink-0" />
                 <span>{t('nav_sample_btn', 'Nhận Mẫu Thử')}</span>
               </button>
