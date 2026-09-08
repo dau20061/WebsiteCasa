@@ -77,7 +77,7 @@ export async function deleteRtdbCategory(categoryId) {
 export async function getRtdbProducts() {
   try {
     const data = await productApi.getAll();
-    if (data && Array.isArray(data) && data.length > 0) {
+    if (data && Array.isArray(data)) {
       try {
         localStorage.setItem('casa_admin_products', JSON.stringify(data));
       } catch (_) {}
@@ -95,7 +95,20 @@ export async function saveRtdbProduct(product) {
   try {
     const isNew = !product.id || String(product.id).startsWith('product_');
     const result = isNew ? await productApi.create(product) : await productApi.update(product.id, product);
-    return result.id || product.id;
+    const savedId = result.id || product.id;
+    try {
+      const saved = localStorage.getItem('casa_admin_products');
+      let list = saved ? JSON.parse(saved) : [];
+      const itemToSave = { ...product, id: savedId };
+      const idx = list.findIndex((p) => String(p.id) === String(savedId));
+      if (idx >= 0) {
+        list[idx] = itemToSave;
+      } else {
+        list.unshift(itemToSave);
+      }
+      localStorage.setItem('casa_admin_products', JSON.stringify(list));
+    } catch (_) {}
+    return savedId;
   } catch (err) {
     console.warn('[Frontend Service] saveRtdbProduct error:', err.message);
     return product.id;
@@ -104,7 +117,15 @@ export async function saveRtdbProduct(product) {
 
 export async function deleteRtdbProduct(productId) {
   try {
-    return await productApi.delete(productId);
+    const res = await productApi.delete(productId);
+    try {
+      const saved = localStorage.getItem('casa_admin_products');
+      if (saved) {
+        const list = JSON.parse(saved).filter((p) => String(p.id) !== String(productId));
+        localStorage.setItem('casa_admin_products', JSON.stringify(list));
+      }
+    } catch (_) {}
+    return res;
   } catch (err) {
     console.warn('[Frontend Service] deleteRtdbProduct error:', err.message);
     return { success: false, error: err.message };

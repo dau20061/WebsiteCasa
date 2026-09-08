@@ -283,7 +283,7 @@ export default function AdminDashboard() {
       if (res && res.length > 0) setCategories(res);
     });
     getRtdbProducts().then((res) => {
-      if (res && res.length > 0) setProducts(res);
+      if (Array.isArray(res)) setProducts(res);
     });
     getRtdbNews().then((res) => {
       if (res && res.length > 0) setNews(res);
@@ -1784,8 +1784,27 @@ export default function AdminDashboard() {
               </table>
 
               {filteredProducts.length === 0 && (
-                <div className="text-center py-12 text-gray-400 text-xs">
-                  Không tìm thấy sản phẩm nào khớp với bộ lọc.
+                <div className="text-center py-14 px-4 bg-gray-50/60 rounded-2xl border border-dashed border-gray-200 my-4 space-y-3">
+                  <Package className="w-10 h-10 text-gray-300 mx-auto" />
+                  <p className="text-sm font-semibold text-gray-700">
+                    {products.length === 0
+                      ? 'Chưa có sản phẩm nào trong cơ sở dữ liệu.'
+                      : 'Không tìm thấy sản phẩm nào khớp với bộ lọc.'}
+                  </p>
+                  <p className="text-xs text-gray-400 max-w-md mx-auto">
+                    {products.length === 0
+                      ? 'Tất cả sản phẩm mẫu đã được xóa sạch. Bạn hãy bấm "+ Thêm Sản Phẩm Mới" ở góc phải phía trên để bắt đầu thêm sản phẩm của riêng mình.'
+                      : 'Vui lòng thử tìm với từ khóa khác hoặc chuyển sang danh mục khác.'}
+                  </p>
+                  {products.length === 0 && (
+                    <button
+                      onClick={() => handleOpenProductModal()}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-all shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Thêm Sản Phẩm Mới Đầu Tiên</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>

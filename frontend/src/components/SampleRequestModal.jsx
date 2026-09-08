@@ -19,7 +19,7 @@ export default function SampleRequestModal({ isOpen, onClose, defaultProduct = n
 
   useEffect(() => {
     getRtdbProducts().then((res) => {
-      if (res && res.length > 0) setProductList(res);
+      if (Array.isArray(res)) setProductList(res);
     });
   }, []);
 

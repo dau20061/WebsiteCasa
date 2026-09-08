@@ -42,7 +42,7 @@ export default function ProductDetail() {
   useEffect(() => {
     getRtdbProducts()
       .then((res) => {
-        if (res && res.length > 0) {
+        if (Array.isArray(res)) {
           setAllProducts(res);
         }
       })

@@ -129,7 +129,7 @@ export default function Home() {
 
   useEffect(() => {
     getRtdbProducts().then((res) => {
-      if (res && res.length > 0) setProducts(res);
+      if (Array.isArray(res)) setProducts(res);
     });
     getRtdbNews().then((res) => {
       if (res && res.length > 0) setNews(res);
