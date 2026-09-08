@@ -49,3 +49,8 @@ export async function translateFaqToTraditionalChinese(faq = {}) {
 export async function translateMachineryToTraditionalChinese(machinery = {}) {
   return await aiApi.translateMachineryZh(machinery);
 }
+
+export async function translateCategoryToTraditionalChinese(category = {}) {
+  return await aiApi.translateCategoryZh(category);
+}
+

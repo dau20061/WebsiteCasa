@@ -31,9 +31,74 @@ async function restRtdb(path, method = 'GET', data = null) {
   return null;
 }
 
+// Initial categories seed
+const INITIAL_CATEGORIES = [
+  {
+    id: 'tra-den',
+    name: 'Trà Đen (Black Tea)',
+    nameZh: '阿薩姆與特選紅茶',
+    slug: 'tra-den',
+    order: 1,
+    desc: 'Các dòng trà đen đậm đà chuyên dụng cho pha chế trà sữa truyền thống, hồng trà kem cheese',
+    descZh: '專業濃郁紅茶系列，適用於傳統奶茶、芝士奶蓋紅茶',
+    active: true
+  },
+  {
+    id: 'tra-oolong',
+    name: 'Trà Ô Long (Oolong)',
+    nameZh: '高山炭焙烏龍茶',
+    slug: 'tra-oolong',
+    order: 2,
+    desc: 'Trà Ô Long rang mộc hương thơm khói sâu lắng, hậu vị ngọt kéo dài',
+    descZh: '碳焙烏龍茶，沉穩炭焙香氣，喉韻回甘綿長',
+    active: true
+  },
+  {
+    id: 'tra-lai-xanh',
+    name: 'Trà Lài & Trà Xanh',
+    nameZh: '茉莉窨花與特級綠茶',
+    slug: 'tra-lai-xanh',
+    order: 3,
+    desc: 'Hương hoa lài thanh khiết ướp tự nhiên, nền trà xanh tươi mát cho trà sữa lài và trà trái cây',
+    descZh: '天然鮮花窨製茉莉花茶，清爽綠茶茶底',
+    active: true
+  },
+  {
+    id: 'tra-rang',
+    name: 'Trà Rang & Hojicha',
+    nameZh: '日式焙茶與煎茶',
+    slug: 'tra-rang',
+    order: 4,
+    desc: 'Công nghệ sao rang nhiệt sâu chuẩn phong cách Nhật Bản, ít chát, hương thơm ấm áp',
+    descZh: '日式深層烘焙工藝，低單寧酸，溫潤焦香',
+    active: true
+  },
+  {
+    id: 'tra-trai-cay',
+    name: 'Nền Trà Trái Cây',
+    nameZh: '清爽果茶專用茶底',
+    slug: 'tra-trai-cay',
+    order: 5,
+    desc: 'Nền cốt trà sáng trong, tôn vinh trọn vẹn hương vị của đào, dâu, xoài, mãng cầu và chanh leo',
+    descZh: '透亮清澈茶湯，完美襯托蜜桃、草莓、百香果等鮮果風味',
+    active: true
+  },
+  {
+    id: 'bot-pha-che',
+    name: 'Bột Pha Chế & Topping',
+    nameZh: '特級植脂末與配料',
+    slug: 'bot-pha-che',
+    order: 6,
+    desc: 'Bột béo thực vật không sữa Non-dairy Creamer, bột matcha, thạch và topping F&B cao cấp',
+    descZh: '特級非乳脂奶精粉、宇治抹茶粉、晶球及高端調飲配料',
+    active: true
+  }
+];
+
 // In-memory runtime cache/fallback
 let memoryStore = {
   products: [...INITIAL_PRODUCTS],
+  categories: [...INITIAL_CATEGORIES],
   news: [...INITIAL_NEWS],
   faqs: [...INITIAL_FAQS],
   machinery: [...INITIAL_MACHINERY],
@@ -354,3 +419,71 @@ export async function deleteUser(uid) {
   }
   return { success: true, uid };
 }
+
+// ============================================================================
+// PRODUCT CATEGORIES (CRUD)
+// ============================================================================
+export async function getCategories() {
+  try {
+    const snap = await get(ref(rtdb, 'categories'));
+    if (snap.exists()) {
+      const val = snap.val();
+      const list = Object.keys(val).map((k) => ({ id: k, ...val[k] }));
+      if (list.length > 0) {
+        return list.sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99));
+      }
+    }
+  } catch (_) {}
+
+  const data = await restRtdb('categories');
+  if (data && Object.keys(data).length > 0) {
+    const list = Object.keys(data).map((k) => ({ id: k, ...data[k] }));
+    return list.sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99));
+  }
+
+  return [...memoryStore.categories].sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99));
+}
+
+export async function getCategoryById(id) {
+  const categories = await getCategories();
+  return categories.find((c) => String(c.id) === String(id) || String(c.slug) === String(id)) || null;
+}
+
+export async function saveCategory(category) {
+  const cleanId = category.id || category.slug || `cat_${Date.now()}`;
+  const record = {
+    ...category,
+    id: cleanId,
+    slug: category.slug || cleanId,
+    order: Number(category.order) || 1,
+    active: category.active !== false,
+    updatedAt: new Date().toISOString()
+  };
+
+  try {
+    await set(ref(rtdb, `categories/${cleanId}`), record);
+  } catch (_) {
+    await restRtdb(`categories/${cleanId}`, 'PUT', record);
+  }
+
+  const idx = memoryStore.categories.findIndex((c) => String(c.id) === String(cleanId));
+  if (idx >= 0) {
+    memoryStore.categories[idx] = record;
+  } else {
+    memoryStore.categories.push(record);
+  }
+
+  return record;
+}
+
+export async function deleteCategory(categoryId) {
+  try {
+    await remove(ref(rtdb, `categories/${categoryId}`));
+  } catch (_) {
+    await restRtdb(`categories/${categoryId}`, 'DELETE');
+  }
+
+  memoryStore.categories = memoryStore.categories.filter((c) => String(c.id) !== String(categoryId));
+  return { success: true, id: categoryId };
+}
+

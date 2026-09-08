@@ -1,3 +1,4 @@
+import WaveDivider from './WaveDivider';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
@@ -23,7 +24,16 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-tea-dark text-white border-t border-tea-emerald/30 relative overflow-hidden pt-16 pb-12">
+    <>
+      {/* Animated Wavy Transition into Footer (Global across all pages) */}
+      <WaveDivider
+        toColor="text-tea-dark dark:text-tea-dark"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        height="h-14 sm:h-20 md:h-24"
+        flipX={true}
+      />
+      <footer className="bg-tea-dark text-white relative overflow-hidden pt-12 pb-12">
       {/* Background ambient leaf glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-tea-emerald/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -233,6 +243,7 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }
 

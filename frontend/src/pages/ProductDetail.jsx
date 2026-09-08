@@ -10,7 +10,9 @@ import {
   Clock,
   Box,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  ShoppingBag,
+  MessageCircle
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
@@ -265,23 +267,48 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Actions: Request Free Sample & Download TDS */}
+            {/* Actions: Purchase / Contact & Request Free Sample */}
             <div className="pt-6 border-t border-gray-100 dark:border-white/10 space-y-3">
               <div className="flex flex-col sm:flex-row items-center gap-3">
-                <button
-                  onClick={() => openSampleModal(product)}
-                  className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-tea-primary hover:bg-tea-emerald text-white text-xs sm:text-sm font-bold shadow-tea-md transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5"
-                >
-                  <Sparkles className="w-4 h-4 text-tea-mint" />
-                  <span>{isChinese ? '免費索取 100g 體驗茶樣' : 'Đăng Ký Nhận Mẫu Thử 100g Miễn Phí'}</span>
-                </button>
+                {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
+                  <>
+                    <a
+                      href={product.shopeeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>{isChinese ? '前往蝦皮賣場購買 (Shopee)' : 'Mua Ngay Trên Shopee'}</span>
+                    </a>
 
-                <Link
-                  to="/contact"
-                  className="w-full sm:w-auto py-4 px-6 rounded-2xl bg-tea-mist dark:bg-[#0B130E] hover:bg-tea-soft dark:hover:bg-[#1B2E23] text-tea-primary dark:text-tea-mint border border-tea-border dark:border-white/10 text-xs sm:text-sm font-bold transition-all text-center"
-                >
-                  {isChinese ? '大宗批發採購報價' : 'Báo giá số lượng lớn'}
-                </Link>
+                    <Link
+                      to={`/contact?product=${encodeURIComponent(displayName)}`}
+                      className="w-full sm:w-auto py-4 px-6 rounded-2xl bg-tea-mist dark:bg-[#0B130E] hover:bg-tea-soft dark:hover:bg-[#1B2E23] text-tea-primary dark:text-tea-mint border border-tea-border dark:border-white/10 text-xs sm:text-sm font-bold transition-all text-center flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{isChinese ? '聯繫諮詢採購' : 'Liên Hệ Tư Vấn'}</span>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to={`/contact?product=${encodeURIComponent(displayName)}`}
+                      className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-tea-primary hover:bg-tea-emerald text-white text-xs sm:text-sm font-bold shadow-tea-md transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5"
+                    >
+                      <MessageCircle className="w-4 h-4 text-tea-mint" />
+                      <span>{isChinese ? '聯繫諮詢 / 索取大宗報價' : 'Liên Hệ Tư Vấn & Báo Giá Sỉ'}</span>
+                    </Link>
+
+                    <button
+                      onClick={() => openSampleModal(product)}
+                      className="w-full sm:w-auto py-4 px-6 rounded-2xl bg-tea-mist dark:bg-[#0B130E] hover:bg-tea-soft dark:hover:bg-[#1B2E23] text-tea-primary dark:text-tea-mint border border-tea-border dark:border-white/10 text-xs sm:text-sm font-bold transition-all text-center flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4 text-tea-mint" />
+                      <span>{isChinese ? '免費索取 100g 茶樣' : 'Đăng Ký Mẫu Thử 100g'}</span>
+                    </button>
+                  </>
+                )}
               </div>
 
               <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-1">

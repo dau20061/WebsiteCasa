@@ -118,3 +118,49 @@
   animation: sonar-wave 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+/* ==========================================================================
+   Animated Wavy Section Divider Animations (Continuous Rolling Waves)
+   ========================================================================== */
+@keyframes wave-roll-forward {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes wave-roll-reverse {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-wave-flow-1 {
+  animation: wave-roll-forward 14s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-flow-2 {
+  animation: wave-roll-reverse 9s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-flow-3 {
+  animation: wave-roll-forward 18s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-flow-1,
+  .animate-wave-flow-2,
+  .animate-wave-flow-3 {
+    animation: none !important;
+  }
+}
+
+
+

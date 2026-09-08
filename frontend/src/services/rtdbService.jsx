@@ -3,7 +3,73 @@
 // Tầng xử lý giao tiếp database tập trung qua Backend REST API Server (/api/...)
 // ============================================================================
 
-import { productApi, newsApi, faqApi, machineryApi, certificationApi, contactApi, userApi } from '../api/client';
+import { productApi, categoryApi, newsApi, faqApi, machineryApi, certificationApi, contactApi, userApi } from '../api/client';
+import { PRODUCT_CATEGORIES } from '../constants/categories';
+
+// ============================================================================
+// PRODUCT CATEGORIES (CRUD)
+// ============================================================================
+export async function getRtdbCategories() {
+  try {
+    const data = await categoryApi.getAll();
+    if (data && Array.isArray(data) && data.length > 0) {
+      try {
+        localStorage.setItem('casa_admin_categories', JSON.stringify(data));
+      } catch (_) {}
+      return data;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] getRtdbCategories via Backend API failed, using cached fallback:', err.message);
+  }
+
+  const saved = localStorage.getItem('casa_admin_categories');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch (_) {}
+  }
+
+  // Fallback default categories
+  const defaults = PRODUCT_CATEGORIES
+    .filter((c) => c.id !== 'all')
+    .map((c, idx) => ({
+      id: c.id,
+      slug: c.id,
+      name: c.name,
+      nameZh: c.nameZh || '',
+      order: idx + 1,
+      active: true,
+      desc: '',
+      descZh: '',
+    }));
+
+  try {
+    localStorage.setItem('casa_admin_categories', JSON.stringify(defaults));
+  } catch (_) {}
+
+  return defaults;
+}
+
+export async function saveRtdbCategory(category) {
+  try {
+    const isNew = !category.id || String(category.id).startsWith('cat_');
+    const result = isNew ? await categoryApi.create(category) : await categoryApi.update(category.id, category);
+    return result.id || category.id;
+  } catch (err) {
+    console.warn('[Frontend Service] saveRtdbCategory error:', err.message);
+    return category.id;
+  }
+}
+
+export async function deleteRtdbCategory(categoryId) {
+  try {
+    return await categoryApi.delete(categoryId);
+  } catch (err) {
+    console.warn('[Frontend Service] deleteRtdbCategory error:', err.message);
+    return { success: false, error: err.message };
+  }
+}
 
 // ============================================================================
 // PRODUCTS

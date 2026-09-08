@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Droplets, Flame, Wind } from 'lucide-react';
+import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductCard({ product, onRequestSample }) {
@@ -55,6 +55,29 @@ export default function ProductCard({ product, onRequestSample }) {
             {sku}
           </span>
         </div>
+
+        {/* Shopee Buy Button / Contact Button Pill on Image */}
+        {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
+          <a
+            href={product.shopeeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-[#EE4D2D] text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-orange-400" />
+            <span>{isChinese ? '在蝦皮購買' : 'Mua trên Shopee'}</span>
+          </a>
+        ) : (
+          <Link
+            to={`/contact?product=${encodeURIComponent(displayName)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-tea-primary text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
+          >
+            <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
+            <span>{isChinese ? '聯繫諮詢' : 'Liên hệ tư vấn'}</span>
+          </Link>
+        )}
       </div>
 
       {/* Content */}
@@ -101,19 +124,40 @@ export default function ProductCard({ product, onRequestSample }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center gap-2.5">
+        <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center gap-2">
+          {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
+            <a
+              href={product.shopeeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs font-bold transition-all shadow-sm"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>{isChinese ? '在蝦皮購買' : 'Mua trên Shopee'}</span>
+            </a>
+          ) : (
+            <Link
+              to={`/contact?product=${encodeURIComponent(displayName)}`}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-colors shadow-sm"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
+              <span>{isChinese ? '聯繫諮詢' : 'Liên hệ tư vấn'}</span>
+            </Link>
+          )}
+
           <Link
             to={`/products/${id}`}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-tea-mist dark:bg-[#1A2C21] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-tea-primary dark:text-tea-mint text-xs font-bold transition-colors"
+            className="px-3.5 py-2.5 rounded-xl bg-tea-mist dark:bg-[#1A2C21] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-tea-primary dark:text-tea-mint text-xs font-bold transition-colors whitespace-nowrap"
           >
             <span>{t('card_detail', 'Chi tiết')}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3 h-3 inline ml-1" />
           </Link>
 
-          {onRequestSample && (
+          {onRequestSample && product.purchaseAction !== 'shopee' && (
             <button
               onClick={() => onRequestSample(product)}
-              className="px-3 py-2.5 rounded-xl border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-primary dark:text-tea-mint hover:bg-tea-primary dark:hover:bg-tea-green hover:text-white text-xs font-bold transition-all whitespace-nowrap"
+              className="px-2.5 py-2.5 rounded-xl border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-primary dark:text-tea-mint hover:bg-tea-primary dark:hover:bg-tea-green hover:text-white text-xs font-bold transition-all whitespace-nowrap"
+              title={isChinese ? '索取樣品' : 'Mẫu thử'}
             >
               {t('card_sample', 'Mẫu thử')}
             </button>

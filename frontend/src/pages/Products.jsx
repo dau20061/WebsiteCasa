@@ -3,10 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Filter, Sparkles, SlidersHorizontal, Package, X } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import WaveDivider from '../components/WaveDivider';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { PRODUCT_CATEGORIES } from '../constants/categories';
-import { getRtdbProducts } from '../services/rtdbService';
+import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -21,10 +22,30 @@ export default function Products() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_categories');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (_) {}
+    }
+    return PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c, i) => ({
+      ...c,
+      order: i + 1,
+      active: true
+    }));
+  });
+
   useEffect(() => {
     getRtdbProducts().then((res) => {
       if (res && res.length > 0) {
         setProducts(res);
+      }
+    });
+    getRtdbCategories().then((res) => {
+      if (res && res.length > 0) {
+        setCategories(res);
       }
     });
   }, []);
@@ -89,7 +110,7 @@ export default function Products() {
       />
 
       {/* 1. HERO HEADER */}
-      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] border-b border-tea-border/60 dark:border-white/10 overflow-hidden transition-colors">
+      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] overflow-hidden transition-colors">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-5 right-10 w-[450px] h-[450px] bg-tea-mint/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-5 left-10 w-[350px] h-[350px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -107,8 +128,17 @@ export default function Products() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Hero -> Catalog Controls */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0B130E]"
+        toColor="text-white/95 dark:text-[#0B130E]/95"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 2. CATALOG CONTROLS (SEARCH & CATEGORIES & SORT) */}
-      <section className="py-6 bg-white/95 dark:bg-[#0B130E]/95 backdrop-blur-md border-b border-tea-border/60 dark:border-white/10 sticky top-16 z-30 shadow-tea-sm transition-colors">
+      <section className="py-6 bg-white/95 dark:bg-[#0B130E]/95 backdrop-blur-md sticky top-16 z-30 shadow-tea-sm transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             
@@ -152,23 +182,41 @@ export default function Products() {
 
           {/* Category Tabs */}
           <div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {PRODUCT_CATEGORIES.map((cat) => {
-              const catLabelKey = `cat_${cat.id.replace(/-/g, '_')}`;
-              const displayCatName = t(catLabelKey, cat.name);
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-tea-primary text-white shadow-tea-sm'
-                      : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
-                  }`}
-                >
-                  {displayCatName}
-                </button>
-              );
-            })}
+            {/* Tab Tất cả sản phẩm */}
+            <button
+              onClick={() => handleCategoryChange('all')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-tea-primary text-white shadow-tea-sm'
+                  : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
+              }`}
+            >
+              {isChinese ? '全部產品' : t('cat_all', 'Tất cả sản phẩm')}
+            </button>
+
+            {/* Các tab danh mục động (CRUD) */}
+            {categories
+              .filter((c) => c.active !== false && c.id !== 'all')
+              .sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99))
+              .map((cat) => {
+                const catLabelKey = `cat_${cat.id.replace(/-/g, '_')}`;
+                const displayCatName = isChinese
+                  ? (cat.nameZh || t(catLabelKey, cat.name))
+                  : (cat.name || t(catLabelKey, cat.name));
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                      selectedCategory === cat.id
+                        ? 'bg-tea-primary text-white shadow-tea-sm'
+                        : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
+                    }`}
+                  >
+                    {displayCatName}
+                  </button>
+                );
+              })}
           </div>
         </div>
       </section>

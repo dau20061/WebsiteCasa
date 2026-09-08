@@ -20,6 +20,7 @@ import {
   Factory
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import WaveDivider from '../components/WaveDivider';
 import ProductCard from '../components/ProductCard';
 import NewsCard from '../components/NewsCard';
 import CertificationCard from '../components/CertificationCard';
@@ -454,8 +455,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Hero -> Value Proposition */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#070D09]"
+        toColor="text-white dark:text-[#0C1710]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 2. SECTION GIỚI THIỆU NGẮN: "CHÚNG TÔI MANG ĐẾN ĐIỀU GÌ?" */}
-      <section className="py-20 bg-white dark:bg-[#0B130E] relative">
+      <section className="py-20 bg-white dark:bg-[#0C1710] relative transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge={isChinese ? 'B2B 核心價值' : 'Giá Trị Cốt Lõi B2B'}
@@ -500,8 +510,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Value Proposition -> Featured Products */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0C1710]"
+        toColor="text-[#FAF9F5] dark:text-[#08120B]"
+        accentColor="text-tea-leaf/25 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
       {/* 3. SECTION SẢN PHẨM NỔI BẬT */}
-      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] border-t border-tea-border/60 dark:border-white/10">
+      <section className="py-20 bg-[#FAF9F5] dark:bg-[#08120B] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div>
@@ -565,8 +584,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Products -> 5-Step Production Story */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#08120B]"
+        toColor="text-tea-dark dark:text-[#040A06]"
+        accentColor="text-tea-mint/35 dark:text-tea-mint/25"
+        secondaryAccent="text-tea-leaf/30 dark:text-tea-leaf/15"
+        flipX={false}
+      />
+
       {/* 4. SECTION MÁY MÓC & QUY TRÌNH: STORYTELLING 5 BƯỚC */}
-      <section className="py-24 bg-tea-dark text-white relative overflow-hidden">
+      <section className="py-24 bg-tea-dark dark:bg-[#040A06] text-white relative overflow-hidden transition-colors">
         {/* Background Gradients */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-tea-emerald/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -658,8 +686,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Production Story -> Certifications */}
+      <WaveDivider
+        fromBg="bg-tea-dark dark:bg-[#040A06]"
+        toColor="text-white dark:text-[#0B130E]"
+        accentColor="text-tea-leaf/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/25 dark:text-tea-leaf/15"
+        flipX={true}
+      />
+
       {/* 5. SECTION CHỨNG NHẬN: "CAM KẾT CHẤT LƯỢNG" */}
-      <section className="py-20 bg-white dark:bg-[#0B130E]">
+      <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge={isChinese ? '食品安全與衛生標準' : 'An Toàn Vệ Sinh Thực Phẩm'}
@@ -703,8 +740,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Certifications -> Stats Counter */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-tea-primary dark:text-[#183B2B]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/25 dark:text-tea-leaf/15"
+        flipX={false}
+      />
+
       {/* 6. STATS COUNTER SECTION */}
-      <section className="py-16 bg-gradient-to-r from-tea-primary via-tea-emerald to-tea-green text-white">
+      <section className="py-16 bg-gradient-to-r from-tea-primary via-tea-emerald to-tea-green text-white transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/15">
             {STATS.map((stat, idx) => (
@@ -728,8 +774,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Stats Counter -> Partners Feedback */}
+      <WaveDivider
+        fromBg="bg-tea-green dark:bg-[#2F7A59]"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
       {/* 7. SECTION ĐỐI TÁC & LỜI CHỨNG THỰC */}
-      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711]">
+      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge={isChinese ? '長期合作夥伴' : 'Đối Tác Đồng Hành'}
@@ -781,9 +836,20 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Partners Feedback -> Featured News */}
+      {displayHomeNews && displayHomeNews.length > 0 && (
+        <WaveDivider
+          fromBg="bg-[#FAF9F5] dark:bg-[#0E1711]"
+          toColor="text-white dark:text-[#0B130E]"
+          accentColor="text-tea-mint/25 dark:text-tea-mint/15"
+          secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+          flipX={false}
+        />
+      )}
+
       {/* 8. FEATURED NEWS & F&B INSIGHTS SECTION */}
       {displayHomeNews && displayHomeNews.length > 0 && (
-        <section className="py-20 bg-white dark:bg-[#0B130E] border-t border-tea-border/60 dark:border-white/10 transition-colors">
+        <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
               <div>
@@ -817,8 +883,17 @@ export default function Home() {
         </section>
       )}
 
+      {/* Animated Wavy Transition: Featured News -> Bottom CTA */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-leaf/25 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
       {/* 9. BOTTOM CTA SECTION */}
-      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] relative border-t border-tea-border/60 dark:border-white/10 transition-colors">
+      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] relative transition-colors">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="p-8 sm:p-14 rounded-4xl bg-gradient-to-br from-tea-primary via-tea-emerald to-tea-green text-white text-center shadow-tea-lg relative overflow-hidden">
             {/* Background elements */}

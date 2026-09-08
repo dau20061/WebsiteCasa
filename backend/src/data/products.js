@@ -27,6 +27,8 @@ export const PRODUCTS = [
     image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1000&q=80',
     featured: true,
     bestseller: true,
+    purchaseAction: 'shopee',
+    shopeeUrl: 'https://shopee.vn',
     tasteProfile: {
       bitterness: 85,
       aroma: 92,

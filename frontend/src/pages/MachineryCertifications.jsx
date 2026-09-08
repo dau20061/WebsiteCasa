@@ -15,6 +15,7 @@ import {
   Gauge
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import WaveDivider from '../components/WaveDivider';
 import MachineryCard from '../components/MachineryCard';
 import CertificationCard from '../components/CertificationCard';
 import SEO from '../components/SEO';
@@ -61,7 +62,7 @@ export default function MachineryCertifications() {
       />
 
       {/* 1. HERO SECTION */}
-      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-20 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] border-b border-tea-border/60 dark:border-white/10 overflow-hidden transition-colors">
+      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-20 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] overflow-hidden transition-colors">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-10 right-10 w-[500px] h-[500px] bg-tea-mint/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -102,6 +103,15 @@ export default function MachineryCertifications() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Hero -> Machinery Grid */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0B130E]"
+        toColor="text-white dark:text-[#0B130E]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 2. GALLERY MÁY MÓC & HẠ TẦNG SẢN XUẤT */}
       <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -140,6 +150,15 @@ export default function MachineryCertifications() {
           </div>
         </div>
       </section>
+
+      {/* Animated Wavy Transition: Machinery Grid -> 5-Gate QC */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-tea-dark dark:text-tea-dark"
+        accentColor="text-tea-mint/35 dark:text-tea-mint/25"
+        secondaryAccent="text-tea-leaf/30 dark:text-tea-leaf/15"
+        flipX={true}
+      />
 
       {/* 3. 5-GATE QUALITY CONTROL SYSTEM */}
       <section className="py-20 bg-tea-dark text-white relative overflow-hidden">
@@ -200,6 +219,15 @@ export default function MachineryCertifications() {
           </div>
         </div>
       </section>
+
+      {/* Animated Wavy Transition: 5-Gate QC -> Certifications */}
+      <WaveDivider
+        fromBg="bg-tea-dark dark:text-tea-dark"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-leaf/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/25 dark:text-tea-leaf/15"
+        flipX={false}
+      />
 
       {/* 4. CHỨNG NHẬN CHẤT LƯỢNG (CERTIFICATIONS SHOWCASE) */}
       <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">

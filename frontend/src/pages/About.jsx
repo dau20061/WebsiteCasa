@@ -22,14 +22,86 @@ import {
   Package,
   Coffee,
   FlaskConical,
-  ExternalLink
+  ExternalLink,
+  ZoomIn,
+  FileCheck,
+  BadgeCheck
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import WaveDivider from '../components/WaveDivider';
 import SEO from '../components/SEO';
-import { TIMELINE, TEA_REGIONS, CORE_VALUES, COMPANY_INFO } from '../constants/company';
+import { TEA_REGIONS, CORE_VALUES, COMPANY_INFO } from '../constants/company';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
 import contactInfographicImg from '../img/contact.jpg';
+import isoCertImg from '../img/ISO.avif';
+import gmpCertImg from '../img/gmp.avif';
+import haccpCertImg from '../img/Haccp.avif';
+import halalCertImg from '../img/halal.avif';
+
+
+export const CASA_CERTIFICATES_DATA = [
+  {
+    id: 'iso-22000',
+    badge: 'ISO 22000:2018',
+    badgeZh: 'ISO 22000:2018',
+    titleVi: 'Hệ Thống Quản Lý An Toàn Thực Phẩm ISO 22000:2018',
+    titleZh: 'ISO 22000:2018 食品安全管理系統認證',
+    orgVi: 'Tổ chức Chứng nhận Quốc tế G-CERTI (IAS & IAF)',
+    orgZh: 'G-CERTI 國際認證機構 (IAS 認可 / IAF 成員)',
+    certNo: 'GKVN-0402-FC',
+    validity: '2023.05.08 – 2026.05.07',
+    summaryVi: 'Chứng nhận toàn diện quy trình chế biến trà (ô long, trà đen, trà xanh, trà lài), cà phê túi lọc, bột kem béo không sữa, matcha nguyên chất, bột pudding, bột sương sáo, khoai môn và socola 3in1 đóng gói màng bạc vô trùng.',
+    summaryZh: '全面涵蓋原葉茶（烏龍茶、紅茶、綠茶、茉莉綠茶）、濾掛咖啡、植脂末、純抹茶、布丁粉、仙草凍粉及 3合1 特調粉之充氮無菌加工與包裝體系。',
+    image: isoCertImg,
+    tag: 'Tiêu Chuẩn Quốc Tế ISO'
+  },
+  {
+    id: 'gmp',
+    badge: 'GMP Certified',
+    badgeZh: 'GMP 良好生產規範',
+    titleVi: 'Thực Hành Sản Xuất Tốt (GMP)',
+    titleZh: 'GMP 良好生產規範認證 (Good Manufacturing Practice)',
+    orgVi: 'Tổ chức G-CERTI System Service',
+    orgZh: 'G-CERTI 國際製造品質認證服務機構',
+    certNo: 'GKVN-0402-GMP',
+    validity: '2023.05.08 – 2026.05.07',
+    summaryVi: 'Kiểm soát khắt khe tiêu chuẩn vệ sinh xưởng, dây chuyền máy móc cơ điện khép kín, môi trường phòng sạch và quy tắc vận hành của nhân sự kỹ thuật sản xuất thực phẩm & đồ uống.',
+    summaryZh: '嚴格規範生產潔淨廠房車間環境、全自動化設備管路衛生、人員作業防護及預防交叉污染之標準作業程序 (SOP)。',
+    image: gmpCertImg,
+    tag: 'Thực Hành Sản Xuất Tốt'
+  },
+  {
+    id: 'haccp',
+    badge: 'HACCP System',
+    badgeZh: 'HACCP 食品安全體系',
+    titleVi: 'Hệ Thống Quản Lý An Toàn Thực Phẩm HACCP',
+    titleZh: 'HACCP 危害分析與關鍵控制點系統認證',
+    orgVi: 'Tổ chức Chứng nhận An toàn Thực phẩm G-CERTI',
+    orgZh: 'G-CERTI 食品安全驗證管理機構',
+    certNo: 'GKVN-0402-HC',
+    validity: '2023.05.08 – 2026.05.07',
+    summaryVi: 'Phân tích mối nguy và kiểm soát 5 điểm tới hạn (CCP) từ khâu tiếp nhận búp chè nguyên liệu tại nông trường, sao sấy diệt men nhiệt độ cao, đóng gói chân không đến xuất kho.',
+    summaryZh: '全面建立茶葉從高山契作採摘、高溫殺青乾燥、均質拼配至包裝入庫全流程之關鍵控制點 (CCP) 監控與風險防範。',
+    image: haccpCertImg,
+    tag: 'Kiểm Soát Mối Nguy Tới Hạn'
+  },
+  {
+    id: 'halal',
+    badge: 'HALAL Certified',
+    badgeZh: 'HALAL 國際清真認證',
+    titleVi: 'Chứng Nhận Chuẩn Hồi Giáo Quốc Tế Halal (JAKIM Scheme)',
+    titleZh: 'HALAL 國際清真認證 (馬來西亞 JAKIM 體系)',
+    orgVi: 'Halal Certification Agency Vietnam (HCA) / JAKIM',
+    orgZh: '越南清真認證局 HCA (符合馬來西亞 JAKIM 規範)',
+    certNo: 'HCA 975/JAKIM',
+    validity: '2024.06.14 – 2025.06.13',
+    summaryVi: 'Chứng nhận hợp chuẩn Luật Hồi giáo MS 1500:2019 cho 3 nhóm chủ lực: Trà (Tea), Cà phê (Coffee), Bột pha chế (Powder), đủ điều kiện xuất khẩu và phục vụ chuỗi quốc tế.',
+    summaryZh: '依據伊斯蘭教法及馬來西亞 MS 1500:2019 清真標準，合格認證原葉茶、咖啡與調配粉三大核心品類，暢行全球清真穆斯林市場。',
+    image: halalCertImg,
+    tag: 'Tiêu Chuẩn Xuất Khẩu Toàn Cầu'
+  }
+];
 
 const SERVICES_8 = [
   {
@@ -217,6 +289,15 @@ export default function About() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Hero -> Storytelling */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0B130E]"
+        toColor="text-white dark:text-[#0B130E]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 2. CÂU CHUYỆN HÌNH THÀNH (STORYTELLING) */}
       <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -282,8 +363,18 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* Animated Wavy Transition: Storytelling -> Global Bases */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-[#FAF9F5] dark:text-[#0B130E]"
+        accentColor="text-tea-leaf/25 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
       {/* 2.5 QUY MÔ TOÀN CẦU & HỆ SINH THÁI DỊCH VỤ TOÀN DIỆN (INFOGRAPHIC & ARTICLE) */}
-      <section className="py-24 bg-gradient-to-b from-[#FAF9F5] via-[#EBF8EE]/40 to-white dark:from-[#0B130E] dark:via-[#102317]/50 dark:to-[#0B130E] border-t border-tea-border/60 dark:border-white/10 transition-colors relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-b from-[#FAF9F5] via-[#EBF8EE]/40 to-white dark:from-[#0B130E] dark:via-[#102317]/50 dark:to-[#0B130E] transition-colors relative overflow-hidden">
         {/* Background glow auras */}
         <div className="absolute top-20 right-10 w-[600px] h-[600px] bg-tea-mint/10 dark:bg-tea-mint/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-tea-leaf/10 dark:bg-tea-leaf/5 rounded-full blur-3xl pointer-events-none" />
@@ -538,8 +629,17 @@ export default function About() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Global Bases -> Vision & Values */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 3. TẦM NHÌN, SỨ MỆNH & GIÁ TRỊ CỐT LÕI */}
-      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] border-t border-tea-border/60 dark:border-white/10 transition-colors">
+      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge={isChinese ? '戰略發展方向' : 'Định Hướng Chiến Lược'}
@@ -636,52 +736,186 @@ export default function About() {
         </div>
       </section>
 
-      {/* 4. HÀNH TRÌNH PHÁT TRIỂN (TIMELINE) */}
-      <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Animated Wavy Transition: Vision & Values -> Certificates */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0E1711]"
+        toColor="text-white dark:text-[#0B130E]"
+        accentColor="text-tea-leaf/25 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
+      {/* 4. CHỨNG NHẬN CHẤT LƯỢNG QUỐC TẾ (CERTIFICATES) */}
+      <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors relative overflow-hidden">
+        {/* Subtle Ambient Background Gradients */}
+        <div className="absolute top-1/4 -left-40 w-96 h-96 bg-tea-mint/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 -right-40 w-96 h-96 bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <SectionHeading
-            badge={isChinese ? '時光印記' : 'Dấu Ấn Thời Gian'}
-            title={isChinese ? 'CASA 發展歷程里程碑' : 'Hành trình phát triển của CASA'}
-            subtitle={isChinese ? '見證我們一步步奠定專業商用茶葉原料領先地位的重要時刻。' : 'Những cột mốc quan trọng khẳng định vị thế thương hiệu nguyên liệu trà hàng đầu.'}
+            badge={isChinese ? '國際權威認證・品質背書' : 'Hồ Sơ Chứng Nhận Quốc Tế'}
+            title={isChinese ? 'CASA 國際合規管理體系認證' : 'Hệ Thống Chứng Nhận Chất Lượng Quốc Tế Của CASA'}
+            subtitle={isChinese ? 'CASA 嚴格遵循國際最高標準，全廠線榮獲 ISO 22000、GMP、HACCP 及 HALAL 權威認證，為每批茶品原料提供堅不可摧的合規品質背書。' : 'Minh chứng pháp lý vững chắc với đầy đủ chứng nhận ISO 22000, GMP, HACCP và HALAL, bảo chứng cho sự an toàn và chất lượng thượng hạng của từng mẻ nguyên liệu trà xuất xưởng.'}
           />
 
-          <div className="relative border-l-2 border-tea-soft dark:border-white/10 ml-4 sm:ml-32 space-y-12">
-            {TIMELINE.map((item, idx) => (
+          {/* 4 Certificate Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {CASA_CERTIFICATES_DATA.map((cert, idx) => (
               <motion.div
-                key={item.year}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                key={cert.id}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="relative pl-8 sm:pl-10 group"
+                className="group relative flex flex-col bg-[#FAF9F5] dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 hover:border-tea-mint/60 shadow-tea-sm hover:shadow-2xl transition-all duration-500 overflow-hidden"
               >
-                {/* Year Marker on Left for Desktop */}
-                <div className="hidden sm:block absolute -left-28 top-0 text-xl font-black text-tea-emerald dark:text-tea-mint font-sans">
-                  {item.year}
+                {/* Certificate Document Thumbnail Preview */}
+                <div
+                  onClick={() => openLightbox({
+                    title: isChinese ? cert.titleZh : cert.titleVi,
+                    image: cert.image
+                  })}
+                  className="relative h-72 sm:h-80 w-full overflow-hidden bg-gray-950/80 cursor-pointer group/img"
+                  title={isChinese ? "點擊全螢幕放大檢視原件" : "Bấm để phóng to chứng nhận gốc"}
+                >
+                  <img
+                    src={cert.image}
+                    alt={isChinese ? cert.titleZh : cert.titleVi}
+                    className="w-full h-full object-contain p-2 sm:p-3 filter drop-shadow-md group-hover/img:scale-105 transition-transform duration-500 ease-out"
+                  />
+
+                  {/* Glass Gradient Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-5 px-3">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tea-emerald text-white text-xs font-bold shadow-xl backdrop-blur-md transform translate-y-2 group-hover/img:translate-y-0 transition-transform duration-300">
+                      <ZoomIn className="w-3.5 h-3.5" />
+                      {isChinese ? '放大檢視原件' : 'Phóng to bản gốc'}
+                    </span>
+                  </div>
+
+                  {/* Standard Badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-tea-mint text-[11px] font-bold tracking-wide shadow-md">
+                      {isChinese ? cert.badgeZh : cert.badge}
+                    </span>
+                  </div>
+
+                  {/* Validity status pill */}
+                  <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold shadow-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{isChinese ? '有效合規' : 'Có hiệu lực'}</span>
+                  </div>
                 </div>
 
-                {/* Dot marker */}
-                <div className="absolute -left-2.5 top-1.5 w-5 h-5 rounded-full bg-white dark:bg-[#132018] border-4 border-tea-leaf group-hover:border-tea-emerald group-hover:scale-125 transition-all shadow-sm" />
+                {/* Certificate Details & Summary */}
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <h4 className="text-base sm:text-lg font-bold text-tea-dark dark:text-white leading-snug group-hover:text-tea-leaf transition-colors">
+                      {isChinese ? cert.titleZh : cert.titleVi}
+                    </h4>
 
-                <div className="bg-[#FAF9F5] dark:bg-[#132018] p-6 rounded-2xl border border-tea-border dark:border-white/10 transition-colors">
-                  <span className="sm:hidden text-xs font-black text-tea-emerald dark:text-tea-mint block mb-1">
-                    {item.year}
-                  </span>
-                  <h4 className="text-lg font-bold text-tea-dark dark:text-white mb-1">
-                    {(isChinese && item.titleZh) || item.title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                    {(isChinese && item.descZh) || item.desc}
-                  </p>
+                    {/* Metadata Badges */}
+                    <div className="space-y-1.5 pt-1 text-xs">
+                      <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
+                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '認證編號：' : 'Số chứng nhận:'}</span>
+                        <span className="font-mono font-semibold text-tea-dark dark:text-tea-mint bg-white dark:bg-black/40 px-2 py-0.5 rounded border border-gray-200 dark:border-white/10">
+                          {cert.certNo}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
+                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '機構：' : 'Cơ quan:'}</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-200 text-right truncate max-w-[150px]">
+                          {isChinese ? cert.orgZh : cert.orgVi}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
+                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '有效期限：' : 'Hiệu lực:'}</span>
+                        <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                          {cert.validity}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Summary Description */}
+                    <div className="pt-1">
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                        {isChinese ? '涵蓋產品品類：' : 'Phạm vi chứng nhận:'}
+                      </span>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-4">
+                        {isChinese ? cert.summaryZh : cert.summaryVi}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Zoom Button */}
+                  <button
+                    onClick={() => openLightbox({
+                      title: isChinese ? cert.titleZh : cert.titleVi,
+                      image: cert.image
+                    })}
+                    className="w-full mt-2 py-2.5 px-4 rounded-xl bg-white dark:bg-white/5 hover:bg-tea-primary hover:text-white dark:hover:bg-tea-leaf border border-tea-border dark:border-white/10 text-tea-dark dark:text-gray-200 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-sm group-hover:border-tea-leaf cursor-pointer"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                    <span>{isChinese ? '檢視高解析原件' : 'Phóng to xem bản gốc'}</span>
+                  </button>
                 </div>
               </motion.div>
             ))}
           </div>
+
+          {/* Bottom Commitment & Sample Request Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-tea-primary to-tea-emerald text-white shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6"
+          >
+            <div className="space-y-2 text-center md:text-left max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-tea-mint text-xs font-bold">
+                <ShieldCheck className="w-4 h-4" />
+                <span>{isChinese ? '法規透明・完整背書' : 'Minh Bạch Pháp Lý & Hồ Sơ Đầy Đủ'}</span>
+              </div>
+              <h4 className="text-lg sm:text-xl font-bold">
+                {isChinese ? '需要完整 COA 檢驗分析單與認證公證複本嗎？' : 'Bạn cần đầy đủ hồ sơ kiểm định chất lượng và phiếu COA từng lô?'}
+              </h4>
+              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                {isChinese
+                  ? 'CASA 隨時為廣大連鎖茶飲品牌、經銷商及加盟體系提供 ISO、GMP、HACCP、HALAL 認證公證複本、自主申報文件及批次 COA 檢驗單。'
+                  : 'CASA sẵn sàng cung cấp bản sao công chứng chứng chỉ ISO, GMP, HACCP, HALAL, hồ sơ tự công bố sản phẩm và phiếu kiểm nghiệm định kỳ cho mọi chuỗi F&B và đối tác nhượng quyền.'}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+              <button
+                onClick={() => openSampleModal()}
+                className="px-6 py-3 rounded-xl bg-white hover:bg-tea-mint text-tea-dark hover:text-white text-xs font-bold transition-all duration-200 shadow-lg cursor-pointer"
+              >
+                {isChinese ? '索取樣品與檢驗報告' : 'Nhận mẫu thử & Hồ sơ kiểm định'}
+              </button>
+              <Link
+                to="/contact"
+                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/25 border border-white/30 text-white text-xs font-bold transition-all duration-200 cursor-pointer"
+              >
+                {isChinese ? '聯絡法規品控部門' : 'Liên hệ bộ phận QC'}
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Certificates -> Tea Regions */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 5. VÙNG TRỒNG NGUYÊN LIỆU ĐẶC BIỆT */}
-      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] border-t border-tea-border/60 dark:border-white/10 transition-colors">
+      <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge={isChinese ? '特色產區來源' : 'Nguồn Gốc Nông Sản'}

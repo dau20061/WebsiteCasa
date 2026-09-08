@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import SEO from '../components/SEO';
+import WaveDivider from '../components/WaveDivider';
 import { FAQ_CATEGORIES } from '../constants/categories';
 import { COMPANY_INFO } from '../constants/company';
 import { useToast } from '../components/Toast';
@@ -71,7 +72,7 @@ export default function FAQ() {
       />
 
       {/* 1. HERO TITLE */}
-      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] border-b border-tea-border/60 dark:border-white/10 overflow-hidden transition-colors">
+      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] overflow-hidden transition-colors">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-5 right-10 w-[450px] h-[450px] bg-tea-mint/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-5 left-10 w-[350px] h-[350px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -89,8 +90,17 @@ export default function FAQ() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Hero -> Search Filters */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0B130E]"
+        toColor="text-white/95 dark:text-[#0B130E]/95"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
+
       {/* 2. SEARCH & CATEGORY FILTER */}
-      <section className="py-6 bg-white/95 dark:bg-[#0B130E]/95 backdrop-blur-md border-b border-tea-border/60 dark:border-white/10 sticky top-16 z-20 shadow-tea-sm transition-colors">
+      <section className="py-6 bg-white/95 dark:bg-[#0B130E]/95 backdrop-blur-md sticky top-16 z-20 shadow-tea-sm transition-colors">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Category tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full sm:w-auto">

@@ -54,7 +54,8 @@ import {
   translateProductToTraditionalChinese,
   translateArticleToTraditionalChinese,
   translateFaqToTraditionalChinese,
-  translateMachineryToTraditionalChinese
+  translateMachineryToTraditionalChinese,
+  translateCategoryToTraditionalChinese
 } from '../../services/geminiService';
 
 import { PRODUCT_CATEGORIES, FAQ_CATEGORIES } from '../../constants/categories';
@@ -63,6 +64,9 @@ import {
   getRtdbProducts,
   saveRtdbProduct,
   deleteRtdbProduct,
+  getRtdbCategories,
+  saveRtdbCategory,
+  deleteRtdbCategory,
   getRtdbNews,
   saveRtdbNews,
   deleteRtdbNews,
@@ -99,6 +103,173 @@ export default function AdminDashboard() {
   const [newsModalTab, setNewsModalTab] = useState('edit'); // 'edit' | 'preview'
 
   // ============================================================================
+  // STATE CRUD: DANH MỤC SẢN PHẨM (CATEGORIES)
+  // ============================================================================
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_categories');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (_) {}
+    }
+    return PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c, i) => ({
+      id: c.id,
+      slug: c.id,
+      name: c.name,
+      nameZh: '',
+      order: i + 1,
+      active: true,
+      desc: '',
+      descZh: ''
+    }));
+  });
+
+  const [categorySearch, setCategorySearch] = useState('');
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [deleteCategoryModalOpen, setDeleteCategoryModalOpen] = useState(false);
+  const [isTranslatingCategory, setIsTranslatingCategory] = useState(false);
+
+  const initialCategoryForm = {
+    id: '',
+    name: '',
+    nameZh: '',
+    slug: '',
+    order: 1,
+    desc: '',
+    descZh: '',
+    active: true
+  };
+  const [categoryFormData, setCategoryFormData] = useState(initialCategoryForm);
+
+  const generateCategorySlug = (str) => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+  };
+
+  const handleOpenCategoryModal = (cat = null) => {
+    if (cat) {
+      setEditingCategory(cat);
+      setCategoryFormData({
+        id: cat.id || '',
+        name: cat.name || '',
+        nameZh: cat.nameZh || '',
+        slug: cat.slug || cat.id || '',
+        order: cat.order || 1,
+        desc: cat.desc || '',
+        descZh: cat.descZh || '',
+        active: cat.active !== false
+      });
+    } else {
+      setEditingCategory(null);
+      setCategoryFormData({
+        id: '',
+        name: '',
+        nameZh: '',
+        slug: '',
+        order: categories.length + 1,
+        desc: '',
+        descZh: '',
+        active: true
+      });
+    }
+    setCategoryModalOpen(true);
+  };
+
+  const handleSaveCategory = async (e) => {
+    e.preventDefault();
+    if (!categoryFormData.name.trim()) {
+      showToast('Vui lòng nhập tên danh mục!', 'error');
+      return;
+    }
+
+    const cleanSlug = categoryFormData.slug.trim() || generateCategorySlug(categoryFormData.name);
+    const catId = editingCategory ? editingCategory.id : (cleanSlug || `cat_${Date.now()}`);
+
+    const payload = {
+      ...categoryFormData,
+      id: catId,
+      slug: cleanSlug,
+      order: Number(categoryFormData.order) || 1,
+      active: categoryFormData.active !== false
+    };
+
+    try {
+      setIsSyncingRtdb(true);
+      await saveRtdbCategory(payload);
+
+      setCategories((prev) => {
+        const idx = prev.findIndex((c) => c.id === catId);
+        let updated;
+        if (idx >= 0) {
+          updated = [...prev];
+          updated[idx] = payload;
+        } else {
+          updated = [...prev, payload];
+        }
+        return updated.sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99));
+      });
+
+      showToast(editingCategory ? 'Đã cập nhật danh mục thành công!' : 'Đã thêm danh mục mới thành công!', 'success');
+      setCategoryModalOpen(false);
+    } catch (err) {
+      showToast('Lỗi lưu danh mục: ' + err.message, 'error');
+    } finally {
+      setIsSyncingRtdb(false);
+    }
+  };
+
+  const handleTranslateCategory = async () => {
+    if (!categoryFormData.name.trim()) {
+      showToast('Vui lòng nhập tên danh mục tiếng Việt trước!', 'warning');
+      return;
+    }
+    try {
+      setIsTranslatingCategory(true);
+      const res = await translateCategoryToTraditionalChinese({
+        name: categoryFormData.name,
+        desc: categoryFormData.desc
+      });
+      if (res && res.nameZh) {
+        setCategoryFormData((prev) => ({
+          ...prev,
+          nameZh: res.nameZh,
+          descZh: res.descZh || prev.descZh
+        }));
+        showToast('Đã dịch sang tiếng Trung Phồn thể thành công!', 'success');
+      }
+    } catch (err) {
+      showToast('Lỗi dịch tiếng Trung: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    try {
+      setIsSyncingRtdb(true);
+      await deleteRtdbCategory(categoryToDelete.id);
+      setCategories((prev) => prev.filter((c) => c.id !== categoryToDelete.id));
+      showToast(`Đã xóa danh mục "${categoryToDelete.name}" thành công!`, 'success');
+      setDeleteCategoryModalOpen(false);
+      setCategoryToDelete(null);
+    } catch (err) {
+      showToast('Lỗi xóa danh mục: ' + err.message, 'error');
+    } finally {
+      setIsSyncingRtdb(false);
+    }
+  };
+
+  // ============================================================================
   // 1. STATE CRUD: SẢN PHẨM (PRODUCTS)
   // ============================================================================
   const [products, setProducts] = useState(() => {
@@ -108,6 +279,9 @@ export default function AdminDashboard() {
 
   // Tải dữ liệu trực tiếp từ Firebase Realtime Database khi mở trang
   useEffect(() => {
+    getRtdbCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
     getRtdbProducts().then((res) => {
       if (res && res.length > 0) setProducts(res);
     });
@@ -144,6 +318,8 @@ export default function AdminDashboard() {
     originZh: '',
     image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
     status: 'PUBLISHED',
+    purchaseAction: 'contact',
+    shopeeUrl: '',
     tasteProfile: { aroma: 85, body: 90, sweetness: 75, color: 'Nâu đỏ ruby' },
     applications: ['Trà sữa truyền thống', 'Trà kem cheese'],
     packaging: ['Gói 1kg (10 gói/thùng)']
@@ -362,6 +538,8 @@ export default function AdminDashboard() {
         origin: prod.origin || 'Bảo Lộc, Lâm Đồng',
         image: prod.image || '',
         status: prod.status || 'PUBLISHED',
+        purchaseAction: prod.purchaseAction || (prod.shopeeUrl ? 'shopee' : 'contact'),
+        shopeeUrl: prod.shopeeUrl || '',
         tasteProfile: prod.tasteProfile || { aroma: 85, body: 90, sweetness: 75, color: 'Nâu đỏ ruby' },
         applications: prod.applications || ['Trà sữa truyền thống'],
         packaging: prod.packaging || ['Gói 1kg'],
@@ -385,6 +563,8 @@ export default function AdminDashboard() {
         origin: 'Cao nguyên Bảo Lộc, Lâm Đồng',
         image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
         status: 'PUBLISHED',
+        purchaseAction: 'contact',
+        shopeeUrl: '',
         tasteProfile: { aroma: 90, body: 90, sweetness: 80, color: 'Đỏ Hổ Phách' },
         applications: ['Trà sữa đậm vị', 'Trà trái cây tươi'],
         packaging: ['Gói 1kg (10 gói/thùng)', 'Bao 25kg'],
@@ -1235,7 +1415,20 @@ export default function AdminDashboard() {
         {/* ==================================================================== */}
         {/* STATS OVERVIEW CARDS */}
         {/* ==================================================================== */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+          <div
+            onClick={() => setActiveTab('categories')}
+            className={`cursor-pointer p-4 rounded-2xl bg-white border transition-all ${
+              activeTab === 'categories' ? 'border-tea-emerald shadow-tea-sm ring-2 ring-tea-emerald/20' : 'border-tea-border hover:border-tea-leaf'
+            }`}
+          >
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>Danh mục</span>
+              <Layers className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div className="text-2xl font-black text-tea-dark mt-1">{categories.length}</div>
+            <div className="text-[10px] text-emerald-600 font-semibold">CRUD Đầy Đủ</div>
+          </div>
           <div
             onClick={() => setActiveTab('products')}
             className={`cursor-pointer p-4 rounded-2xl bg-white border transition-all ${
@@ -1335,6 +1528,18 @@ export default function AdminDashboard() {
           >
             <Package className="w-4 h-4" />
             <span>1. Quản Lý Sản Phẩm ({products.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'categories'
+                ? 'bg-tea-primary text-white shadow-tea-sm'
+                : 'text-gray-600 hover:bg-white'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>Danh Mục Sản Phẩm ({categories.length})</span>
           </button>
 
           <button
@@ -1453,9 +1658,10 @@ export default function AdminDashboard() {
               <select
                 value={productCategoryFilter}
                 onChange={(e) => setProductCategoryFilter(e.target.value)}
-                className="w-full sm:w-56 px-3 py-2.5 rounded-xl border border-gray-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white"
+                className="w-full sm:w-56 px-3 py-2.5 rounded-xl border border-gray-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white text-gray-900"
               >
-                {PRODUCT_CATEGORIES.map((c) => (
+                <option value="all">Tất cả danh mục ({products.length})</option>
+                {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
@@ -1495,6 +1701,21 @@ export default function AdminDashboard() {
                           {p.badge && (
                             <span className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded font-medium">
                               {p.badge}
+                            </span>
+                          )}
+                          {p.purchaseAction === 'shopee' && p.shopeeUrl ? (
+                            <a
+                              href={p.shopeeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] bg-orange-50 text-[#EE4D2D] border border-orange-200 px-1.5 py-0.5 rounded font-bold hover:underline inline-flex items-center gap-1"
+                              title={p.shopeeUrl}
+                            >
+                              <span>🛍️ Shopee</span>
+                            </a>
+                          ) : (
+                            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-medium inline-flex items-center gap-1">
+                              <span>📞 Tư vấn</span>
                             </span>
                           )}
                         </div>
@@ -1570,6 +1791,158 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* ==================================================================== */}
+        {/* TAB: DANH MỤC SẢN PHẨM (CATEGORIES CRUD) */}
+        {/* ==================================================================== */}
+        {activeTab === 'categories' && (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-tea-border shadow-tea-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-tea-dark flex items-center gap-2">
+                  <Layers className="w-6 h-6 text-tea-emerald" />
+                  <span>Quản Lý Danh Mục Sản Phẩm (Category CRUD)</span>
+                </h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  Thêm, chỉnh sửa thứ tự hiển thị, quản lý tên song ngữ Việt - Trung và kiểm soát danh mục hiển thị trên website.
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleOpenCategoryModal()}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold shadow-tea-sm transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Thêm Danh Mục Mới</span>
+              </button>
+            </div>
+
+            {/* Filter & Search Toolbar */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Tìm theo tên danh mục, slug, tên tiếng Trung..."
+                  value={categorySearch}
+                  onChange={(e) => setCategorySearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white text-gray-900 placeholder-gray-400"
+                />
+              </div>
+              <div className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                Tổng cộng: <strong className="text-tea-dark">{categories.length}</strong> danh mục
+              </div>
+            </div>
+
+            {/* Categories Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-tea-cream/60 text-gray-500 uppercase tracking-wider">
+                    <th className="p-3.5 font-bold text-center w-16">Thứ Tự</th>
+                    <th className="p-3.5 font-bold">Tên Danh Mục (Việt - Trung)</th>
+                    <th className="p-3.5 font-bold">Mã Định Danh (Slug/ID)</th>
+                    <th className="p-3.5 font-bold text-center">Sản Phẩm</th>
+                    <th className="p-3.5 font-bold text-center">Trạng Thái</th>
+                    <th className="p-3.5 font-bold text-right">Thao Tác (CRUD)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                  {categories
+                    .filter((c) => {
+                      const q = categorySearch.toLowerCase().trim();
+                      if (!q) return true;
+                      return (
+                        (c.name && c.name.toLowerCase().includes(q)) ||
+                        (c.nameZh && c.nameZh.toLowerCase().includes(q)) ||
+                        (c.id && c.id.toLowerCase().includes(q)) ||
+                        (c.desc && c.desc.toLowerCase().includes(q))
+                      );
+                    })
+                    .sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99))
+                    .map((cat) => {
+                      const linkedCount = products.filter(
+                        (p) => p.category === cat.id || p.category === cat.slug
+                      ).length;
+                      return (
+                        <tr key={cat.id} className="hover:bg-tea-cream/30 transition-colors">
+                          <td className="p-3.5 text-center">
+                            <span className="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-tea-mist font-mono font-bold text-tea-dark text-xs border border-tea-emerald/20">
+                              #{cat.order || 1}
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <div className="font-bold text-sm text-tea-dark">{cat.name}</div>
+                            {cat.nameZh && (
+                              <div className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5 font-medium">
+                                <span>🇹🇼</span>
+                                <span>{cat.nameZh}</span>
+                              </div>
+                            )}
+                            {cat.desc && (
+                              <div className="text-[11px] text-gray-400 mt-1 max-w-md line-clamp-1">
+                                {cat.desc}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3.5">
+                            <code className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 font-mono text-[11px] border border-gray-200">
+                              {cat.slug || cat.id}
+                            </code>
+                          </td>
+                          <td className="p-3.5 text-center">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+                              <Package className="w-3 h-3 text-emerald-600" />
+                              <span>{linkedCount} SP</span>
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-center">
+                            {cat.active !== false ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                <span>Hiển thị</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-[10px] font-bold">
+                                <XCircle className="w-3 h-3 text-gray-400" />
+                                <span>Tạm ẩn</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-right space-x-1 whitespace-nowrap">
+                            <button
+                              onClick={() => handleOpenCategoryModal(cat)}
+                              className="p-2 rounded-xl text-tea-emerald hover:bg-tea-mist border border-transparent hover:border-tea-emerald/20 transition-all"
+                              title="Chỉnh sửa danh mục"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setCategoryToDelete(cat);
+                                setDeleteCategoryModalOpen(true);
+                              }}
+                              className="p-2 rounded-xl text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
+                              title="Xóa danh mục"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+
+              {categories.length === 0 && (
+                <div className="text-center py-12 text-gray-400 text-xs">
+                  Chưa có danh mục nào. Hãy bấm "+ Thêm Danh Mục Mới" để tạo danh mục đầu tiên!
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
 
         {/* ==================================================================== */}
         {/* TAB 2: TIN TỨC & CÔNG THỨC (NEWS CRUD) */}
@@ -2064,6 +2437,268 @@ export default function AdminDashboard() {
 
       </div>
 
+
+      {/* ==================================================================== */}
+      {/* MODAL: THÊM / SỬA DANH MỤC SẢN PHẨM */}
+      {/* ==================================================================== */}
+      <AnimatePresence>
+        {categoryModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[92vh] overflow-y-auto border border-tea-border shadow-tea-xl space-y-5"
+            >
+              {/* MODAL HEADER */}
+              <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                <div>
+                  <h3 className="text-lg font-bold text-tea-dark flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-tea-emerald" />
+                    <span>{editingCategory ? 'Chỉnh Sửa Danh Mục' : 'Thêm Danh Mục Mới'}</span>
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Quản lý thông tin định danh, tên song ngữ và thứ tự hiển thị danh mục.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setCategoryModalOpen(false)}
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* FORM */}
+              <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    Tên Danh Mục (Tiếng Việt) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ví dụ: Trà Đen (Black Tea), Bột Pha Chế..."
+                    value={categoryFormData.name}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      if (!editingCategory) {
+                        setCategoryFormData({
+                          ...categoryFormData,
+                          name: newName,
+                          slug: generateCategorySlug(newName)
+                        });
+                      } else {
+                        setCategoryFormData({ ...categoryFormData, name: newName });
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-gray-700 flex items-center gap-1.5">
+                      <span>Tên Tiếng Trung Phồn Thể</span>
+                      <span className="text-xs">🇹🇼</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleTranslateCategory}
+                      disabled={isTranslatingCategory || !categoryFormData.name}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold border border-indigo-200 transition-all disabled:opacity-50"
+                    >
+                      <Sparkles className="w-3 h-3 text-indigo-600" />
+                      <span>{isTranslatingCategory ? 'Đang dịch AI...' : 'AI Dịch Tiếng Trung'}</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: 特級阿薩姆與經典紅茶"
+                    value={categoryFormData.nameZh}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, nameZh: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Mã Định Danh (Slug / ID)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="tra-den, tra-oolong..."
+                      value={categoryFormData.slug}
+                      onChange={(e) => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl border border-gray-200 font-mono bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Thứ Tự Hiển Thị (#)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={categoryFormData.order}
+                      onChange={(e) => setCategoryFormData({ ...categoryFormData, order: Number(e.target.value) || 1 })}
+                      className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    Trạng Thái Hoạt Động
+                  </label>
+                  <select
+                    value={categoryFormData.active ? 'active' : 'inactive'}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, active: e.target.value === 'active' })}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  >
+                    <option value="active">Hiển thị công khai trên website</option>
+                    <option value="inactive">Tạm ẩn (Không xuất hiện trên trang sản phẩm)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">Mô Tả Danh Mục (Tiếng Việt)</label>
+                  <textarea
+                    rows="2"
+                    placeholder="Mô tả tóm tắt ứng dụng của nhóm sản phẩm này..."
+                    value={categoryFormData.desc}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, desc: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">Mô Tả Danh Mục (Tiếng Trung Phồn Thể 🇹🇼)</label>
+                  <textarea
+                    rows="2"
+                    placeholder="類別詳細應用說明..."
+                    value={categoryFormData.descZh}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, descZh: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
+                {/* MODAL ACTIONS */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setCategoryModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors"
+                  >
+                    Hủy Bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSyncingRtdb}
+                    className="px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white font-bold shadow-tea-sm transition-all flex items-center gap-2"
+                  >
+                    {isSyncingRtdb ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Đang Lưu...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{editingCategory ? 'Lưu Cập Nhật' : 'Tạo Danh Mục'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ==================================================================== */}
+      {/* MODAL: XÁC NHẬN XÓA DANH MỤC */}
+      {/* ==================================================================== */}
+      <AnimatePresence>
+        {deleteCategoryModalOpen && categoryToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-red-100 shadow-tea-xl space-y-5"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+                <Trash2 className="w-6 h-6" />
+              </div>
+
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Xác Nhận Xóa Danh Mục?
+                </h3>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Bạn có chắc chắn muốn xóa vĩnh viễn danh mục <strong className="text-tea-dark">"{categoryToDelete.name}"</strong>?
+                </p>
+              </div>
+
+              {/* Warning if products are linked */}
+              {(() => {
+                const linked = products.filter(
+                  (p) => p.category === categoryToDelete.id || p.category === categoryToDelete.slug
+                );
+                if (linked.length > 0) {
+                  return (
+                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs space-y-1">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        <span>Cảnh báo liên kết dữ liệu!</span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed">
+                        Hiện có <strong className="font-bold">{linked.length} sản phẩm</strong> đang thuộc danh mục này ({linked.slice(0, 3).map(p => p.name).join(', ')}{linked.length > 3 ? '...' : ''}).
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteCategoryModalOpen(false);
+                    setCategoryToDelete(null);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors text-xs"
+                >
+                  Hủy Bỏ
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteCategory}
+                  disabled={isSyncingRtdb}
+                  className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-tea-sm transition-all text-xs flex items-center justify-center gap-1.5"
+                >
+                  {isSyncingRtdb ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Đang xóa...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Xóa Vĩnh Viễn</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* ==================================================================== */}
       {/* MODAL: THÊM / SỬA SẢN PHẨM (PRODUCT MODAL) */}
       {/* ==================================================================== */}
@@ -2258,9 +2893,9 @@ export default function AdminDashboard() {
                         }}
                         className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
                       >
-                        {PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c) => (
+                        {categories.filter((c) => c.id !== 'all').map((c) => (
                           <option key={c.id} value={c.id}>
-                            {c.name}
+                            {c.name} {c.nameZh ? `(${c.nameZh})` : ''}
                           </option>
                         ))}
                       </select>
@@ -2286,6 +2921,86 @@ export default function AdminDashboard() {
                         <option value="DRAFT">DRAFT (Bản nháp)</option>
                       </select>
                     </div>
+                  </div>
+
+                  {/* HÌNH THỨC BÁN HÀNG & NÚT HÀNH ĐỘNG (CTA) */}
+                  <div className="p-4 rounded-2xl bg-[#FAF9F5] border border-tea-border space-y-3">
+                    <label className="block font-bold text-tea-dark text-xs uppercase tracking-wider">
+                      Hình Thức Mua Hàng & Nút Hành Động (Call to Action)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label
+                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                          productFormData.purchaseAction !== 'shopee'
+                            ? 'bg-white border-tea-emerald shadow-sm ring-2 ring-tea-emerald/20 text-tea-dark font-bold'
+                            : 'bg-white/70 border-gray-200 hover:border-tea-leaf/50 text-gray-700'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="purchaseAction"
+                          value="contact"
+                          checked={productFormData.purchaseAction !== 'shopee'}
+                          onChange={() => setProductFormData({ ...productFormData, purchaseAction: 'contact' })}
+                          className="mt-0.5 text-tea-emerald focus:ring-tea-emerald"
+                        />
+                        <div className="text-xs">
+                          <div className="font-bold flex items-center gap-1.5">
+                            <span>📞 Liên hệ tư vấn</span>
+                          </div>
+                          <span className="text-[11px] text-gray-500 font-normal block mt-0.5">
+                            Khách bấm sẽ nhảy trực tiếp sang trang Liên hệ (/contact)
+                          </span>
+                        </div>
+                      </label>
+
+                      <label
+                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                          productFormData.purchaseAction === 'shopee'
+                            ? 'bg-white border-[#EE4D2D] shadow-sm ring-2 ring-[#EE4D2D]/20 text-[#EE4D2D] font-bold'
+                            : 'bg-white/70 border-gray-200 hover:border-[#EE4D2D]/50 text-gray-700'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="purchaseAction"
+                          value="shopee"
+                          checked={productFormData.purchaseAction === 'shopee'}
+                          onChange={() => setProductFormData({ ...productFormData, purchaseAction: 'shopee' })}
+                          className="mt-0.5 text-[#EE4D2D] focus:ring-[#EE4D2D]"
+                        />
+                        <div className="text-xs">
+                          <div className="font-bold flex items-center gap-1.5 text-gray-900">
+                            <span className="text-[#EE4D2D]">🛍️ Mua trên Shopee</span>
+                          </div>
+                          <span className="text-[11px] text-gray-500 font-normal block mt-0.5">
+                            Gắn đường link dẫn tới gian hàng Shopee của bạn
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* Ô nhập đường link Shopee khi chọn "Mua trên Shopee" */}
+                    {productFormData.purchaseAction === 'shopee' && (
+                      <div className="pt-2">
+                        <label className="block font-bold text-gray-700 mb-1 text-xs">
+                          Đường Link Sản Phẩm Shopee <span className="text-[#EE4D2D]">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="url"
+                            placeholder="https://shopee.vn/ten-san-pham-i.123456789.987654321..."
+                            value={productFormData.shopeeUrl || ''}
+                            onChange={(e) => setProductFormData({ ...productFormData, shopeeUrl: e.target.value })}
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#EE4D2D]/30 focus:border-[#EE4D2D] outline-none text-xs"
+                          />
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm">🛍️</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          Nút "Mua trên Shopee" sẽ xuất hiện trên thẻ sản phẩm và trang chi tiết, dẫn khách hàng trực tiếp sang Shopee.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* 1. MÔ TẢ NGẮN (SHORT DESCRIPTION) */}

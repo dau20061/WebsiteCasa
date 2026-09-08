@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // CASA TEA - FRONTEND API CLIENT
 // Giao tiếp trực tiếp với Backend REST API Server (/api/...)
 // ============================================================================
@@ -41,6 +41,17 @@ export const productApi = {
   create: (data) => request('/products', { method: 'POST', body: data }),
   update: (id, data) => request(`/products/${id}`, { method: 'PUT', body: data }),
   delete: (id) => request(`/products/${id}`, { method: 'DELETE' }),
+};
+
+// ----------------------------------------------------------------------------
+// PRODUCT CATEGORIES API
+// ----------------------------------------------------------------------------
+export const categoryApi = {
+  getAll: () => request('/categories'),
+  getById: (id) => request(`/categories/${id}`),
+  create: (data) => request('/categories', { method: 'POST', body: data }),
+  update: (id, data) => request(`/categories/${id}`, { method: 'PUT', body: data }),
+  delete: (id) => request(`/categories/${id}`, { method: 'DELETE' }),
 };
 
 // ----------------------------------------------------------------------------
@@ -102,6 +113,7 @@ export const aiApi = {
   translateNewsZh: (data) => request('/ai/translate-news-zh', { method: 'POST', body: data }),
   translateFaqZh: (data) => request('/ai/translate-faq-zh', { method: 'POST', body: data }),
   translateMachineryZh: (data) => request('/ai/translate-machinery-zh', { method: 'POST', body: data }),
+  translateCategoryZh: (data) => request('/ai/translate-category-zh', { method: 'POST', body: data }),
 };
 
 // ----------------------------------------------------------------------------
@@ -114,6 +126,8 @@ export const userApi = {
 
 export default {
   products: productApi,
+  categories: categoryApi,
+  category: categoryApi,
   news: newsApi,
   faq: faqApi,
   machinery: machineryApi,

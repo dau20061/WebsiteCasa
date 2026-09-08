@@ -3,6 +3,7 @@ import cors from 'cors';
 import 'dotenv/config';
 
 import productRoutes from './routes/productRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import newsRoutes from './routes/newsRoutes.js';
 import faqRoutes from './routes/faqRoutes.js';
 import machineryRoutes from './routes/machineryRoutes.js';
@@ -30,6 +31,7 @@ app.get('/api/health', (req, res) => {
 
 // Mount Routes
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/faq', faqRoutes);
 app.use('/api/faqs', faqRoutes);

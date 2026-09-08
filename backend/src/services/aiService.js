@@ -515,4 +515,44 @@ YÊU CẦU ĐẦU RA JSON:
   }
 }
 
+/**
+ * 8. DÙNG GEMINI AI DỊCH DANH MỤC SẢN PHẨM SANG TRUNG PHỒN THỂ (繁體中文)
+ * @param {Object} category - { name, desc }
+ */
+export async function translateCategoryToTraditionalChinese(category = {}) {
+  const prompt = `
+Bạn là chuyên gia thẩm định và phân loại trà & nguyên liệu F&B cao cấp tại Đài Loan.
+Hãy dịch tên và mô tả danh mục sản phẩm sau từ tiếng Việt sang TIẾNG TRUNG PHỒN THỂ (繁體中文 - Traditional Chinese):
+
+Thông tin danh mục:
+- Tên danh mục: "${category.name || ''}"
+- Mô tả: "${category.desc || ''}"
+
+QUY TẮC:
+- BẮT BUỘC dùng chữ Hán Phồn thể (繁體中文).
+- Dùng từ ngữ sang trọng, chuyên nghiệp chuẩn ngành trà & F&B Đài Loan (ví dụ: 特級阿薩姆與經典紅茶, 高山炭焙烏龍茶, 茉莉花茶與鮮萃綠茶, 特級植脂末與調飲配料...).
+
+YÊU CẦU ĐẦU RA JSON:
+{
+  "nameZh": "Tên danh mục tiếng Trung Phồn thể",
+  "descZh": "Mô tả danh mục tiếng Trung Phồn thể"
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    return {
+      nameZh: aiResult.nameZh || category.name || '',
+      descZh: aiResult.descZh || category.desc || ''
+    };
+  } catch (err) {
+    console.warn('[Gemini AI] Lỗi dịch danh mục sang tiếng Trung Phồn thể:', err.message);
+    return {
+      nameZh: category.name || '',
+      descZh: category.desc || ''
+    };
+  }
+}
+
+
 

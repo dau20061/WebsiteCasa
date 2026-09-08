@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   MapPin,
@@ -13,6 +14,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import WaveDivider from '../components/WaveDivider';
 import SEO from '../components/SEO';
 import { COMPANY_INFO } from '../constants/company';
 import { useToast } from '../components/Toast';
@@ -22,6 +24,8 @@ import { useLanguage } from '../context/LanguageContext';
 export default function Contact() {
   const { t, isChinese } = useLanguage();
   const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
+  const productParam = searchParams.get('product') || '';
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -29,10 +33,20 @@ export default function Contact() {
     phone: '',
     email: '',
     businessType: 'Chuỗi trà sữa (Nhiều chi nhánh)',
-    productInterest: 'Trà Đen Assam & Trà Ô Long Nướng',
+    productInterest: productParam ? `Tư vấn sản phẩm: ${productParam}` : 'Trà Đen Assam & Trà Ô Long Nướng',
     requestSample: true,
-    message: '',
+    message: productParam ? `Tôi quan tâm và muốn được tư vấn chi tiết, báo giá sỉ cho sản phẩm: ${productParam}` : '',
   });
+
+  useEffect(() => {
+    if (productParam) {
+      setFormData((prev) => ({
+        ...prev,
+        productInterest: `Tư vấn sản phẩm: ${productParam}`,
+        message: prev.message || `Tôi quan tâm và muốn được tư vấn chi tiết, báo giá sỉ cho sản phẩm: ${productParam}`
+      }));
+    }
+  }, [productParam]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +90,7 @@ export default function Contact() {
       />
 
       {/* 1. HERO HEADER */}
-      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] border-b border-tea-border/60 dark:border-white/10 overflow-hidden transition-colors">
+      <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-14 bg-gradient-to-b from-[#DFF5E1]/50 via-[#BFE8D0]/20 to-[#FAF9F5] dark:from-[#132B1C]/70 dark:via-[#0F1E14]/40 dark:to-[#0B130E] overflow-hidden transition-colors">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-5 right-10 w-[450px] h-[450px] bg-tea-mint/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-5 left-10 w-[350px] h-[350px] bg-tea-leaf/10 rounded-full blur-3xl pointer-events-none" />
@@ -94,6 +108,15 @@ export default function Contact() {
           </p>
         </div>
       </section>
+
+      {/* Animated Wavy Transition: Hero -> Contact Form */}
+      <WaveDivider
+        fromBg="bg-[#FAF9F5] dark:bg-[#0B130E]"
+        toColor="text-white dark:text-[#0B130E]"
+        accentColor="text-tea-mint/30 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-leaf/20 dark:text-tea-leaf/10"
+        flipX={false}
+      />
 
       {/* 2. MAIN CONTACT SECTION */}
       <section className="py-16 bg-white dark:bg-[#0B130E] transition-colors">
@@ -200,6 +223,22 @@ export default function Contact() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+                  {/* Banner sản phẩm đang yêu cầu tư vấn */}
+                  {productParam && (
+                    <div className="p-4 rounded-2xl bg-tea-mist dark:bg-[#1C2F23] border border-tea-leaf/30 dark:border-tea-mint/30 flex items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <Sparkles className="w-4 h-4 text-tea-emerald dark:text-tea-mint shrink-0" />
+                        <span className="text-gray-700 dark:text-gray-200">
+                          {isChinese ? '正在諮詢產品：' : 'Bạn đang yêu cầu tư vấn cho sản phẩm: '}
+                          <strong className="text-tea-dark dark:text-white font-bold">{productParam}</strong>
+                        </span>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full bg-tea-primary text-white text-[10px] font-bold shrink-0">
+                        {isChinese ? '專屬諮詢' : 'Tư Vấn Sản Phẩm'}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
@@ -350,8 +389,17 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* Animated Wavy Transition: Contact Form -> Maps */}
+      <WaveDivider
+        fromBg="bg-white dark:bg-[#0B130E]"
+        toColor="text-[#FAF9F5] dark:text-[#0E1711]"
+        accentColor="text-tea-leaf/25 dark:text-tea-mint/20"
+        secondaryAccent="text-tea-mint/20 dark:text-tea-leaf/10"
+        flipX={true}
+      />
+
       {/* 3. GOOGLE MAPS SECTION */}
-      <section className="py-12 bg-[#FAF9F5] dark:bg-[#0E1711] border-t border-tea-border/60 dark:border-white/10 transition-colors">
+      <section className="py-12 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-tea-dark dark:text-white flex items-center gap-2">

@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import {
   generateProductWithGemini,
   rewriteDescriptionWithGemini,
@@ -6,7 +6,8 @@ import {
   translateProductToTraditionalChinese,
   translateArticleToTraditionalChinese,
   translateFaqToTraditionalChinese,
-  translateMachineryToTraditionalChinese
+  translateMachineryToTraditionalChinese,
+  translateCategoryToTraditionalChinese
 } from '../services/aiService.js';
 
 const router = Router();
@@ -68,6 +69,15 @@ router.post('/translate-faq-zh', async (req, res) => {
 router.post('/translate-machinery-zh', async (req, res) => {
   try {
     const result = await translateMachineryToTraditionalChinese(req.body);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/translate-category-zh', async (req, res) => {
+  try {
+    const result = await translateCategoryToTraditionalChinese(req.body);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
