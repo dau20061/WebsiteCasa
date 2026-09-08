@@ -50,11 +50,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
-app.listen(PORT, () => {
-  console.log('====================================================');
-  console.log(`🍵 CASA TEA Backend Server is running on port ${PORT}`);
-  console.log(`🔗 API Base: http://localhost:${PORT}/api`);
-  console.log('====================================================');
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log('====================================================');
+    console.log(`CASA TEA Backend Server is running on port ${PORT}`);
+    console.log(`API Base: http://localhost:${PORT}/api`);
+    console.log('====================================================');
+  });
+}
 
 export default app;

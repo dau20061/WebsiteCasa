@@ -2,6 +2,7 @@
   "name": "casa-tea-workspace",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "CASA TEA & BEVERAGE SOLUTIONS - Monorepo Structure with Separated Frontend and Backend",
   "scripts": {
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
@@ -12,6 +13,12 @@
     "frontend:preview": "npm --prefix frontend run preview",
     "backend:test": "npm --prefix backend test",
     "backend:deploy": "firebase deploy --config backend/firebase.json"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.4.0"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
