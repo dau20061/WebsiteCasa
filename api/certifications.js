@@ -12,3 +12,4 @@ app.use('/certifications', certificationRoutes);
 app.use('/', certificationRoutes);
 
 export default app;
+

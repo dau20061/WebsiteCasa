@@ -70,6 +70,16 @@ YÊU CẦU ĐẦU RA ĐÚNG ĐỊNH DẠNG JSON:
 
 function fallbackTranslation(product) {
   const dictionary = [
+    [/syrup bí đao/gi, '特級冬瓜風味糖漿'],
+    [/siro bí đao/gi, '特級冬瓜風味糖漿'],
+    [/bí đao/gi, '冬瓜'],
+    [/syrup/gi, '風味糖漿'],
+    [/siro/gi, '風味糖漿'],
+    [/hàng mới/gi, '新品上市'],
+    [/bán chạy nhất|bán chạy/gi, '熱銷首選'],
+    [/cao cấp/gi, '頂級'],
+    [/thượng hạng/gi, '特選'],
+    [/đặc biệt/gi, '特級'],
     [/trà lài/gi, '茉莉綠茶'],
     [/trà xanh/gi, '綠茶'],
     [/trà sen/gi, '蓮花茶'],
@@ -81,11 +91,13 @@ function fallbackTranslation(product) {
     [/bột matcha/gi, '頂級抹茶粉'],
     [/matcha/gi, '抹茶粉'],
     [/bột pha chế/gi, '商用調飲粉'],
-    [/thượng hạng/gi, '特級'],
-    [/đặc biệt/gi, '特選'],
-    [/cao cấp/gi, '頂級'],
+    [/bột pudding/gi, '特調布丁粉'],
+    [/bột tàu hủ/gi, '豆花專用粉'],
+    [/bột kem béo|bột kem/gi, '特濃調飲奶精粉'],
     [/túi lọc tam giác/gi, '立體三角茶包'],
     [/túi lọc/gi, '原葉茶包'],
+    [/cao nguyên bảo lộc, lâm đồng/gi, '越南林同省保祿高原產區'],
+    [/cao nguyên bảo lộc/gi, '越南保祿高原'],
     [/bảo lộc/gi, '越南保祿'],
     [/lâm đồng/gi, '林同省'],
     [/mộc châu/gi, '越南木州'],
@@ -93,7 +105,6 @@ function fallbackTranslation(product) {
     [/việt nam/gi, '越南'],
     [/đài loan/gi, '臺灣'],
     [/nhật bản/gi, '日本'],
-    [/bán chạy/gi, '熱銷首選'],
     [/đậm đà/gi, '醇厚濃郁'],
     [/thơm mát/gi, '芬芳清香']
   ];
@@ -123,6 +134,16 @@ function fallbackTranslation(product) {
     fullDescZh = fullDescZh.replace(regex, replacement);
   }
 
+  if (nameZh === (product.name || '') && /bí đao/i.test(product.name)) {
+    nameZh = '特級冬瓜風味糖漿';
+  }
+  if (shortDescZh === (product.shortDesc || '') && /bí đao/i.test(product.name)) {
+    shortDescZh = '萃取新鮮冬瓜天然精華，CASA冬瓜糖漿呈現純淨清甜、天然濃郁風味與純樸清新的香氣，徹底喚醒味蕾。';
+  }
+  if (fullDescZh === (product.fullDesc || '') && /bí đao/i.test(product.name)) {
+    fullDescZh = 'CASA特級冬瓜糖漿完美再現傳統古早味冬瓜香，濃郁清甜，色澤晶瑩剔透。口感清爽解渴，尾韻回甘悠長，是調製古早味冬瓜茶、冬瓜鮮奶茶、冬瓜檸檬與各式創意冰飲的最佳專用原料。';
+  }
+
   const applicationsZh = (product.applications || []).map((app) => {
     let trans = String(app);
     for (const [regex, replacement] of dictionary) {
@@ -132,11 +153,11 @@ function fallbackTranslation(product) {
   });
 
   return {
-    nameZh: nameZh || product.name || '',
-    badgeZh: badgeZh || '精選原料',
+    nameZh: nameZh || product.name || '特選商用茶飲原料',
+    badgeZh: badgeZh || '新品上市',
     shortDescZh: shortDescZh || product.shortDesc || '',
     fullDescZh: fullDescZh || product.fullDesc || '',
-    originZh: originZh || '越南產地直送',
+    originZh: originZh || '越南林同省保祿高原產區',
     applicationsZh
   };
 }

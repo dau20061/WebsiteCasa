@@ -19,3 +19,4 @@ app.use('/categories', categoryRoutes);
 app.use('/', categoryRoutes);
 
 export default app;
+

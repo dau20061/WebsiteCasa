@@ -21,3 +21,4 @@ app.use('/faqs', faqRoutes);
 app.use('/', faqRoutes);
 
 export default app;
+

@@ -19,3 +19,4 @@ app.use('/news', newsRoutes);
 app.use('/', newsRoutes);
 
 export default app;
+

@@ -540,6 +540,12 @@ export default function AdminDashboard() {
         status: prod.status || 'PUBLISHED',
         purchaseAction: prod.purchaseAction || (prod.shopeeUrl ? 'shopee' : 'contact'),
         shopeeUrl: prod.shopeeUrl || '',
+        nameZh: prod.nameZh || '',
+        badgeZh: prod.badgeZh || '',
+        shortDescZh: prod.shortDescZh || '',
+        fullDescZh: prod.fullDescZh || '',
+        originZh: prod.originZh || '',
+        applicationsZh: prod.applicationsZh || [],
         tasteProfile: prod.tasteProfile || { aroma: 85, body: 90, sweetness: 75, color: 'Nâu đỏ ruby' },
         applications: prod.applications || ['Trà sữa truyền thống'],
         packaging: prod.packaging || ['Gói 1kg'],
@@ -561,6 +567,12 @@ export default function AdminDashboard() {
         shortDesc: '',
         fullDesc: '',
         origin: 'Cao nguyên Bảo Lộc, Lâm Đồng',
+        nameZh: '',
+        badgeZh: '新品上市',
+        shortDescZh: '',
+        fullDescZh: '',
+        originZh: '越南林同省保祿高原產區',
+        applicationsZh: ['濃醇厚奶茶', '現萃鮮果茶'],
         image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
         status: 'PUBLISHED',
         purchaseAction: 'contact',
@@ -757,15 +769,17 @@ export default function AdminDashboard() {
 
     let finalData = { ...productFormData };
 
-    // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ (繁體中文) NẾU CHƯA CÓ
-    if (!finalData.nameZh || !finalData.nameZh.trim()) {
+    // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ (繁體中文) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
+    const isZhEmptyOrVietnamese = !finalData.nameZh || !finalData.nameZh.trim() || finalData.nameZh.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+    if (isZhEmptyOrVietnamese) {
       try {
         const zh = await translateProductToTraditionalChinese(finalData);
         finalData.nameZh = zh.nameZh;
-        finalData.badgeZh = zh.badgeZh;
+        finalData.badgeZh = zh.badgeZh || '新品上市';
         finalData.shortDescZh = zh.shortDescZh;
         finalData.fullDescZh = zh.fullDescZh;
         finalData.originZh = zh.originZh;
+        finalData.applicationsZh = zh.applicationsZh;
       } catch (e) {
         console.warn('Tự động dịch ngầm:', e);
       }
@@ -3095,16 +3109,28 @@ export default function AdminDashboard() {
 
                   {/* BẢN DỊCH TRUNG PHỒN THỂ (繁體中文) */}
                   <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <span className="text-base">🇹🇼</span>
                         <span className="font-bold text-purple-900 text-xs">
                           Bản Dịch Tiếng Trung Phồn Thể (繁體中文)
                         </span>
                       </div>
-                      <span className="text-[10px] text-purple-600 font-medium">
-                        Tự động dịch bằng AI khi Lưu nếu để trống
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleTranslateProductZh}
+                          disabled={isTranslatingProduct}
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                          title="Dịch toàn bộ thông tin sản phẩm sang chữ Hán Phồn Thể"
+                        >
+                          <Sparkles className={`w-3.5 h-3.5 text-purple-200 ${isTranslatingProduct ? 'animate-spin' : ''}`} />
+                          <span>{isTranslatingProduct ? 'Đang dịch AI...' : '✨ Dịch Sang Tiếng Trung Ngay'}</span>
+                        </button>
+                        <span className="text-[10px] text-purple-600 font-medium">
+                          (Tự động dịch khi Lưu nếu để trống)
+                        </span>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

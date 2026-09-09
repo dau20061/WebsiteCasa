@@ -19,3 +19,4 @@ app.use('/products', productRoutes);
 app.use('/', productRoutes);
 
 export default app;
+
