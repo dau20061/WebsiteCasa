@@ -84,7 +84,7 @@ export default function FAQ() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-tea-dark dark:text-white tracking-tight">
             {t('faq_hero_title', 'Câu Hỏi Thường Gặp (FAQ)')}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto font-normal">
             {t('faq_hero_desc', 'Tổng hợp các thắc mắc phổ biến của các chuỗi trà sữa, quán cafe và nhà phân phối khi tìm hiểu về nguyên liệu và chính sách của CASA.')}
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function FAQ() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
                       >
-                        <div className="px-5 pb-6 sm:px-6 sm:pb-6 pt-2 border-t border-gray-100 dark:border-white/10 text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                        <div className="px-5 pb-6 sm:px-6 sm:pb-6 pt-2 border-t border-gray-100 dark:border-white/10 text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed font-normal">
                           {displayAnswer}
                         </div>
                       </motion.div>
@@ -204,7 +204,7 @@ export default function FAQ() {
                 <h3 className="text-lg font-bold text-tea-dark dark:text-white">
                   {isChinese ? '仍有其他疑問需要解答？' : 'Vẫn còn câu hỏi thắc mắc khác?'}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-normal">
                   {isChinese
                     ? '送出您的問題，CASA 專業調配技術專家將透過電子郵件或電話直接回覆您。'
                     : 'Gửi câu hỏi của bạn, chuyên gia kỹ thuật của CASA sẽ phản hồi trực tiếp qua email hoặc hotline.'}

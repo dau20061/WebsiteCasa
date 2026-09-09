@@ -50,17 +50,17 @@ export default function CertificationCard({ cert, onSelect }) {
           {displayTitle}
         </p>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          {isChinese ? '發證機構：' : 'Cơ quan:'} <span className="text-gray-700 dark:text-gray-200 font-medium">{displayOrg}</span>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
+          {isChinese ? '發證機構：' : 'Cơ quan:'} <span className="text-gray-800 dark:text-gray-200 font-semibold">{displayOrg}</span>
         </p>
 
         {/* Scope snippet */}
-        <p className="mt-3.5 text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+        <p className="mt-3.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3 font-normal">
           {displayScope}
         </p>
 
         {/* Placeholder disclaimer badge */}
-        <div className="mt-3.5 py-1.5 px-2.5 bg-gray-50 dark:bg-black/30 rounded-lg border border-dashed border-gray-200 dark:border-white/10 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+        <div className="mt-3.5 py-1.5 px-2.5 bg-gray-50 dark:bg-black/30 rounded-lg border border-dashed border-gray-200 dark:border-white/10 text-[11px] text-gray-600 dark:text-gray-400 flex items-center gap-1.5 font-medium">
           <span className="w-1.5 h-1.5 rounded-full bg-tea-leaf dark:bg-tea-mint" />
           <span className="truncate">{cert.certNumber}</span>
         </div>
@@ -68,7 +68,7 @@ export default function CertificationCard({ cert, onSelect }) {
 
       {/* Button to open lightbox preview */}
       <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-        <span className="text-[11px] text-gray-400 dark:text-gray-400">
+        <span className="text-[11px] text-gray-600 dark:text-gray-400 font-medium">
           {isChinese ? '效期：' : 'Hiệu lực:'} {displayValidity}
         </span>
         <button

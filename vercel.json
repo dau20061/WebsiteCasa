@@ -5,6 +5,20 @@
   "functions": {
     "api/**/*.js": {
       "includeFiles": "backend/**"
+    },
+    "api/*.js": {
+      "includeFiles": "backend/**"
     }
   }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

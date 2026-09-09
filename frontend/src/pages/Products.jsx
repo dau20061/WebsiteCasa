@@ -122,7 +122,7 @@ export default function Products() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-tea-dark dark:text-white tracking-tight">
             {t('prod_catalog_title', 'Danh Mục Trà Nguyên Liệu & Bột Pha Chế')}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto font-normal">
             {t('prod_catalog_desc', 'Hương vị chuẩn hóa, độ ổn định tuyệt đối và tỷ lệ chiết xuất TDS cao tối ưu chi phí giá vốn ly cho chuỗi đồ uống.')}
           </p>
         </div>
@@ -225,7 +225,7 @@ export default function Products() {
       <section className="py-12 bg-[#FAF9F5] dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Results counter */}
-          <div className="flex items-center justify-between mb-8 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between mb-8 text-xs text-gray-600 dark:text-gray-400 font-medium">
             <span>
               {isChinese ? '顯示 ' : 'Hiển thị '}
               <strong>{sortedProducts.length}</strong>
@@ -242,10 +242,10 @@ export default function Products() {
           {sortedProducts.length === 0 ? (
             <div className="py-20 text-center bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8">
               <Package className="w-12 h-12 text-gray-300 dark:text-gray-500 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-gray-700 dark:text-white">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-white">
                 {isChinese ? '查無符合條件的產品' : 'Không tìm thấy sản phẩm phù hợp'}
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-sm mx-auto font-medium">
                 {isChinese
                   ? '請嘗試使用其他關鍵字搜尋，或清除篩選條件以查看完整產品系列。'
                   : 'Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc để xem toàn bộ danh mục sản phẩm.'}

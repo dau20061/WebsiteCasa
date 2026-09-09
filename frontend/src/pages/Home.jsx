@@ -385,7 +385,7 @@ export default function Home() {
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isChinese ? '三大經典原茶基底' : '3 Dòng Cốt Trà Chuẩn Vị'}
               </h4>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '綠茶 (Green) • 紅茶 (Black) • 烏龍茶 (Oolong) 香氣濃郁飽滿，完美支撐各式手搖特調。'
                   : 'Trà Xanh (Green) • Trà Đen (Black) • Trà Ô Long (Oolong) đậm đà, chuẩn gu người tiêu dùng hiện đại.'}
@@ -405,7 +405,7 @@ export default function Home() {
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isChinese ? '三角立體茶包工藝' : 'Túi Lọc Tam Giác Pyramid'}
               </h4>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '食品級玉米纖維 PLA 環保網布，不吸附茶香，讓原葉在立體空間中完全舒展釋放。'
                   : 'Màng lưới bắp sinh học tự phân hủy, không gian bung tỏa tối đa cho búp trà nguyên bản.'}
@@ -425,7 +425,7 @@ export default function Home() {
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isChinese ? '高濃度萃取 TDS > 2.8%' : 'Chiết Xuất TDS > 2.8%'}
               </h4>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '茶湯醇厚回甘，加奶加冰不易淡味，1,000 批次風味始終穩定如一。'
                   : 'Cốt trà sánh đậm đặc biệt, không nhạt vị khi kết hợp đá hoặc sữa, 1.000 lô đồng nhất quanh năm.'}
@@ -445,7 +445,7 @@ export default function Home() {
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isChinese ? 'ISO 22000 & HACCP' : 'Chứng Nhận Quốc Tế'}
               </h4>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '嚴格遵循國際食安管理體系，SGS 多項無農殘檢驗，提供合規合法的批發證明文件。'
                   : 'Đạt chuẩn ISO 22000, HACCP, kiểm nghiệm khắt khe không dư lượng BVTV, an toàn tuyệt đối.'}
@@ -500,7 +500,7 @@ export default function Home() {
                     {(isChinese && val.subtitleZh) || val.subtitle}
                   </span>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                     {(isChinese && val.descZh) || val.desc}
                   </p>
                 </motion.div>
@@ -531,7 +531,7 @@ export default function Home() {
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-tea-dark dark:text-white tracking-tight">
                 {isChinese ? '探索我們的商用茶葉原料' : 'Khám phá dòng sản phẩm của chúng tôi'}
               </h2>
-              <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm sm:text-base max-w-xl">
+              <p className="mt-2 text-gray-700 dark:text-gray-300 text-sm sm:text-base max-w-xl font-normal">
                 {isChinese
                   ? '精選濃厚茶底、天然香氣與專業調飲粉料，深受各大餐飲及手搖飲連鎖品牌信賴。'
                   : 'Tuyển chọn những nền trà đậm vị, hương thơm tự nhiên và bột pha chế chuyên dụng được các chuỗi F&B tin dùng nhất.'}
@@ -724,7 +724,7 @@ export default function Home() {
                 <h4 className="text-base font-bold text-tea-dark dark:text-white">
                   {isChinese ? '需要每批次自我宣告文件與 COA 檢驗報告？' : 'Cần hồ sơ tự công bố & phiếu kiểm nghiệm COA từng lô?'}
                 </h4>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-0.5 font-normal">
                   {isChinese ? 'CASA 提供完整蓋印紙本證明及 PDF 電子檔，協助客戶順利完成各項法規備案與進口手續。' : 'CASA cung cấp đầy đủ bản cứng có dấu mộc và bản PDF cho quý khách hàng hoàn tất thủ tục pháp lý.'}
                 </p>
               </div>
@@ -815,7 +815,7 @@ export default function Home() {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="bg-white dark:bg-[#132018] p-7 rounded-3xl border border-tea-border dark:border-white/10 shadow-tea-sm flex flex-col justify-between"
               >
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed italic mb-6">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic mb-6 font-normal">
                   "{(isChinese && item.contentZh) || item.content}"
                 </p>
 
@@ -827,7 +827,7 @@ export default function Home() {
                   />
                   <div>
                     <h4 className="text-sm font-bold text-tea-dark dark:text-white">{item.name}</h4>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-1">{(isChinese && item.roleZh) || item.role}</p>
+                    <p className="text-[11px] text-gray-600 dark:text-gray-400 line-clamp-1 font-medium">{(isChinese && item.roleZh) || item.role}</p>
                   </div>
                 </div>
               </motion.div>
@@ -860,7 +860,7 @@ export default function Home() {
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-tea-dark dark:text-white tracking-tight">
                   {t('news_title', 'Tin Tức & Bí Quyết Pha Chế Nổi Bật')}
                 </h2>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 max-w-2xl">
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mt-2 max-w-2xl font-normal">
                   {t('news_subtitle', 'Cập nhật xu hướng đồ uống mới nhất, công thức chuẩn Barista SOP và kỹ thuật bảo quản cốt trà từ đội ngũ R&D CASA.')}
                 </p>
               </div>

@@ -40,6 +40,24 @@ app.use('/api/certifications', certificationRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/users', userRoutes);
+// Mount Routes (support both with /api and without /api for Vercel Serverless Function compatibility)
+const routeList = [
+  ['/products', productRoutes],
+  ['/categories', categoryRoutes],
+  ['/news', newsRoutes],
+  ['/faq', faqRoutes],
+  ['/faqs', faqRoutes],
+  ['/machinery', machineryRoutes],
+  ['/certifications', certificationRoutes],
+  ['/contacts', contactRoutes],
+  ['/ai', aiRoutes],
+  ['/users', userRoutes],
+];
+
+for (const [routePath, router] of routeList) {
+  app.use(`/api${routePath}`, router);
+  app.use(routePath, router);
+}
 
 // 404 handler
 app.use((req, res) => {

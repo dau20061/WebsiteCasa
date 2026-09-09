@@ -94,7 +94,7 @@ export default function MachineryCertifications() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed font-normal"
           >
             {isChinese
               ? '位於林同省保祿市佔地6,000平方公尺的現代化工廠，全面引進流化床乾燥線、Sortex 光學色選機及符合 ISO 22000 與 HACCP Codex 標準的無菌品管實驗室。'

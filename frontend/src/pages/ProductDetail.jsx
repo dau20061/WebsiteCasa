@@ -74,7 +74,7 @@ export default function ProductDetail() {
         <h2 className="text-2xl font-bold text-tea-dark dark:text-white">
           {isChinese ? '找不到該產品' : 'Không tìm thấy sản phẩm'}
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+        <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 font-normal">
           {isChinese ? '產品編號 ' : 'Mã sản phẩm '}
           <span className="font-mono font-bold text-tea-primary dark:text-tea-mint">{id}</span>
           {isChinese ? ' 不存在於系統中或已停產。' : ' không tồn tại trên hệ thống hoặc đã ngừng cung ứng.'}
@@ -186,7 +186,7 @@ export default function ProductDetail() {
         {/* Back Link */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-tea-primary dark:hover:text-tea-mint mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> {isChinese ? '返回上一頁列表' : 'Quay lại danh sách'}
         </button>
@@ -220,15 +220,15 @@ export default function ProductDetail() {
             {/* Sub details badges */}
             <div className="grid grid-cols-3 gap-3 text-center text-xs">
               <div className="p-3 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-gray-400 dark:text-gray-400 block font-mono text-[10px]">{isChinese ? '產品編號' : 'MÃ SKU'}</span>
+                <span className="text-gray-500 dark:text-gray-400 block font-mono text-[10px] font-semibold">{isChinese ? '產品編號' : 'MÃ SKU'}</span>
                 <span className="font-bold text-tea-dark dark:text-white mt-0.5 block">{sku}</span>
               </div>
               <div className="p-3 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-gray-400 dark:text-gray-400 block text-[10px]">{isChinese ? '保存期限' : 'HẠN SỬ DỤNG'}</span>
+                <span className="text-gray-500 dark:text-gray-400 block text-[10px] font-semibold">{isChinese ? '保存期限' : 'HẠN SỬ DỤNG'}</span>
                 <span className="font-bold text-tea-dark dark:text-white mt-0.5 block">{isChinese ? '24 個月' : shelfLife}</span>
               </div>
               <div className="p-3 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-gray-400 dark:text-gray-400 block text-[10px]">{isChinese ? '品質認證' : 'TIÊU CHUẨN'}</span>
+                <span className="text-gray-500 dark:text-gray-400 block text-[10px] font-semibold">{isChinese ? '品質認證' : 'TIÊU CHUẨN'}</span>
                 <span className="font-bold text-tea-emerald dark:text-tea-mint mt-0.5 block">ISO 22000</span>
               </div>
             </div>
@@ -245,7 +245,7 @@ export default function ProductDetail() {
                 {displayName}
               </h1>
 
-              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+              <p className="text-sm sm:text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-line font-normal">
                 {fullDesc}
               </p>
 
@@ -311,7 +311,7 @@ export default function ProductDetail() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-1">
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 font-medium pt-1">
                 <button
                   onClick={() => handleDownloadDoc('TDS Spec Sheet')}
                   className="inline-flex items-center gap-1.5 text-tea-emerald dark:text-tea-mint hover:underline font-semibold"
@@ -346,7 +346,7 @@ export default function ProductDetail() {
                 <h3 className="text-lg font-bold text-tea-dark dark:text-white">
                   {isChinese ? '調茶師標準萃取 SOP 指南' : 'Hướng Dẫn Ủ Cốt Trà Chuẩn SOP Barista'}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
                   {isChinese ? 'CASA 資深研發品茶師推薦最佳萃取參數' : 'Quy trình chiết xuất khuyến nghị từ chuyên gia CASA'}
                 </p>
               </div>
@@ -354,33 +354,33 @@ export default function ProductDetail() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
                   {isChinese ? '茶水比例 (茶 : 水)' : 'TỶ LỆ NƯỚC : TRÀ'}
                 </span>
                 <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.ratio}</span>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
                   {isChinese ? '最佳浸泡水溫' : 'NHIỆT ĐỘ NƯỚC Ủ'}
                 </span>
                 <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.temp}</span>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
                   {isChinese ? '悶泡萃取時間' : 'THỜI GIAN HÃM'}
                 </span>
                 <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.time}</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-tea-mist dark:bg-[#0B130E] border border-tea-leaf/20 dark:border-white/10 text-xs text-gray-700 dark:text-gray-300 space-y-1">
+            <div className="p-4 rounded-2xl bg-tea-mist dark:bg-[#0B130E] border border-tea-leaf/20 dark:border-white/10 text-xs text-gray-800 dark:text-gray-200 space-y-1">
               <strong className="text-tea-primary dark:text-tea-mint flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-tea-leaf" />
                 {isChinese ? 'Master Barista 調茶秘笈：' : 'Bí quyết từ Master Barista:'}
               </strong>
-              <p className="leading-relaxed">{brewingGuide.tips}</p>
+              <p className="leading-relaxed font-normal">{brewingGuide.tips}</p>
             </div>
           </div>
 
@@ -394,17 +394,17 @@ export default function ProductDetail() {
                 <h3 className="text-lg font-bold text-tea-dark dark:text-white">
                   {isChinese ? '商用包裝規格與檢驗標準' : 'Quy Cách Đóng Gói & Tiêu Chuẩn'}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
                   {isChinese ? '工業級 B2B 標準化出貨規格' : 'Quy cách B2B tiêu chuẩn công nghiệp'}
                 </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-bold text-gray-600 dark:text-gray-300 block">
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
                 {isChinese ? '出貨包裝規格：' : 'Quy cách xuất hàng:'}
               </span>
-              <ul className="space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+              <ul className="space-y-1.5 text-xs text-gray-800 dark:text-gray-200">
                 {packaging.map((pack, i) => (
                   <li key={i} className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-tea-leaf shrink-0" />
@@ -415,12 +415,12 @@ export default function ProductDetail() {
             </div>
 
             <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
-              <span className="text-xs font-bold text-gray-600 dark:text-gray-300 block">
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
                 {isChinese ? '實驗室檢測技術指標：' : 'Chỉ tiêu kỹ thuật kiểm định:'}
               </span>
               <div className="space-y-1.5 text-xs">
                 {specifications.map((spec, i) => (
-                  <div key={i} className="flex justify-between text-gray-600 dark:text-gray-400 border-b border-gray-50 dark:border-white/5 pb-1">
+                  <div key={i} className="flex justify-between text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-white/5 pb-1">
                     <span>{spec.label}:</span>
                     <strong className="text-tea-dark dark:text-white">{spec.value}</strong>
                   </div>

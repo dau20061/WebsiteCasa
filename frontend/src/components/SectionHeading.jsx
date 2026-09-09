@@ -49,7 +49,7 @@ export default function SectionHeading({
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className={`mt-4 text-base sm:text-lg leading-relaxed ${
-            dark ? 'text-gray-300' : 'text-gray-600 dark:text-gray-300'
+            dark ? 'text-gray-300' : 'text-gray-700 dark:text-gray-300 font-normal'
           }`}
         >
           {subtitle}

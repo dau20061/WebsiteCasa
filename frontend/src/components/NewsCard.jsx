@@ -36,7 +36,7 @@ export default function NewsCard({ article }) {
 
       <div className="p-6 flex-1 flex flex-col justify-between">
         <div>
-          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2.5">
+          <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 mb-2.5 font-medium">
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" /> {date}
             </span>
@@ -53,13 +53,13 @@ export default function NewsCard({ article }) {
             </h3>
           </Link>
 
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 line-clamp-2 leading-relaxed font-normal">
             {displayExcerpt}
           </p>
         </div>
 
         <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-          <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 italic">
+          <span className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 italic font-medium">
             {isChinese ? '發布:' : 'Bởi:'} {author.split('(')[0].trim()}
           </span>
 

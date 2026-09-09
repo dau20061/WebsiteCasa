@@ -281,7 +281,7 @@ export default function About() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed"
+              className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-normal"
             >
               {t('about_hero_desc', 'Khởi nguồn từ tình yêu với những đồi chè đại ngàn cao nguyên Việt Nam, CASA mang sứ mệnh chuẩn hóa hương vị, nâng tầm giá trị nông sản và đồng hành cùng sự phát triển bền vững của ngành F&B hiện đại.')}
             </motion.p>
@@ -312,13 +312,13 @@ export default function About() {
                 {isChinese ? '從晨霧繚繞的茶山，到現代化封閉式茶廠' : 'Từ Đồi Chè Sương Mù Đến Nhà Máy Hiện Đại'}
               </h2>
 
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '14 年前，我們注意到許多手搖茶飲與餐飲店主面臨著棘手難題：市面上的商業茶葉原料品質參差不齊、前後批次風味極不穩定，甚至過度使用刺鼻的人工化學香精。'
                   : 'Hơn 14 năm trước, chúng tôi nhận thấy các chủ quán trà sữa và đồ uống tại Việt Nam gặp phải một vấn đề nan giải: trà nguyên liệu trôi nổi trên thị trường thường không ổn định về chất lượng, lô trước đậm vị thì lô sau nhạt nhòa, hoặc sử dụng hương liệu tổng hợp gắt nồng khó chịu.'}
               </p>
 
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '這正是 CASA TEA 創立的初心。我們從直接與保祿（Bảo Lộc）及木州（Mộc Châu）高山茶農契作著手，建立半有機友善耕作標準，嚴格杜絕化學農藥，並打造符合 ISO 22000 與 HACCP Codex 國際規範的全封閉現代化製茶廠。'
                   : 'Đó là lý do CASA TEA ra đời. Chúng tôi bắt đầu bằng việc liên kết trực tiếp với các hộ nông dân tại vùng cao nguyên Bảo Lộc và Mộc Châu, thiết lập quy chuẩn canh tác bán hữu cơ, loại bỏ thuốc trừ sâu hóa học và xây dựng nhà máy chế biến khép kín chuẩn ISO 22000 & HACCP Codex.'}
@@ -327,7 +327,7 @@ export default function About() {
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#132018] border border-tea-border dark:border-white/10">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block font-sans">100%</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-medium mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1 block">
                     {isChinese ? '每批次嚴格農殘檢驗' : 'Kiểm tra dư lượng từng lô'}
                   </span>
                 </div>
@@ -335,7 +335,7 @@ export default function About() {
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block font-sans">
                     {isChinese ? '24 個月' : '24 Tháng'}
                   </span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-medium mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1 block">
                     {isChinese ? 'QC 品管留樣追溯期' : 'Lưu mẫu đối chứng QC'}
                   </span>
                 </div>
@@ -419,28 +419,28 @@ export default function About() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                 <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">21</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isChinese ? '跨國生產基地' : 'Cơ Sở Sản Xuất'}
                   </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">04</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isChinese ? '國家與地區' : 'Quốc Gia & Vùng'}
                   </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">08</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isChinese ? '核心服務項目' : 'Dịch Vụ Trọn Gói'}
                   </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/20 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">100%</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold mt-1 block">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isChinese ? '國際食安檢驗' : 'Kiểm Định An Toàn'}
                   </span>
                 </div>
@@ -483,7 +483,7 @@ export default function About() {
                   </div>
                 </div>
 
-                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 font-medium">
+                <p className="text-center text-xs text-gray-600 dark:text-gray-400 mt-3 font-medium">
                   {isChinese ? '▲ 點擊圖片可全螢幕高清縮放檢視 21 大工廠與服務地圖' : '▲ Nhấp vào hình để phóng to xem chi tiết bản đồ và 21 nhà máy'}
                 </p>
               </div>
@@ -499,7 +499,7 @@ export default function About() {
               <h3 className="text-2xl sm:text-3xl font-extrabold text-tea-dark dark:text-white tracking-tight">
                 {isChinese ? '一站式 OEM / ODM 全方位解決方案' : '8 Giải Pháp Dịch Vụ Sản Xuất & Chế Biến Toàn Diện'}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 font-normal">
                 {isChinese
                   ? '從品牌代工、茶飲研發到跨國檢驗，為您的飲品品牌提供無縫銜接的一條龍支持。'
                   : 'Đáp ứng mọi yêu cầu khắt khe từ đóng gói thương hiệu riêng, máy pha trà thông minh đến xuất khẩu quốc tế.'}
@@ -528,7 +528,7 @@ export default function About() {
                       <h4 className="text-base sm:text-lg font-bold text-tea-dark dark:text-white mb-2 leading-snug">
                         {isChinese ? srv.titleZh : srv.titleVi}
                       </h4>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed font-normal">
                         {isChinese ? srv.descZh : srv.descVi}
                       </p>
                     </div>
@@ -596,7 +596,7 @@ export default function About() {
                           {reg.count}
                         </span>
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-700 dark:text-gray-300 font-medium">
                         {isChinese ? reg.descZh : reg.descVi}
                       </p>
                     </div>
@@ -615,7 +615,7 @@ export default function About() {
                           <h5 className="text-sm font-bold text-tea-dark dark:text-white group-hover:text-tea-primary dark:group-hover:text-tea-mint transition-colors truncate">
                             {isChinese ? base.nameZh : base.nameVi}
                           </h5>
-                          <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                          <p className="text-[11px] text-gray-600 dark:text-gray-300 truncate mt-0.5 font-medium">
                             {base.en}
                           </p>
                         </div>
@@ -656,7 +656,7 @@ export default function About() {
               <h3 className="text-2xl font-bold text-tea-dark dark:text-white">
                 {isChinese ? '企業願景 (Vision)' : 'Tầm Nhìn (Vision)'}
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '成為越南及東南亞地區首屈一指的茶葉深加工製造商與原料解決方案提供商，是國內外知名餐飲連鎖集團不可或缺的戰略合作夥伴。'
                   : 'Trở thành đơn vị sản xuất, chế biến sâu và cung ứng giải pháp nguyên liệu trà số 1 tại Việt Nam và Đông Nam Á. Là đối tác chiến lược không thể thiếu của các tập đoàn chuỗi F&B trong nước và quốc tế.'}
@@ -671,7 +671,7 @@ export default function About() {
               <h3 className="text-2xl font-bold text-tea-dark dark:text-white">
                 {isChinese ? '發展使命 (Mission)' : 'Sứ Mệnh (Mission)'}
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese
                   ? '提供天然純淨的茶葉原料、終年穩定一致的醇厚風味與創新調配配方，協助客戶品牌建立獨特差異化，全面優化單杯經營成本。'
                   : 'Mang đến nguồn nguyên liệu trà tinh khiết, hương vị ổn định tuyệt đối và các giải pháp công thức sáng tạo. Giúp thương hiệu của khách hàng tạo dựng sự khác biệt độc đáo và tối ưu hóa hiệu quả kinh doanh.'}
@@ -692,7 +692,7 @@ export default function About() {
               <h4 className="font-bold text-tea-dark dark:text-white text-lg">
                 {isChinese ? '卓越品質' : 'Chất Lượng'}
               </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese ? '從產地源頭標準化把關，100% 堅持食品安全零妥協。' : 'Chuẩn hóa từ vùng trồng, kiểm soát 100% không thỏa hiệp về an toàn thực phẩm.'}
               </p>
             </div>
@@ -704,7 +704,7 @@ export default function About() {
               <h4 className="font-bold text-tea-dark dark:text-white text-lg">
                 {isChinese ? '誠信履約' : 'Uy Tín'}
               </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese ? '嚴格恪守供貨交期、研發配方絕對保密、批發價格公開透明。' : 'Giữ trọn cam kết về tiến độ giao hàng, bảo mật công thức và chính sách giá sỉ minh bạch.'}
               </p>
             </div>
@@ -716,7 +716,7 @@ export default function About() {
               <h4 className="font-bold text-tea-dark dark:text-white text-lg">
                 {isChinese ? '持續創新' : 'Đổi Mới'}
               </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese ? '緊跟全球手搖飲趨勢，導入國際頂尖低溫烘焙與色選加工科技。' : 'Không ngừng cập nhật xu hướng đồ uống toàn cầu, ứng dụng công nghệ sao sấy tân tiến.'}
               </p>
             </div>
@@ -728,7 +728,7 @@ export default function About() {
               <h4 className="font-bold text-tea-dark dark:text-white text-lg">
                 {isChinese ? '攜手共贏' : 'Đồng Hành'}
               </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isChinese ? '提供獨家 R&D 調茶諮詢、標準 SOP 培訓，與合作夥伴並肩壯大。' : 'Tư vấn R&D độc quyền, đào tạo barista và kề vai sát cánh cùng sự lớn mạnh của đối tác.'}
               </p>
             </div>
@@ -816,21 +816,21 @@ export default function About() {
                     {/* Metadata Badges */}
                     <div className="space-y-1.5 pt-1 text-xs">
                       <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
-                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '認證編號：' : 'Số chứng nhận:'}</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">{isChinese ? '認證編號：' : 'Số chứng nhận:'}</span>
                         <span className="font-mono font-semibold text-tea-dark dark:text-tea-mint bg-white dark:bg-black/40 px-2 py-0.5 rounded border border-gray-200 dark:border-white/10">
                           {cert.certNo}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
-                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '機構：' : 'Cơ quan:'}</span>
-                        <span className="font-medium text-gray-700 dark:text-gray-200 text-right truncate max-w-[150px]">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">{isChinese ? '機構：' : 'Cơ quan:'}</span>
+                        <span className="font-semibold text-gray-800 dark:text-gray-200 text-right truncate max-w-[150px]">
                           {isChinese ? cert.orgZh : cert.orgVi}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60 dark:border-white/10">
-                        <span className="text-gray-500 dark:text-gray-400">{isChinese ? '有效期限：' : 'Hiệu lực:'}</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">{isChinese ? '有效期限：' : 'Hiệu lực:'}</span>
                         <span className="font-medium text-emerald-600 dark:text-emerald-400">
                           {cert.validity}
                         </span>
@@ -839,10 +839,10 @@ export default function About() {
 
                     {/* Summary Description */}
                     <div className="pt-1">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                      <span className="text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider block mb-1">
                         {isChinese ? '涵蓋產品品類：' : 'Phạm vi chứng nhận:'}
                       </span>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-4">
+                      <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 font-normal">
                         {isChinese ? cert.summaryZh : cert.summaryVi}
                       </p>
                     </div>
@@ -944,12 +944,12 @@ export default function About() {
                     <p className="text-xs text-tea-emerald dark:text-tea-mint font-semibold mt-1">
                       {isChinese ? '海拔：' : 'Độ cao: '} {(isChinese && region.altitudeZh) || region.altitude}
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-2 leading-relaxed font-normal">
                       {(isChinese && region.climateZh) || region.climate}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="pt-3 border-t border-gray-100 dark:border-white/10 text-xs text-gray-700 dark:text-gray-300 font-medium">
                     <strong className="text-tea-primary dark:text-tea-mint">
                       {isChinese ? '特色：' : 'Đặc sản:'}
                     </strong>{' '}

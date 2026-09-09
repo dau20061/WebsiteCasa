@@ -103,7 +103,7 @@ export default function Contact() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-tea-dark dark:text-white tracking-tight">
             {t('contact_hero_title', 'Liên Hệ Với Chúng Tôi')}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto font-normal">
             {t('contact_hero_desc', 'Bạn đang tìm nguồn trà nguyên liệu cho thương hiệu của mình? Hãy kết nối với chúng tôi để nhận bảng giá sỉ và bộ mẫu thử miễn phí.')}
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function Contact() {
                 <h2 className="text-2xl font-bold text-tea-dark dark:text-white">
                   {isChinese ? '直接聯絡資訊' : 'Thông Tin Liên Lạc Trực Tiếp'}
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                   {isChinese
                     ? '我們誠摯歡迎各位合作夥伴預約參訪位於保祿的專業杯測實驗室 (Cupping Lab) 與現代化製茶廠。'
                     : 'Chúng tôi luôn sẵn sàng đón tiếp quý đối tác đến thăm quan Trung tâm Thử nếm Cupping Lab và Nhà máy chế biến tại Bảo Lộc.'}
@@ -150,7 +150,7 @@ export default function Contact() {
                     <strong className="text-tea-dark dark:text-white block font-bold mb-0.5">
                       {isChinese ? '總部研發中心 (Innovation Center)：' : 'Trụ Sở Chính (Innovation Center):'}
                     </strong>
-                    <span className="text-gray-600 dark:text-gray-300 leading-relaxed block">{COMPANY_INFO.headquarters}</span>
+                    <span className="text-gray-700 dark:text-gray-300 leading-relaxed block font-normal">{COMPANY_INFO.headquarters}</span>
                   </div>
                 </div>
 
@@ -182,7 +182,7 @@ export default function Contact() {
                 <h3 className="text-xl sm:text-2xl font-bold text-tea-dark dark:text-white">
                   {isChinese ? '送出諮詢與大宗批發報價需求' : 'Gửi Yêu Cầu Tư Vấn & Báo Giá Sỉ'}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-1 font-normal">
                   {isChinese
                     ? '請填寫以下資訊以取得階梯產量批發報價單，並預約免費樣品套件寄送。'
                     : 'Điền thông tin bên dưới để nhận bảng giá chiết khấu theo sản lượng và đăng ký nhận bộ mẫu thử tận nơi.'}
@@ -197,7 +197,7 @@ export default function Contact() {
                   <h4 className="text-2xl font-bold text-tea-dark dark:text-white">
                     {isChinese ? '感謝您的諮詢！' : 'Cảm Ơn Quý Khách!'}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 max-w-md mx-auto font-normal">
                     {isChinese
                       ? `CASA 已收到 ${formData.company || formData.fullName} 的諮詢需求。專屬業務人員將於 2 個工作小時內與您聯繫。`
                       : `CASA đã tiếp nhận thông tin yêu cầu của ${formData.company || formData.fullName}. Chuyên viên kinh doanh phụ trách khu vực sẽ kết nối qua Zalo/Điện thoại trong vòng 2 giờ làm việc.`}

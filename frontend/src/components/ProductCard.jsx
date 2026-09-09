@@ -89,14 +89,14 @@ export default function ProductCard({ product, onRequestSample }) {
             </h3>
           </Link>
 
-          <p className="mt-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">
+          <p className="mt-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 line-clamp-2 leading-relaxed font-normal">
             {displayShortDesc}
           </p>
 
           {/* Taste Sensory mini indicators */}
           {tasteProfile && (
             <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/10 space-y-2">
-              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between text-[11px] text-gray-600 dark:text-gray-400 font-medium">
                 <span className="flex items-center gap-1.5">
                   <Wind className="w-3 h-3 text-tea-leaf dark:text-tea-mint" /> {t('card_aroma', 'Hương thơm:')}
                 </span>
@@ -108,7 +108,7 @@ export default function ProductCard({ product, onRequestSample }) {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between text-[11px] text-gray-600 dark:text-gray-400 font-medium">
                 <span className="flex items-center gap-1.5">
                   <Flame className="w-3 h-3 text-tea-emerald dark:text-tea-leaf" /> {t('card_body', 'Độ đầm vị (Body):')}
                 </span>

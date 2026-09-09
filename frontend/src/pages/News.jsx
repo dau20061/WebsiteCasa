@@ -64,7 +64,7 @@ export default function News() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-tea-dark dark:text-white tracking-tight">
             {t('news_hero_title', 'Tin Tức, Xu Hướng & Công Thức Pha Chế')}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto font-normal">
             {t('news_hero_desc', 'Tổng hợp các báo cáo thị trường đồ uống, bí quyết kiểm soát chất lượng cốt trà và công thức menu mùa mới dành riêng cho chủ chuỗi.')}
           </p>
         </div>
@@ -99,11 +99,11 @@ export default function News() {
                   </h2>
                 </Link>
 
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                   {(isChinese && (featuredArticle.excerptZh || featuredArticle.excerpt_zh)) || featuredArticle.excerpt}
                 </p>
 
-                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 pt-2">
+                <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 pt-2 font-medium">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-tea-leaf dark:text-tea-mint" /> {featuredArticle.date}
                   </span>

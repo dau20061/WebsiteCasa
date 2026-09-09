@@ -97,7 +97,7 @@ export default function NewsDetail() {
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-tea-primary dark:hover:text-tea-mint mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> {isChinese ? '返回上一頁' : 'Quay lại'}
         </button>
@@ -114,7 +114,7 @@ export default function NewsDetail() {
               {displayTitle}
             </h1>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-b border-gray-100 dark:border-white/10 pb-6 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-b border-gray-100 dark:border-white/10 pb-6 text-xs text-gray-600 dark:text-gray-400 font-medium">
               <div className="flex items-center gap-4">
                 <span className="font-semibold text-tea-dark dark:text-white">{isChinese ? '作者' : 'Tác giả'}: {article.author}</span>
                 <span>•</span>
@@ -149,7 +149,7 @@ export default function NewsDetail() {
 
           {/* Article Body HTML Content */}
           <div
-            className="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed space-y-4"
+            className="prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed space-y-4 font-normal"
             dangerouslySetInnerHTML={{ __html: displayContent }}
           />
 
@@ -172,10 +172,10 @@ export default function NewsDetail() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
                     {isChinese ? '準備原物料：' : 'Nguyên liệu chuẩn bị:'}
                   </h4>
-                  <ul className="space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+                  <ul className="space-y-1.5 text-xs text-gray-800 dark:text-gray-200">
                     {article.recipeBox.ingredients.map((ing, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-tea-leaf shrink-0 mt-0.5" />
@@ -186,10 +186,10 @@ export default function NewsDetail() {
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
                     {isChinese ? '標準調茶 SOP 操作步驟：' : 'Các bước thực hiện SOP:'}
                   </h4>
-                  <ol className="list-decimal pl-4 space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+                  <ol className="list-decimal pl-4 space-y-1.5 text-xs text-gray-800 dark:text-gray-200">
                     {article.recipeBox.steps.map((st, i) => (
                       <li key={i} className="leading-relaxed">{st}</li>
                     ))}
@@ -202,8 +202,8 @@ export default function NewsDetail() {
           {/* Tags */}
           {article.tags && (
             <div className="pt-6 border-t border-gray-100 dark:border-white/10 flex flex-wrap items-center gap-2">
-              <Tag className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">
+              <Tag className="w-4 h-4 text-tea-leaf" />
+              <span className="text-xs text-gray-700 dark:text-gray-300 mr-2 font-medium">
                 {isChinese ? '文章標籤：' : 'Thẻ bài viết:'}
               </span>
               {article.tags.map((tag, i) => (
