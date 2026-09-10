@@ -13,19 +13,34 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
+  /* Native controls color-scheme for OS popups, dropdowns, scrollbars */
+  html.dark,
+  .dark {
+    color-scheme: dark;
+  }
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
   /* Form control text visibility safeguard */
   input, textarea, select {
     color: #111827;
   }
-  .dark input:not(.bg-white),
-  .dark textarea:not(.bg-white),
-  .dark select:not(.bg-white) {
+  .dark input,
+  .dark textarea,
+  .dark select {
     color: #f3f4f6;
   }
-  .bg-white input,
-  .bg-white textarea,
-  .bg-white select {
-    color: #111827 !important;
+
+  /* Select and option dropdown styling across browsers */
+  select option {
+    background-color: #ffffff;
+    color: #111827;
+  }
+  .dark select option,
+  html.dark select option {
+    background-color: #132018 !important;
+    color: #f3f4f6 !important;
   }
 }
 

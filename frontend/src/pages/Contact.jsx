@@ -250,7 +250,7 @@ export default function Contact() {
                         placeholder={isChinese ? "例如: 王大明" : "VD: Trần Anh Tuấn"}
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                       />
                     </div>
 
@@ -264,7 +264,7 @@ export default function Contact() {
                         placeholder={isChinese ? "例如: +886 912 345 678" : "VD: 0988 123 456"}
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -279,7 +279,7 @@ export default function Contact() {
                         placeholder={isChinese ? "例如: 沐茶茶飲連鎖" : "VD: Chuỗi Trà Sữa Mộc Trà"}
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                       />
                     </div>
 
@@ -292,7 +292,7 @@ export default function Contact() {
                         placeholder="email@example.com"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -305,21 +305,21 @@ export default function Contact() {
                       <select
                         value={formData.businessType}
                         onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white transition-colors cursor-pointer"
                       >
-                        <option value="Chuỗi trà sữa (Nhiều chi nhánh)">
+                        <option value="Chuỗi trà sữa (Nhiều chi nhánh)" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
                           {isChinese ? '連鎖茶飲體系 (多門市)' : 'Chuỗi trà sữa (Nhiều chi nhánh)'}
                         </option>
-                        <option value="Quán cafe / Trà sữa độc lập">
+                        <option value="Quán cafe / Trà sữa độc lập" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
                           {isChinese ? '獨立咖啡館 / 風格茶飲店' : 'Quán cafe / Trà sữa độc lập'}
                         </option>
-                        <option value="Xưởng sản xuất đóng chai RTD">
+                        <option value="Xưởng sản xuất đóng chai RTD" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
                           {isChinese ? '瓶裝即飲 RTD 生產工廠' : 'Xưởng sản xuất đóng chai RTD'}
                         </option>
-                        <option value="Đại lý phân phối nguyên liệu F&B">
+                        <option value="Đại lý phân phối nguyên liệu F&B" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
                           {isChinese ? '餐飲原物料經銷代理商' : 'Đại lý phân phối nguyên liệu F&B'}
                         </option>
-                        <option value="Gia công OEM/ODM thương hiệu riêng">
+                        <option value="Gia công OEM/ODM thương hiệu riêng" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
                           {isChinese ? '自有品牌客製代工 OEM/ODM' : 'Gia công OEM/ODM thương hiệu riêng'}
                         </option>
                       </select>
@@ -334,7 +334,7 @@ export default function Contact() {
                         placeholder={isChinese ? "例如: 炭焙烏龍茶、阿薩姆紅茶..." : "VD: Trà Oolong Nướng, Trà Đen Assam..."}
                         value={formData.productInterest}
                         onChange={(e) => setFormData({ ...formData, productInterest: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -364,7 +364,7 @@ export default function Contact() {
                       placeholder={isChinese ? "請描述預估每月採購量、配送地區或特定風味要求..." : "Mô tả số lượng dự kiến hàng tháng, khu vực giao hàng hoặc yêu cầu đặc biệt về hương vị..."}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 resize-none transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 resize-none transition-colors"
                     />
                   </div>
 

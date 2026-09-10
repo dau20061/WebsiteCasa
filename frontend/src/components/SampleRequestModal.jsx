@@ -203,11 +203,11 @@ export default function SampleRequestModal({ isOpen, onClose, defaultProduct = n
                     onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 focus:border-tea-emerald"
                   >
-                    <option className="dark:bg-[#1C2F23]">{isChinese ? '手搖茶飲連鎖（多家門市）' : 'Chuỗi trà sữa (Nhiều chi nhánh)'}</option>
-                    <option className="dark:bg-[#1C2F23]">{isChinese ? '獨立咖啡館 / 獨立茶飲店' : 'Quán cafe / Trà sữa độc lập'}</option>
-                    <option className="dark:bg-[#1C2F23]">{isChinese ? 'RTD 即飲瓶裝工廠 / OEM 代工' : 'Nhà xưởng đóng chai RTD / OEM'}</option>
-                    <option className="dark:bg-[#1C2F23]">{isChinese ? '餐飲原料批發經銷商' : 'Đại lý phân phối nguyên liệu F&B'}</option>
-                    <option className="dark:bg-[#1C2F23]">{isChinese ? '新店籌備項目（菜單研發中）' : 'Dự án mở quán mới (Đang lên menu)'}</option>
+                    <option className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">{isChinese ? '手搖茶飲連鎖（多家門市）' : 'Chuỗi trà sữa (Nhiều chi nhánh)'}</option>
+                    <option className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">{isChinese ? '獨立咖啡館 / 獨立茶飲店' : 'Quán cafe / Trà sữa độc lập'}</option>
+                    <option className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">{isChinese ? 'RTD 即飲瓶裝工廠 / OEM 代工' : 'Nhà xưởng đóng chai RTD / OEM'}</option>
+                    <option className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">{isChinese ? '餐飲原料批發經銷商' : 'Đại lý phân phối nguyên liệu F&B'}</option>
+                    <option className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">{isChinese ? '新店籌備項目（菜單研發中）' : 'Dự án mở quán mới (Đang lên menu)'}</option>
                   </select>
                 </div>
               </div>
@@ -219,13 +219,13 @@ export default function SampleRequestModal({ isOpen, onClose, defaultProduct = n
                 <select
                   value={formData.product}
                   onChange={(e) => setFormData({ ...formData, product: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 focus:border-tea-emerald"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 focus:border-tea-emerald cursor-pointer"
                 >
-                  <option value="Combo Mẫu Thử Đầy Đủ (Best-Sellers)" className="dark:bg-[#1C2F23]">
+                  <option value="Combo Mẫu Thử Đầy Đủ (Best-Sellers)" className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">
                     {isChinese ? '★ 熱銷必試：4款頂級商用茶樣體驗套件（阿薩姆、炭焙烏龍、茉莉綠茶、植脂末）' : '★ Combo Trọn Bộ 4 Mẫu Trà Thượng Hạng (Assam, Ô Long Nướng, Lài, Bột Béo)'}
                   </option>
                   {productList.map((p) => (
-                    <option key={p.id} value={p.name} className="dark:bg-[#1C2F23]">
+                    <option key={p.id} value={p.name} className="bg-white dark:bg-[#1C2F23] text-gray-800 dark:text-gray-100">
                       {p.sku} – {(isChinese && (p.nameZh || p.name_zh)) || p.name}
                     </option>
                   ))}

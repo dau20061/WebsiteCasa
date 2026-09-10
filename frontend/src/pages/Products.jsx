@@ -190,12 +190,12 @@ export default function Products() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-tea-border dark:border-white/15 text-xs font-semibold text-tea-dark dark:text-white bg-white dark:bg-[#132018] focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 transition-colors"
+                className="px-3 py-2 rounded-xl border border-tea-border dark:border-white/15 text-xs font-semibold text-tea-dark dark:text-white bg-white dark:bg-[#132018] focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 transition-colors cursor-pointer"
               >
-                <option value="popular">{t('sort_popular', 'Bán chạy nhất (Best Seller)')}</option>
-                <option value="body-desc">{t('sort_body', 'Độ đầm vị trà sữa (Body cao)')}</option>
-                <option value="aroma-desc">{t('sort_aroma', 'Hương thơm tự nhiên (Aroma cao)')}</option>
-                <option value="name-asc">{t('sort_name', 'Tên sản phẩm (A-Z)')}</option>
+                <option value="popular" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100">{t('sort_popular', 'Bán chạy nhất (Best Seller)')}</option>
+                <option value="body-desc" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100">{t('sort_body', 'Độ đầm vị trà sữa (Body cao)')}</option>
+                <option value="aroma-desc" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100">{t('sort_aroma', 'Hương thơm tự nhiên (Aroma cao)')}</option>
+                <option value="name-asc" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100">{t('sort_name', 'Tên sản phẩm (A-Z)')}</option>
               </select>
             </div>
           </div>
