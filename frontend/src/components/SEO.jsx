@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
 const SITE_URL = 'https://websiteacasa.vercel.app';
-const DEFAULT_IMAGE = `${SITE_URL}/leaf-icon.svg`;
+const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
 const SITE_NAME = 'CASA TEA & BEVERAGE SOLUTIONS';
 
 function setMetaTag(attrName, attrValue, content) {

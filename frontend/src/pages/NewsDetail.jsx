@@ -77,7 +77,6 @@ export default function NewsDetail() {
       <SEO
         title={`${displayTitle} – Kiến Thức & Công Thức F&B`}
         description={displayExcerpt}
-        keywords={[displayTitle, article.category, 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
         keywords={[displayTitle, article.category, ...(Array.isArray(article.tags) ? article.tags : []), 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
         canonical={`/news/${article.slug || article.id}`}
         ogType="article"
@@ -104,7 +103,7 @@ export default function NewsDetail() {
               name: 'CASA TEA & BEVERAGE SOLUTIONS',
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://websiteacasa.vercel.app/leaf-icon.svg'
+                url: 'https://websiteacasa.vercel.app/logo.png'
               }
             },
             mainEntityOfPage: `https://websiteacasa.vercel.app/news/${article.slug || article.id}`

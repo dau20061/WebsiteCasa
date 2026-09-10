@@ -1,8 +1,9 @@
 import WaveDivider from './WaveDivider';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { COMPANY_INFO } from '../constants/company';
+import logoImg from '../img/logo.png';
 import { useToast } from './Toast';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -42,23 +43,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-white/10">
           {/* Col 1 & 2: Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link to="/" className="flex items-center gap-3 shrink-0 select-none group">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-tea-leaf to-tea-mint flex items-center justify-center text-tea-dark shadow-tea-sm group-hover:scale-105 transition-transform shrink-0">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex flex-col justify-center shrink-0">
-                <div className="flex items-baseline gap-1.5 leading-none whitespace-nowrap">
-                  <span className="text-2xl font-black tracking-tight text-white">
-                    CASA
-                  </span>
-                  <span className="text-lg font-bold text-tea-mint">
-                    TEA
-                  </span>
-                </div>
-                <span className="text-[10px] tracking-widest uppercase text-tea-mint/80 font-semibold mt-1 whitespace-nowrap leading-none">
-                  Beverage Ingredient Solutions
-                </span>
-              </div>
+            <Link to="/" className="inline-block shrink-0 select-none group py-1">
+              <img
+                src={logoImg}
+                alt="CASA Tea & Food"
+                className="h-14 sm:h-16 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
+              />
             </Link>
 
             <p className="text-sm text-gray-300 leading-relaxed max-w-md">

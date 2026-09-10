@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, PhoneCall, Sparkles, ChevronRight, Leaf } from 'lucide-react';
+import { Menu, X, PhoneCall, Sparkles, ChevronRight } from 'lucide-react';
 import { COMPANY_INFO } from '../constants/company';
+import logoImg from '../img/logo.png';
 import ThemeToggle from './ThemeToggle';
 import LanguageToggle from './LanguageToggle';
 import { useLanguage } from '../context/LanguageContext';
@@ -51,23 +52,12 @@ export default function Navbar({ onOpenSampleModal }) {
       >
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 xl:gap-4">
           {/* Logo Brand */}
-          <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-tea-primary to-tea-green flex items-center justify-center text-white shadow-tea-sm group-hover:scale-105 transition-transform shrink-0">
-              <Leaf className="w-5 h-5 text-tea-mint" />
-            </div>
-            <div className="flex flex-col justify-center shrink-0">
-              <div className="flex items-baseline gap-1.5 leading-none whitespace-nowrap">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-tea-dark dark:text-white">
-                  CASA
-                </span>
-                <span className="text-base sm:text-lg font-bold text-tea-green dark:text-tea-mint">
-                  TEA
-                </span>
-              </div>
-              <span className="text-[9px] sm:text-[10px] tracking-widest uppercase text-gray-500 dark:text-gray-400 font-semibold mt-1 whitespace-nowrap leading-none">
-                Beverage Solutions
-              </span>
-            </div>
+          <Link to="/" className="flex items-center group shrink-0 select-none py-1">
+            <img
+              src={logoImg}
+              alt="CASA Tea & Food"
+              className="h-10 sm:h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm dark:brightness-125 dark:contrast-110"
+            />
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -172,12 +162,13 @@ export default function Navbar({ onOpenSampleModal }) {
             >
               {/* Drawer Top */}
               <div className="p-6 border-b border-gray-100 dark:border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-tea-primary flex items-center justify-center text-white">
-                    <Leaf className="w-4 h-4 text-tea-mint" />
-                  </div>
-                  <span className="font-bold text-lg text-tea-dark dark:text-white">CASA TEA</span>
-                </div>
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center">
+                  <img
+                    src={logoImg}
+                    alt="CASA Tea & Food"
+                    className="h-9 w-auto object-contain dark:brightness-125 dark:contrast-110"
+                  />
+                </Link>
 
                 <button
                   onClick={() => setMobileMenuOpen(false)}

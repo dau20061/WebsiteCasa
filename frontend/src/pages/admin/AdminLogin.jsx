@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, Lock, Mail, ShieldAlert, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import SEO from '../../components/SEO';
+import logoImg from '../../img/logo.png';
 
 export default function AdminLogin() {
   const { login, authError, isAuthenticated } = useAuth();
@@ -58,10 +59,12 @@ export default function AdminLogin() {
       >
         {/* Brand Header */}
         <div className="text-center space-y-3 mb-8">
-          <Link to="/" className="inline-flex items-center gap-2.5">
-            <div className="w-12 h-12 rounded-2xl bg-tea-primary flex items-center justify-center text-white shadow-tea-sm">
-              <Leaf className="w-6 h-6 text-tea-mint" />
-            </div>
+          <Link to="/" className="inline-block group">
+            <img
+              src={logoImg}
+              alt="CASA Tea & Food"
+              className="h-14 sm:h-16 w-auto object-contain mx-auto transition-transform group-hover:scale-105"
+            />
           </Link>
           <div>
             <h1 className="text-2xl font-extrabold text-tea-dark">CASA Admin Portal</h1>
