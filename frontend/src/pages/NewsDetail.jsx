@@ -75,7 +75,6 @@ export default function NewsDetail() {
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG NEWSARTICLE & BREADCRUMBS */}
       <SEO
-        title={displayTitle}
         title={`${displayTitle} – Kiến Thức & Công Thức F&B`}
         description={displayExcerpt}
         keywords={[displayTitle, article.category, 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
@@ -198,7 +197,6 @@ export default function NewsDetail() {
           <div className="rounded-3xl overflow-hidden aspect-[16/9] mb-10 bg-tea-mist dark:bg-[#0B130E] shadow-tea-sm">
             <img
               src={article.image}
-              alt={displayTitle}
               alt={`${displayTitle} – Chuyên Mục Kiến Thức & Công Thức Pha Chế CASA TEA`}
               title={`${displayTitle} – CASA TEA`}
               loading="eager"
@@ -209,7 +207,7 @@ export default function NewsDetail() {
 
           {/* Article Body HTML Content */}
           <div
-            className="prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed space-y-4 font-normal"
+            className="article-content prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed space-y-4 font-normal"
             dangerouslySetInnerHTML={{ __html: displayContent }}
           />
 

@@ -106,8 +106,6 @@ export default function Products() {
     <div className="overflow-hidden pb-20">
       {/* TECHNICAL SEO: COLLECTIONPAGE & ITEMLIST SCHEMA */}
       <SEO
-        title="Danh Mục Sản Phẩm Trà Nguyên Liệu"
-        description="Catalog sỉ trà nguyên liệu, trà đen Assam, trà ô long nướng, trà lài, trà rang Hojicha và bột béo thực vật chuyên nghiệp cho chuỗi F&B."
         title={t('prod_catalog_title', 'Danh Mục Trà Nguyên Liệu, Syrup & Bột Pha Chế Sỉ B2B')}
         description={t('prod_catalog_desc', 'Catalog sỉ trà nguyên liệu, trà đen Assam, trà ô long rang mộc, trà lài, syrup bí đao và bột béo thực vật cho chuỗi trà sữa và F&B toàn quốc.')}
         keywords={['trà nguyên liệu giá sỉ', 'nguyên liệu pha chế trà sữa', 'syrup bí đao', 'trà đen assam', 'trà ô long', 'bột béo B2B', 'CASA TEA']}

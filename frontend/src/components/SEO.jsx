@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function SEO({ title, description }) {
 const SITE_URL = 'https://websiteacasa.vercel.app';
 const DEFAULT_IMAGE = `${SITE_URL}/leaf-icon.svg`;
 const SITE_NAME = 'CASA TEA & BEVERAGE SOLUTIONS';
@@ -54,10 +53,6 @@ export default function SEO({
   const { isChinese } = useLanguage();
 
   useEffect(() => {
-    const fullTitle = title 
-      ? `${title} | CASA TEA – Giải Pháp Trà Nguyên Liệu B2B`
-      : 'CASA TEA | Tinh Hoa Trà Nguyên Liệu & Giải Pháp Pha Chế B2B Hàng Đầu';
-    
     // 1. TỐI ƯU TITLE TAG
     const defaultSuffix = isChinese
       ? 'CASA TEA | 專業商用茶飲原料與調飲方案'
@@ -65,11 +60,6 @@ export default function SEO({
     const fullTitle = title ? `${title} | ${defaultSuffix}` : defaultSuffix;
     document.title = fullTitle;
 
-    if (description) {
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', description);
-      }
     // 2. TỐI ƯU META DESCRIPTION
     const defaultDesc = isChinese
       ? 'CASA TEA – 專業商用茶飲原料、特選原葉茶包、風味糖漿與調飲專用粉研發供應商。符合ISO 22000、HACCP國際標準。'
@@ -99,7 +89,6 @@ export default function SEO({
     } else {
       setMetaTag('name', 'robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
     }
-  }, [title, description]);
 
     // 6. OPEN GRAPH (FACEBOOK, ZALO, LINKEDIN)
     setMetaTag('property', 'og:site_name', SITE_NAME);

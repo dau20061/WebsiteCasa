@@ -62,6 +62,9 @@ export default function ProductDetail() {
       <div className="pt-36 pb-20 text-center max-w-md mx-auto px-4">
         <RefreshCw className="w-10 h-10 text-tea-primary animate-spin mx-auto mb-4" />
         <h2 className="text-xl font-bold text-tea-dark">Đang tải thông tin sản phẩm...</h2>
+        <div className="w-12 h-12 border-4 border-tea-leaf border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-tea-dark dark:text-white">Đang tải thông tin sản phẩm...</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Vui lòng đợi trong giây lát</p>
       </div>
     );
   }
@@ -160,8 +163,6 @@ export default function ProductDetail() {
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
       <SEO
-        title={product.name}
-        description={product.shortDesc || fullDesc}
         title={`${displayName} – ${categoryName} Pha Chế B2B`}
         description={`Cung ứng sỉ ${displayName} (Mã: ${sku}). ${shortDesc || fullDesc?.slice(0, 150)} Đạt chuẩn ISO 22000, HACCP.`}
         keywords={[displayName, categoryName, 'nguyên liệu pha chế', 'trà nguyên liệu', 'mua sỉ F&B', sku, origin]}
@@ -271,7 +272,6 @@ export default function ProductDetail() {
             <div className="relative rounded-3xl overflow-hidden aspect-square bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
               <img
                 src={image}
-                alt={displayName}
                 alt={`${displayName} – ${categoryName} Nguyên Liệu Pha Chế Chuẩn B2B CASA TEA`}
                 title={`${displayName} – CASA TEA`}
                 loading="eager"

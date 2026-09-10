@@ -3764,7 +3764,7 @@ export default function AdminDashboard() {
 
                     {/* HTML Content Body */}
                     <div
-                      className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-4"
+                      className="article-content prose prose-sm max-w-none text-gray-700 dark:text-gray-200 leading-relaxed space-y-4"
                       dangerouslySetInnerHTML={{
                         __html:
                           newsFormData.content ||

@@ -25,16 +25,21 @@ export const NEWS_ARTICLES = [
     excerptZh: '新一代消費者逐漸從過度甜膩的奶茶轉向香氣濃郁、帶有鮮明炭焙或天然花香的厚茶基底。這是品牌全面升級茶底的黃金契機。',
     content: `
       <p class="lead text-lg font-medium text-tea-dark mb-4">
+      <p class="lead text-lg font-medium text-tea-dark dark:text-white mb-4">
         Sau một thập kỷ bùng nổ với hàng loạt trào lưu topping phong phú, năm 2026 đánh dấu sự quay trở lại mạnh mẽ của yếu tố cốt lõi: <strong>Chất lượng của cốt trà</strong>. Khách hàng ngày càng sành sỏi hơn, sẵn sàng chi trả cao hơn cho một ly đồ uống có hậu vị sâu lắng, hương thơm mộc mạc và cảm giác dễ chịu sau khi thưởng thức.
       </p>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">1. Sự thoái trào của trà sữa ngọt béo công nghiệp</h3>
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">1. Sự thoái trào của trà sữa ngọt béo công nghiệp</h3>
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Trước đây, nhiều mô hình quán dựa vào độ ngọt của siro và độ béo ngậy của bột kem để che giấu nền trà giá rẻ, bị đắng chát hoặc thiếu hương vị. Tuy nhiên, sự xuất hiện của các thương hiệu thế hệ mới chú trọng vào nguồn gốc lá trà đã định hình lại khẩu vị người dùng. Khách hàng giờ đây dễ dàng nhận ra sự khác biệt giữa hương thơm tự nhiên từ búp trà sao sấy chuẩn và mùi hương liệu nhân tạo hóa chất.
       </p>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">2. Ba dòng trà thống trị menu đồ uống hiện đại</h3>
       <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-6">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">2. Ba dòng trà thống trị menu đồ uống hiện đại</h3>
+      <ul class="list-disc pl-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
         <li><strong>Trà Ô Long Nướng (Charcoal Roasted Oolong):</strong> Với nốt hương khói nướng, caramel và hạt dẻ, Oolong nướng mang lại cảm giác ấm cúng, sang trọng và hòa quyện tuyệt vời với sữa tươi thanh trùng.</li>
         <li><strong>Trà Đen Assam Thượng Hạng:</strong> Mang lại sắc nước đỏ hổ phách và vị chát đầm ấm, giữ nguyên độ đượm vị ngay cả khi uống với nhiều đá bi.</li>
         <li><strong>Trà Lài Ướp Hoa Tự Nhiên:</strong> Là lựa chọn hàng đầu cho các món trà trái cây tươi nhờ hương thơm hoa nhài bung tỏa nhẹ nhàng, hậu vị thanh mát.</li>
@@ -43,12 +48,17 @@ export const NEWS_ARTICLES = [
       <div class="p-6 bg-tea-mist border-l-4 border-tea-green rounded-r-2xl my-6">
         <h4 class="font-bold text-tea-primary text-lg mb-2">Góc nhìn từ chuyên gia R&D CASA:</h4>
         <p class="text-gray-700 italic">
+      <div class="p-6 bg-tea-mist dark:bg-[#1A3024] border-l-4 border-tea-green dark:border-tea-mint rounded-r-2xl my-6">
+        <h4 class="font-bold text-tea-primary dark:text-tea-mint text-lg mb-2">Góc nhìn từ chuyên gia R&D CASA:</h4>
+        <p class="text-gray-700 dark:text-gray-300 italic">
           "Để giữ chân khách hàng quay lại hàng ngày, yếu tố quyết định không phải là ly trà có bao nhiêu loại trân châu, mà là ngụm trà đầu tiên phải tạo được ấn tượng êm dịu nơi vòm họng và lưu hương thơm bền bỉ sau khi nuốt. Đó chính là lý do CASA đầu tư hàng triệu USD vào dây chuyền chuẩn hóa hương vị."
         </p>
       </div>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">3. Bài toán kiểm soát cost cho các chuỗi lớn</h3>
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">3. Bài toán kiểm soát cost cho các chuỗi lớn</h3>
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Sử dụng trà chất lượng cao không đồng nghĩa với việc giá vốn (cost) ly đồ uống bị đội lên quá mức. Ngược lại, những dòng trà búp được sao chế bằng công nghệ sấy tầng sôi hiện đại có tỷ lệ chiết xuất TDS cao hơn 25-30% so với trà thông thường. Nhờ đó, barista có thể giảm lượng gram trà khô trên mỗi lít nước ủ mà vẫn đảm bảo cốt trà sánh đặc, tối ưu hóa lợi nhuận kinh doanh.
       </p>
     `,
@@ -89,11 +99,14 @@ export const NEWS_ARTICLES = [
     excerptZh: '許多店家苦惱綠茶茶湯放置2-3小時後便氧化變紅、茶湯渾濁且發酸發澀。讓我們一同探索科學的冰鎮鎖香技術。',
     content: `
       <p class="lead text-lg font-medium text-tea-dark mb-4">
+      <p class="lead text-lg font-medium text-tea-dark dark:text-white mb-4">
         Trà trái cây nhiệt đới là nhóm đồ uống mang lại biên lợi nhuận cao nhất trong menu, nhưng cũng là nhóm sản phẩm dễ gặp lỗi cảm quan nhất nếu quán không nắm vững kỹ thuật bảo quản nước cốt.
       </p>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">Hiện tượng trà bị thâm đỏ và chua gắt do đâu?</h3>
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">Hiện tượng trà bị thâm đỏ và chua gắt do đâu?</h3>
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Lá trà xanh và trà lài chứa hàm lượng lớn hợp chất Catechin và Diệp lục (Chlorophyll). Khi tiếp xúc với oxy trong không khí ở nhiệt độ phòng, quá trình tự oxy hóa diễn ra nhanh chóng, khiến cốt trà đổi màu từ vàng xanh sang đỏ sẫm và sinh ra các axit hữu cơ gây cảm giác chua gắt cổ họng.
       </p>
 
@@ -101,14 +114,22 @@ export const NEWS_ARTICLES = [
       <div class="space-y-4 mb-6 text-gray-700">
         <div class="p-4 bg-white rounded-xl shadow-tea-sm border border-tea-border">
           <h5 class="font-bold text-tea-emerald mb-1">Bước 1: Kiểm soát nhiệt độ nước ủ chính xác</h5>
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">Giải pháp 3 bước từ chuyên gia CASA</h3>
+      <div class="space-y-4 mb-6 text-gray-700 dark:text-gray-300">
+        <div class="p-4 bg-white dark:bg-[#0B130E] rounded-xl shadow-tea-sm border border-tea-border dark:border-white/10">
+          <h5 class="font-bold text-tea-emerald dark:text-tea-mint mb-1">Bước 1: Kiểm soát nhiệt độ nước ủ chính xác</h5>
           <p>Không dùng nước sôi 100°C để ủ trà xanh hay trà lài. Nhiệt độ lý tưởng nhất là 80°C - 83°C. Nước quá nóng sẽ làm 'chín luộc' lá trà, giải phóng ồ ạt vị chát tannin khó uống.</p>
         </div>
         <div class="p-4 bg-white rounded-xl shadow-tea-sm border border-tea-border">
           <h5 class="font-bold text-tea-emerald mb-1">Bước 2: Kỹ thuật sốc nhiệt bằng đá bi (Ice-Shock)</h5>
+        <div class="p-4 bg-white dark:bg-[#0B130E] rounded-xl shadow-tea-sm border border-tea-border dark:border-white/10">
+          <h5 class="font-bold text-tea-emerald dark:text-tea-mint mb-1">Bước 2: Kỹ thuật sốc nhiệt bằng đá bi (Ice-Shock)</h5>
           <p>Ngay sau khi lọc bã trà, cho ngay 20-25% trọng lượng đá bi sạch vào nước cốt trà nóng và khuấy nhanh. Việc hạ nhiệt đột ngột từ 80°C xuống dưới 20°C sẽ ngay lập tức 'khóa' phân tử polyphenol, giữ nguyên màu sắc xanh ngọc và hương hoa tinh khiết.</p>
         </div>
         <div class="p-4 bg-white rounded-xl shadow-tea-sm border border-tea-border">
           <h5 class="font-bold text-tea-emerald mb-1">Bước 3: Bảo quản trong bình chân không kín gió</h5>
+        <div class="p-4 bg-white dark:bg-[#0B130E] rounded-xl shadow-tea-sm border border-tea-border dark:border-white/10">
+          <h5 class="font-bold text-tea-emerald dark:text-tea-mint mb-1">Bước 3: Bảo quản trong bình chân không kín gió</h5>
           <p>Đựng nước cốt trong bình ủ inox chuyên dụng, đậy kín nắp. Cốt trà được xử lý đúng cách có thể lưu trữ thơm ngon trong 24-36 tiếng ở nhiệt độ mát mà không hề biến đổi phẩm vị.</p>
         </div>
       </div>
@@ -148,16 +169,21 @@ export const NEWS_ARTICLES = [
     excerptZh: 'CASA 如何確保原物料符合出口至歐盟、美國和日本等嚴苛市場的高標準？帶您深入了解負責任的綠色農業生態系。',
     content: `
       <p class="lead text-lg font-medium text-tea-dark mb-4">
+      <p class="lead text-lg font-medium text-tea-dark dark:text-white mb-4">
         An toàn vệ sinh thực phẩm không chỉ là một khẩu hiệu tiếp thị, mà là xương sống quyết định sự sống còn của một nhà máy cung ứng nguyên liệu đồ uống quy mô lớn.
       </p>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">1. Nguyên tắc vùng đệm tự nhiên tại nông trường</h3>
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">1. Nguyên tắc vùng đệm tự nhiên tại nông trường</h3>
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Các vùng chè nguyên liệu của CASA được quy hoạch tại các sườn đồi cách xa khu dân cư và quốc lộ tối thiểu 3km. Xung quanh các lô chè là hàng rào cây xanh bản địa tạo thành vùng đệm sinh thái ngăn cách tuyệt đối mọi nguồn lây nhiễm chéo từ không khí hoặc nguồn nước thải.
       </p>
 
       <h3 class="text-2xl font-bold text-tea-dark mt-6 mb-3">2. Phương pháp phân tích sắc ký khối phổ tiên tiến</h3>
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <h3 class="text-2xl font-bold text-tea-dark dark:text-white mt-6 mb-3">2. Phương pháp phân tích sắc ký khối phổ tiên tiến</h3>
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Phòng thí nghiệm kiểm nghiệm nội bộ của chúng tôi được trang bị hệ thống sắc ký lỏng ghép khối phổ hai lần (LC-MS/MS) và sắc ký khí (GC-MS/MS). Thiết bị có khả năng phát hiện dư lượng hoạt chất ở nồng độ siêu vết (phần tỷ - ppb), đảm bảo từng lô trà đáp ứng danh mục hơn 450 chỉ tiêu khắt khe theo quy định của Liên minh Châu Âu (EU MRLs).
       </p>
     `,
@@ -182,10 +208,12 @@ export const NEWS_ARTICLES = [
     excerptZh: 'CASA 位於林同省的第二座現代化加工廠順利通過驗收投產，使全國原物料供應能力翻倍提升。',
     content: `
       <p class="lead text-lg font-medium text-tea-dark mb-4">
+      <p class="lead text-lg font-medium text-tea-dark dark:text-white mb-4">
         Sự kiện đánh dấu cột mốc quan trọng trong chiến lược trở thành đơn vị sản xuất và cung ứng nguyên liệu pha chế hàng đầu tại khu vực Đông Nam Á của CASA.
       </p>
 
       <p class="mb-4 text-gray-700 leading-relaxed">
+      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
         Dây chuyền mới được nhập khẩu đồng bộ từ các đối tác chế tạo máy thực phẩm hàng đầu Châu Âu, tự động hóa từ khâu nạp liệu, sấy tầng sôi, tách tạp chất quang học Sortex cho đến đóng gói túi màng nhôm đa lớp hút chân không nạp khí trơ N2.
       </p>
     `,

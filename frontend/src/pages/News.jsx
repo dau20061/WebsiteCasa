@@ -47,8 +47,6 @@ export default function News() {
     <div className="overflow-hidden pb-20">
       {/* TECHNICAL SEO: COLLECTIONPAGE & ITEMLIST SCHEMA */}
       <SEO
-        title="Tin Tức & Kiến Thức Trà F&B"
-        description="Cập nhật xu hướng đồ uống 2026, công thức pha chế trà sữa, bí quyết ủ cốt trà và kiến thức kỹ thuật R&D từ chuyên gia CASA."
         title={t('news_hero_title', 'Tin Tức F&B, Xu Hướng Đồ Uống & Công Thức Pha Chế Trà Sữa')}
         description={t('news_hero_desc', 'Cập nhật xu hướng đồ uống 2026, công thức pha chế trà sữa chuẩn vị, bí quyết ủ cốt trà không chát và cẩm nang kỹ thuật R&D từ chuyên gia CASA TEA.')}
         keywords={['công thức pha chế trà sữa', 'tin tức F&B', 'bí quyết ủ trà', 'xu hướng đồ uống 2026', 'kiến thức trà sữa', 'CASA TEA']}

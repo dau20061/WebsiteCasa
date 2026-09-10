@@ -29,6 +29,141 @@
   }
 }
 
+/* ==========================================================================
+   Article Content & Rich Text Dark Mode Visibility Safeguard
+   ========================================================================== */
+.article-content {
+  color: #374151;
+  line-height: 1.8;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  color: #0E2218;
+  font-weight: 700;
+}
+
+.article-content .lead,
+.article-content p.lead {
+  color: #183B2B;
+}
+
+/* In Dark Mode: Ensure high contrast, crisp readability, and elegant cards */
+.dark .article-content,
+.dark .prose {
+  color: #E2E8F0 !important;
+}
+
+.dark .article-content h1,
+.dark .article-content h2,
+.dark .article-content h3,
+.dark .article-content h4,
+.dark .article-content h5,
+.dark .article-content h6,
+.dark .article-content .text-tea-dark,
+.dark .article-content [class*="text-tea-dark"],
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6,
+.dark .prose .text-tea-dark,
+.dark .prose [class*="text-tea-dark"] {
+  color: #FFFFFF !important;
+}
+
+.dark .article-content .lead,
+.dark .article-content p.lead,
+.dark .prose .lead,
+.dark .prose p.lead {
+  color: #F8FAFC !important;
+}
+
+.dark .article-content p,
+.dark .article-content li,
+.dark .article-content span,
+.dark .prose p,
+.dark .prose li,
+.dark .prose span {
+  color: #E2E8F0;
+}
+
+.dark .article-content .text-gray-600,
+.dark .article-content .text-gray-700,
+.dark .article-content .text-gray-800,
+.dark .prose .text-gray-600,
+.dark .prose .text-gray-700,
+.dark .prose .text-gray-800 {
+  color: #CBD5E1 !important;
+}
+
+.dark .article-content strong,
+.dark .article-content b,
+.dark .prose strong,
+.dark .prose b {
+  color: #FFFFFF !important;
+}
+
+.dark .article-content .text-tea-primary,
+.dark .article-content .text-tea-emerald,
+.dark .article-content .text-tea-green,
+.dark .article-content [class*="text-tea-primary"],
+.dark .article-content [class*="text-tea-emerald"],
+.dark .prose .text-tea-primary,
+.dark .prose .text-tea-emerald,
+.dark .prose .text-tea-green,
+.dark .prose [class*="text-tea-primary"],
+.dark .prose [class*="text-tea-emerald"] {
+  color: #69C496 !important;
+}
+
+/* Card boxes inside article content in dark mode */
+.dark .article-content .bg-white,
+.dark .prose .bg-white {
+  background-color: #0B130E !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #E2E8F0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .article-content .bg-white p,
+.dark .article-content .bg-white span,
+.dark .prose .bg-white p,
+.dark .prose .bg-white span {
+  color: #CBD5E1 !important;
+}
+
+.dark .article-content .bg-tea-mist,
+.dark .article-content .bg-tea-soft,
+.dark .prose .bg-tea-mist,
+.dark .prose .bg-tea-soft {
+  background-color: #1A3024 !important;
+  border-color: rgba(105, 196, 150, 0.3) !important;
+  color: #E2E8F0 !important;
+}
+
+.dark .article-content .border-tea-border,
+.dark .prose .border-tea-border {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .article-content .border-tea-green,
+.dark .article-content .border-tea-emerald,
+.dark .prose .border-tea-green,
+.dark .prose .border-tea-emerald {
+  border-color: #69C496 !important;
+}
+
+/* Global safeguard: dark mode text-tea-dark contrast fallback */
+.dark .text-tea-dark:not(.bg-white *):not([class*="dark:text-"]) {
+  color: #FFFFFF !important;
+}
+
 /* Dark mode scrollbars */
 .dark ::-webkit-scrollbar-track {
   background: #0B130E;
