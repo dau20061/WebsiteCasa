@@ -28,7 +28,6 @@ export default function ProductCard({ product, onRequestSample }) {
       <div className="relative h-60 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21]">
         <img
           src={image}
-          alt={displayName}
           alt={`${displayName} – ${displayCategoryName} Pha Chế B2B CASA TEA`}
           title={`${displayName} – CASA TEA`}
           loading="lazy"

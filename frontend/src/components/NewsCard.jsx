@@ -23,7 +23,6 @@ export default function NewsCard({ article }) {
       <Link to={`/news/${slug}`} className="relative h-52 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21] block">
         <img
           src={image}
-          alt={displayTitle}
           alt={`${displayTitle} – Tạp Chí F&B & Công Thức CASA TEA`}
           title={`${displayTitle} – CASA TEA`}
           loading="lazy"
