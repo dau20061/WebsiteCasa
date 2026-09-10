@@ -88,19 +88,15 @@
       "destination": "/api/ai/$1"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
-    },
-    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap.js"
     },
     {
-      "source": "/robots.txt",
-      "destination": "/robots.txt"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|robots\\.txt).*)",
       "destination": "/index.html"
     }
   ]
