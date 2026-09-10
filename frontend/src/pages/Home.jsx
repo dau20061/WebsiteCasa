@@ -25,6 +25,7 @@ import ProductCard from '../components/ProductCard';
 import NewsCard from '../components/NewsCard';
 import CertificationCard from '../components/CertificationCard';
 import SEO from '../components/SEO';
+import FallingTeaLeaves from '../components/FallingTeaLeaves';
 import { getRtdbProducts, getRtdbNews } from '../services/rtdbService';
 import { CERTIFICATIONS } from '../constants/certifications';
 import { PRODUCTION_STEPS } from '../constants/categories';
@@ -145,11 +146,14 @@ export default function Home() {
   const displayHomeNews = featuredHomeArticles.length > 0 ? featuredHomeArticles : news.slice(0, 3);
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden relative">
       <SEO
         title={isChinese ? "首頁 - CASA 專業商用茶葉原料" : "Trang Chủ"}
         description={isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, bột pha chế cao cấp cho chuỗi trà sữa, quán cafe và ngành F&B toàn quốc."}
       />
+
+      {/* Hiệu Ứng Lá Trà Rơi Nghệ Thuật CASA TEA */}
+      <FallingTeaLeaves />
 
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[92vh] flex items-center pt-24 pb-20 lg:pt-32 lg:pb-28 bg-gradient-to-b from-[#EBF8EE]/80 via-[#DCF3E4]/30 to-[#FAF9F5] dark:from-[#0D1D13] dark:via-[#09140D] dark:to-[#070D09]">
