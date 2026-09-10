@@ -5,95 +5,12 @@
   "functions": {
     "api/**/*.js": {
       "includeFiles": "backend/**"
-    },
-    "api/*.js": {
-      "includeFiles": "backend/**"
     }
   },
   "rewrites": [
     {
-      "source": "/api/products",
-      "destination": "/api/products.js"
-    },
-    {
-      "source": "/api/products/(.*)",
-      "destination": "/api/products.js?id=$1"
-    },
-    {
-      "source": "/api/categories",
-      "destination": "/api/categories.js"
-    },
-    {
-      "source": "/api/categories/(.*)",
-      "destination": "/api/categories.js?id=$1"
-    },
-    {
-      "source": "/api/news",
-      "destination": "/api/news.js"
-    },
-    {
-      "source": "/api/news/(.*)",
-      "destination": "/api/news.js?id=$1"
-    },
-    {
-      "source": "/api/faq",
-      "destination": "/api/faq.js"
-    },
-    {
-      "source": "/api/faq/(.*)",
-      "destination": "/api/faq.js?id=$1"
-    },
-    {
-      "source": "/api/faqs",
-      "destination": "/api/faq.js"
-    },
-    {
-      "source": "/api/faqs/(.*)",
-      "destination": "/api/faq.js?id=$1"
-    },
-    {
-      "source": "/api/machinery",
-      "destination": "/api/machinery.js"
-    },
-    {
-      "source": "/api/machinery/(.*)",
-      "destination": "/api/machinery.js?id=$1"
-    },
-    {
-      "source": "/api/certifications",
-      "destination": "/api/certifications.js"
-    },
-    {
-      "source": "/api/contacts",
-      "destination": "/api/contacts.js"
-    },
-    {
-      "source": "/api/contacts/(.*)",
-      "destination": "/api/contacts.js?id=$1"
-    },
-    {
-      "source": "/api/users",
-      "destination": "/api/users.js"
-    },
-    {
-      "source": "/api/users/(.*)",
-      "destination": "/api/users.js?uid=$1"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/api/health.js"
-    },
-    {
-      "source": "/api/ai/(.*)",
-      "destination": "/api/ai/$1"
-    },
-    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap.js"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
     },
     {
       "source": "/((?!api/|robots\\.txt).*)",
