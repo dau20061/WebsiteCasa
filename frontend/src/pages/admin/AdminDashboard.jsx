@@ -339,6 +339,7 @@ export default function AdminDashboard() {
   const [newsSearch, setNewsSearch] = useState('');
   const [newsModalOpen, setNewsModalOpen] = useState(false);
   const [editingNews, setEditingNews] = useState(null);
+  const [newsTagInput, setNewsTagInput] = useState('');
   const [newsFormData, setNewsFormData] = useState({
     title: '',
     titleZh: '',
@@ -354,6 +355,7 @@ export default function AdminDashboard() {
     image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80',
     content: '',
     contentZh: '',
+    tags: ['CASA Tea', 'F&B 2026'],
     featuredHome: false,
     featuredNews: false
   });
@@ -896,7 +898,37 @@ export default function AdminDashboard() {
         featuredNews: false
       });
     }
+    setNewsTagInput('');
     setNewsModalOpen(true);
+  };
+
+  // Thêm Tag SEO cho bài viết
+  const handleAddNewsTag = (tagToAdd = null) => {
+    const rawVal = typeof tagToAdd === 'string' ? tagToAdd : newsTagInput;
+    const val = (rawVal || '').trim().replace(/^#+/, '');
+    if (!val) return;
+
+    const currentTags = Array.isArray(newsFormData.tags) ? [...newsFormData.tags] : [];
+    if (currentTags.includes(val)) {
+      showToast(`Từ khóa "${val}" đã có trong danh sách Tags!`, 'info');
+      setNewsTagInput('');
+      return;
+    }
+
+    setNewsFormData({
+      ...newsFormData,
+      tags: [...currentTags, val]
+    });
+    setNewsTagInput('');
+  };
+
+  // Xóa Tag SEO khỏi bài viết
+  const handleRemoveNewsTag = (tagToRemove) => {
+    const currentTags = Array.isArray(newsFormData.tags) ? newsFormData.tags : [];
+    setNewsFormData({
+      ...newsFormData,
+      tags: currentTags.filter((t) => t !== tagToRemove)
+    });
   };
 
   // Tự động thiết kế bài viết & công thức bằng AI
@@ -3630,6 +3662,110 @@ export default function AdminDashboard() {
                       />
                     </div>
 
+                    {/* TAGS & TỪ KHÓA SEO GOOGLE */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50/90 to-teal-50/90 border border-emerald-200/80 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-emerald-600" />
+                          <span className="font-bold text-emerald-950 text-xs sm:text-sm">
+                            Tags & Từ Khóa SEO Google (Google Search Keywords)
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-emerald-700 font-medium">
+                          Tự động đẩy vào Thẻ SEO Meta & Chân Bài Viết
+                        </span>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Nhập từ khóa SEO rồi bấm 'Thêm Tag' hoặc nhấn Enter (VD: Trà nguyên liệu, Siro bí đao...)"
+                            value={newsTagInput}
+                            onChange={(e) => setNewsTagInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddNewsTag();
+                              }
+                            }}
+                            className="flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-emerald-300 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-emerald-500/30 font-medium"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleAddNewsTag()}
+                            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 flex items-center gap-1.5"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Thêm Tag</span>
+                          </button>
+                        </div>
+
+                        {/* Danh sách Tags đã thêm */}
+                        <div className="flex flex-wrap items-center gap-1.5 min-h-[30px] pt-0.5">
+                          {newsFormData.tags && newsFormData.tags.length > 0 ? (
+                            newsFormData.tags.map((tag, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold shadow-2xs group hover:border-emerald-400 transition-colors"
+                              >
+                                <span>#{tag}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveNewsTag(tag)}
+                                  className="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded-md hover:bg-red-50"
+                                  title="Xóa tag này"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-xs text-gray-400 italic">
+                              Chưa có thẻ tag nào. Hãy thêm từ khóa để bài viết đạt thứ hạng SEO Google cao nhất!
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Gợi ý từ khóa SEO F&B nhanh */}
+                        <div className="pt-2 border-t border-emerald-200/60">
+                          <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider block mb-1.5">
+                            💡 Gợi ý từ khóa SEO F&B phổ biến (Bấm để thêm nhanh):
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              'Trà nguyên liệu',
+                              'Công thức pha chế',
+                              'Trà trái cây',
+                              'Trà sữa đậm vị',
+                              'Ô long nướng',
+                              'Bí quyết ủ trà',
+                              'Bột béo thực vật',
+                              'Xu hướng F&B 2026',
+                              'CASA TEA'
+                            ].map((suggested) => {
+                              const isAdded = (newsFormData.tags || []).includes(suggested);
+                              return (
+                                <button
+                                  key={suggested}
+                                  type="button"
+                                  disabled={isAdded}
+                                  onClick={() => handleAddNewsTag(suggested)}
+                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                                    isAdded
+                                      ? 'bg-emerald-100 text-emerald-400 cursor-default opacity-60'
+                                      : 'bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-200 hover:border-emerald-300 shadow-2xs'
+                                  }`}
+                                >
+                                  {isAdded ? `✓ ${suggested}` : `+ ${suggested}`}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Detailed HTML Content Editor */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
@@ -3809,6 +3945,23 @@ export default function AdminDashboard() {
                             </ol>
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Tags Preview */}
+                    {newsFormData.tags && newsFormData.tags.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-4 border-t border-gray-100">
+                        <span className="text-[11px] font-bold text-gray-400 flex items-center gap-1 mr-1">
+                          <Tag className="w-3.5 h-3.5 text-emerald-600" /> Tags SEO:
+                        </span>
+                        {newsFormData.tags.map((tg, i) => (
+                          <span
+                            key={i}
+                            className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200"
+                          >
+                            #{tg}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>

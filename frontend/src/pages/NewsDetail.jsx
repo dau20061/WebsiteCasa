@@ -78,6 +78,7 @@ export default function NewsDetail() {
         title={`${displayTitle} – Kiến Thức & Công Thức F&B`}
         description={displayExcerpt}
         keywords={[displayTitle, article.category, 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
+        keywords={[displayTitle, article.category, ...(Array.isArray(article.tags) ? article.tags : []), 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
         canonical={`/news/${article.slug || article.id}`}
         ogType="article"
         ogImage={article.image}
@@ -90,6 +91,7 @@ export default function NewsDetail() {
             '@type': 'NewsArticle',
             headline: displayTitle,
             description: displayExcerpt,
+            keywords: (article.tags && article.tags.length > 0) ? article.tags.join(', ') : undefined,
             image: [article.image],
             datePublished: article.createdAt || '2026-01-01T00:00:00Z',
             dateModified: article.updatedAt || article.createdAt || '2026-01-01T00:00:00Z',
