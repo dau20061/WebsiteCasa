@@ -73,9 +73,65 @@ export default function NewsDetail() {
 
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
+      {/* TECHNICAL SEO: SCHEMA.ORG NEWSARTICLE & BREADCRUMBS */}
       <SEO
         title={displayTitle}
+        title={`${displayTitle} – Kiến Thức & Công Thức F&B`}
         description={displayExcerpt}
+        keywords={[displayTitle, article.category, 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
+        canonical={`/news/${article.slug || article.id}`}
+        ogType="article"
+        ogImage={article.image}
+        ogImageAlt={`${displayTitle} – CASA TEA`}
+        publishedTime={article.createdAt || '2026-01-01T00:00:00Z'}
+        modifiedTime={article.updatedAt || article.createdAt || '2026-01-01T00:00:00Z'}
+        author={article.author || 'CASA TEA R&D Team'}
+        jsonLd={[
+          {
+            '@type': 'NewsArticle',
+            headline: displayTitle,
+            description: displayExcerpt,
+            image: [article.image],
+            datePublished: article.createdAt || '2026-01-01T00:00:00Z',
+            dateModified: article.updatedAt || article.createdAt || '2026-01-01T00:00:00Z',
+            author: {
+              '@type': 'Person',
+              name: article.author || 'CASA TEA R&D Team'
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'CASA TEA & BEVERAGE SOLUTIONS',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://websiteacasa.vercel.app/leaf-icon.svg'
+              }
+            },
+            mainEntityOfPage: `https://websiteacasa.vercel.app/news/${article.slug || article.id}`
+          },
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: isChinese ? '首頁' : 'Trang Chủ',
+                item: 'https://websiteacasa.vercel.app/'
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: isChinese ? '資訊與配方' : 'Tin Tức & Công Thức',
+                item: 'https://websiteacasa.vercel.app/news'
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: displayTitle,
+                item: `https://websiteacasa.vercel.app/news/${article.slug || article.id}`
+              }
+            ]
+          }
+        ]}
       />
 
       {/* Breadcrumbs */}
@@ -143,6 +199,10 @@ export default function NewsDetail() {
             <img
               src={article.image}
               alt={displayTitle}
+              alt={`${displayTitle} – Chuyên Mục Kiến Thức & Công Thức Pha Chế CASA TEA`}
+              title={`${displayTitle} – CASA TEA`}
+              loading="eager"
+              fetchPriority="high"
               className="w-full h-full object-cover"
             />
           </div>

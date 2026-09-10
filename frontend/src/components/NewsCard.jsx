@@ -24,7 +24,10 @@ export default function NewsCard({ article }) {
         <img
           src={image}
           alt={displayTitle}
+          alt={`${displayTitle} – Tạp Chí F&B & Công Thức CASA TEA`}
+          title={`${displayTitle} – CASA TEA`}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover object-center transform group-hover:scale-106 transition-transform duration-500 ease-out"
         />
         <div className="absolute top-3.5 left-3.5">

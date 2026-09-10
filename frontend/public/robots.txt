@@ -1,0 +1,25 @@
+# ==============================================================================
+# CASA TEA & BEVERAGE SOLUTIONS - ROBOTS.TXT
+# Standard Search Engine Crawling Directives (Google, Bing, Yahoo, Baidu)
+# ==============================================================================
+
+User-agent: *
+Allow: /
+Allow: /products
+Allow: /products/*
+Allow: /news
+Allow: /news/*
+Allow: /about
+Allow: /contact
+Allow: /machinery-certifications
+Allow: /faq
+
+# Disallow private administrative & api endpoints
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /403
+Disallow: /api/
+
+# Sitemap Location
+Sitemap: https://websiteacasa.vercel.app/sitemap.xml
+

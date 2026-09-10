@@ -29,7 +29,10 @@ export default function ProductCard({ product, onRequestSample }) {
         <img
           src={image}
           alt={displayName}
+          alt={`${displayName} – ${displayCategoryName} Pha Chế B2B CASA TEA`}
+          title={`${displayName} – CASA TEA`}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover object-center transform group-hover:scale-108 transition-transform duration-500 ease-out"
         />
         

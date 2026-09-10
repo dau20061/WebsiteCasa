@@ -104,9 +104,31 @@ export default function Products() {
 
   return (
     <div className="overflow-hidden pb-20">
+      {/* TECHNICAL SEO: COLLECTIONPAGE & ITEMLIST SCHEMA */}
       <SEO
         title="Danh Mục Sản Phẩm Trà Nguyên Liệu"
         description="Catalog sỉ trà nguyên liệu, trà đen Assam, trà ô long nướng, trà lài, trà rang Hojicha và bột béo thực vật chuyên nghiệp cho chuỗi F&B."
+        title={t('prod_catalog_title', 'Danh Mục Trà Nguyên Liệu, Syrup & Bột Pha Chế Sỉ B2B')}
+        description={t('prod_catalog_desc', 'Catalog sỉ trà nguyên liệu, trà đen Assam, trà ô long rang mộc, trà lài, syrup bí đao và bột béo thực vật cho chuỗi trà sữa và F&B toàn quốc.')}
+        keywords={['trà nguyên liệu giá sỉ', 'nguyên liệu pha chế trà sữa', 'syrup bí đao', 'trà đen assam', 'trà ô long', 'bột béo B2B', 'CASA TEA']}
+        canonical="/products"
+        ogType="website"
+        jsonLd={{
+          '@type': 'CollectionPage',
+          name: 'Danh Mục Trà Nguyên Liệu & Giải Pháp Pha Chế CASA TEA',
+          description: 'Cung cấp sỉ trà nguyên liệu, trà búp cao cấp, syrup và bột pha chế cho các chuỗi trà sữa và quán cà phê.',
+          url: 'https://websiteacasa.vercel.app/products',
+          mainEntity: {
+            '@type': 'ItemList',
+            numberOfItems: filteredProducts.length,
+            itemListElement: filteredProducts.slice(0, 30).map((p, index) => ({
+              '@type': 'ListItem',
+              position: index + 1,
+              name: p.name,
+              url: `https://websiteacasa.vercel.app/products/${p.id}`
+            }))
+          }
+        }}
       />
 
       {/* 1. HERO HEADER */}

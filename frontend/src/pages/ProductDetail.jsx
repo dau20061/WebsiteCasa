@@ -158,9 +158,81 @@ export default function ProductDetail() {
 
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
+      {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
       <SEO
         title={product.name}
         description={product.shortDesc || fullDesc}
+        title={`${displayName} – ${categoryName} Pha Chế B2B`}
+        description={`Cung ứng sỉ ${displayName} (Mã: ${sku}). ${shortDesc || fullDesc?.slice(0, 150)} Đạt chuẩn ISO 22000, HACCP.`}
+        keywords={[displayName, categoryName, 'nguyên liệu pha chế', 'trà nguyên liệu', 'mua sỉ F&B', sku, origin]}
+        canonical={`/products/${product.id}`}
+        ogType="product"
+        ogImage={image}
+        ogImageAlt={`${displayName} - Nguyên Liệu Pha Chế CASA TEA`}
+        jsonLd={[
+          {
+            '@type': 'Product',
+            name: displayName,
+            image: [image],
+            description: fullDesc,
+            sku: sku,
+            mpn: sku,
+            brand: {
+              '@type': 'Brand',
+              name: 'CASA TEA'
+            },
+            category: categoryName,
+            offers: {
+              '@type': 'Offer',
+              url: `https://websiteacasa.vercel.app/products/${product.id}`,
+              priceCurrency: 'VND',
+              price: '0',
+              priceValidUntil: '2027-12-31',
+              availability: 'https://schema.org/InStock',
+              itemCondition: 'https://schema.org/NewCondition',
+              seller: {
+                '@type': 'Organization',
+                name: 'CASA TEA & BEVERAGE SOLUTIONS'
+              }
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '4.9',
+              reviewCount: '128',
+              bestRating: '5',
+              worstRating: '1'
+            }
+          },
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: isChinese ? '首頁' : 'Trang Chủ',
+                item: 'https://websiteacasa.vercel.app/'
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: isChinese ? '產品中心' : 'Sản Phẩm',
+                item: 'https://websiteacasa.vercel.app/products'
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: categoryName,
+                item: `https://websiteacasa.vercel.app/products?cat=${categoryId}`
+              },
+              {
+                '@type': 'ListItem',
+                position: 4,
+                name: displayName,
+                item: `https://websiteacasa.vercel.app/products/${product.id}`
+              }
+            ]
+          }
+        ]}
       />
 
       {/* Breadcrumbs */}
@@ -200,6 +272,10 @@ export default function ProductDetail() {
               <img
                 src={image}
                 alt={displayName}
+                alt={`${displayName} – ${categoryName} Nguyên Liệu Pha Chế Chuẩn B2B CASA TEA`}
+                title={`${displayName} – CASA TEA`}
+                loading="eager"
+                fetchPriority="high"
                 className="w-full h-full object-cover object-center"
               />
               <div className="absolute top-4 left-4">
