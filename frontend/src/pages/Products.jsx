@@ -76,6 +76,9 @@ export default function Products() {
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedCategory === 'all' || product.category === selectedCategory;
+      selectedCategory === 'all' ||
+      String(product.category || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim() ||
+      String(product.categoryName || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim();
 
     const matchesSearch =
       searchQuery === '' ||

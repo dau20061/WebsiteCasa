@@ -3,12 +3,14 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
+  ArrowRight,
   Sparkles,
   ShieldCheck,
   CheckCircle2,
   Download,
   Clock,
   Box,
+  Layers,
   AlertCircle,
   RefreshCw,
   ShoppingBag,
@@ -17,6 +19,7 @@ import {
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import { getRtdbProducts } from '../services/rtdbService';
+import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useToast } from '../components/Toast';
 import { useLanguage } from '../context/LanguageContext';
@@ -27,6 +30,11 @@ export default function ProductDetail() {
   const { openSampleModal } = useAppUI();
   const { showToast } = useToast();
   const { t, isChinese } = useLanguage();
+
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_categories');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const [allProducts, setAllProducts] = useState(() => {
     const saved = localStorage.getItem('casa_admin_products');
@@ -40,6 +48,15 @@ export default function ProductDetail() {
   });
 
   useEffect(() => {
+    // Tự động cuộn lên đầu trang mỗi khi chọn xem sản phẩm mới
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    getRtdbCategories().then((cats) => {
+      if (Array.isArray(cats) && cats.length > 0) {
+        setCategories(cats);
+      }
+    });
+
     getRtdbProducts()
       .then((res) => {
         if (Array.isArray(res)) {
@@ -97,6 +114,21 @@ export default function ProductDetail() {
   const categoryName = isChinese
     ? t(`cat_${categoryId.replace(/-/g, '_')}`, product.categoryName || 'Trà Nguyên Liệu')
     : (product.categoryName || 'Trà Nguyên Liệu');
+  const categoryId = product.category || 'syrup';
+
+  const currentCategoryObj = categories.find(
+    (c) =>
+      c.id === product.category ||
+      c.slug === product.category ||
+      (c.name && product.categoryName && c.name.toLowerCase() === product.categoryName.toLowerCase()) ||
+      (c.name && product.category && c.name.toLowerCase() === product.category.toLowerCase())
+  );
+
+  const displayCategoryName = isChinese
+    ? (currentCategoryObj?.nameZh || t(`cat_${(product.category || '').replace(/-/g, '_')}`, currentCategoryObj?.name || product.categoryName || 'Trà & Nguyên Liệu'))
+    : (currentCategoryObj?.name || product.categoryName || 'Trà & Nguyên Liệu');
+
+  const categoryName = displayCategoryName;
   const sku = product.sku || `CS-TEA-${product.id?.slice(-4) || '01'}`;
   const origin = (isChinese && (product.originZh || product.origin_zh)) || product.origin || (isChinese ? '精選保祿與木州高山茶園產區' : 'Vùng cao nguyên Bảo Lộc & Mộc Châu tuyển chọn');
   const shelfLife = product.shelfLife || '24 tháng kể từ ngày sản xuất';
@@ -155,6 +187,43 @@ export default function ProductDetail() {
   const relatedProducts = allProducts
     .filter((p) => p.id !== product.id && (p.category === product.category || !product.category))
     .slice(0, 3);
+  // Lọc sản phẩm cùng danh mục chuẩn xác
+  const isSameCategory = (p) => {
+    if (!p || !product || p.id === product.id) return false;
+
+    const pCat = String(p.category || '').toLowerCase().trim();
+    const curCat = String(product.category || '').toLowerCase().trim();
+    const pCatName = String(p.categoryName || '').toLowerCase().trim();
+    const curCatName = String(product.categoryName || '').toLowerCase().trim();
+
+    // 1. Khớp ID hoặc slug danh mục
+    if (pCat && curCat && pCat === curCat) return true;
+
+    // 2. Khớp Tên danh mục (ví dụ 'Syrup' === 'syrup', 'Bột Kem' === 'Bột Kem')
+    if (pCatName && curCatName && pCatName === curCatName) return true;
+
+    // 3. Khớp chéo ID với Tên
+    if (pCat && curCatName && (pCat === curCatName || curCatName.includes(pCat))) return true;
+    if (curCat && pCatName && (curCat === pCatName || pCatName.includes(curCat))) return true;
+
+    // 4. Khớp qua category object
+    if (currentCategoryObj) {
+      const objId = String(currentCategoryObj.id || '').toLowerCase();
+      const objSlug = String(currentCategoryObj.slug || '').toLowerCase();
+      const objName = String(currentCategoryObj.name || '').toLowerCase();
+      if (pCat && (pCat === objId || pCat === objSlug)) return true;
+      if (pCatName && (pCatName === objName || pCatName === objId)) return true;
+    }
+
+    return false;
+  };
+
+  const sameCategoryProducts = allProducts.filter(isSameCategory);
+
+  // Sản phẩm đề xuất khác (nếu danh mục hiện tại có ít sản phẩm)
+  const otherRecommended = allProducts
+    .filter((p) => p.id !== product.id && !sameCategoryProducts.some((sp) => sp.id === p.id))
+    .slice(0, Math.max(0, 4 - sameCategoryProducts.length));
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
@@ -499,6 +568,46 @@ export default function ProductDetail() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {relatedProducts.map((p) => (
+        {/* SẢN PHẨM CÙNG DANH MỤC (RECOMMENDED SAME CATEGORY PRODUCTS) */}
+        <div className="mt-20 pt-12 border-t border-gray-200 dark:border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tea-mist dark:bg-[#1A2C21] text-tea-primary dark:text-tea-mint text-xs font-bold mb-2">
+                <Layers className="w-3.5 h-3.5" />
+                <span>
+                  {isChinese ? '同系列原料' : 'Gợi ý cùng danh mục'}
+                </span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-tea-dark dark:text-white">
+                {isChinese
+                  ? `同系列相關推薦 – ${displayCategoryName}`
+                  : `Sản phẩm cùng danh mục: ${displayCategoryName}`}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {isChinese
+                  ? `探索更多符合標準的 ${displayCategoryName} 商用調飲原料`
+                  : `Khám phá các dòng nguyên liệu ${displayCategoryName} chất lượng cao chuẩn pha chế F&B`}
+              </p>
+            </div>
+
+            {product.category && (
+              <Link
+                to={`/products?cat=${product.category}`}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-tea-emerald dark:text-tea-mint hover:underline self-start sm:self-auto"
+              >
+                <span>
+                  {isChinese
+                    ? `查看全部 ${displayCategoryName} (${sameCategoryProducts.length + 1})`
+                    : `Xem tất cả ${displayCategoryName} (${sameCategoryProducts.length + 1})`}
+                </span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
+          </div>
+
+          {sameCategoryProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {sameCategoryProducts.slice(0, 4).map((p) => (
                 <ProductCard
                   key={p.id}
                   product={p}
@@ -508,6 +617,49 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
+          ) : otherRecommended.length > 0 ? (
+            <div className="space-y-6">
+              <div className="p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-3">
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  {isChinese
+                    ? `目前「${displayCategoryName}」僅此一款商品。為您精選其他 CASA TEA 旗艦調飲原料：`
+                    : `Danh mục "${displayCategoryName}" hiện tại đang được bổ sung thêm sản phẩm mới. Dưới đây là các sản phẩm nổi bật khác từ CASA TEA bạn có thể tham khảo:`}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {otherRecommended.slice(0, 4).map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    onRequestSample={(prod) => openSampleModal(prod)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12 px-4 rounded-3xl bg-white dark:bg-[#132018] border border-gray-100 dark:border-white/5">
+              <Box className="w-10 h-10 text-gray-400 mx-auto mb-3 opacity-60" />
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {isChinese
+                  ? `「${displayCategoryName}」的其他系列產品正在更新中`
+                  : `Các sản phẩm khác thuộc danh mục "${displayCategoryName}" đang được CASA TEA cập nhật`}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {isChinese
+                  ? '請隨時關注或聯繫我們獲取專屬樣品與產品清單'
+                  : 'Vui lòng liên hệ với bộ phận R&D CASA TEA nếu bạn cần tư vấn công thức hoặc mẫu thử riêng'}
+              </p>
+              <Link
+                to="/products"
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-colors shadow-sm"
+              >
+                <span>{isChinese ? '瀏覽全系列原料' : 'Khám phá tất cả sản phẩm'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -560,11 +560,14 @@ export default function AdminDashboard() {
       });
     } else {
       setEditingProduct(null);
+      const firstCat = categories.find((c) => c.id !== 'all') || { id: 'syrup', name: 'Syrup' };
       setProductFormData({
         name: '',
         sku: `CS-TEA-${Math.floor(10 + Math.random() * 90)}`,
         category: 'tra-den',
         categoryName: 'Trà Đen',
+        category: firstCat.id,
+        categoryName: firstCat.name,
         badge: 'Hàng Mới',
         shortDesc: '',
         fullDesc: '',
@@ -2950,6 +2953,7 @@ export default function AdminDashboard() {
                         value={productFormData.category}
                         onChange={(e) => {
                           const selectedCat = PRODUCT_CATEGORIES.find((c) => c.id === e.target.value);
+                          const selectedCat = categories.find((c) => c.id === e.target.value) || PRODUCT_CATEGORIES.find((c) => c.id === e.target.value);
                           setProductFormData({
                             ...productFormData,
                             category: e.target.value,
