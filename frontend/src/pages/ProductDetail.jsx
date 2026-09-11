@@ -101,7 +101,8 @@ export default function ProductDetail() {
   const origin = (isChinese && (product.originZh || product.origin_zh)) || product.origin || (isChinese ? '精選保祿與木州高山茶園產區' : 'Vùng cao nguyên Bảo Lộc & Mộc Châu tuyển chọn');
   const shelfLife = product.shelfLife || '24 tháng kể từ ngày sản xuất';
   const storageText = (isChinese && (product.storageZh || product.storage_zh)) || product.storage || (isChinese ? '存放於陰涼乾燥處（25°C以下），避免陽光直射。' : 'Bảo quản nơi khô ráo, thoáng mát (dưới 25°C), tránh ánh nắng trực tiếp.');
-  const fullDesc = (isChinese && (product.fullDescZh || product.fullDesc_zh)) || product.fullDesc || product.shortDesc || (isChinese ? '特級商用茶葉原料，經現代化科技製茶工藝精心烘焙，確保連鎖餐飲四季風味穩定一致。' : 'Dòng trà nguyên liệu cao cấp được tinh tuyển và chế biến theo quy trình công nghệ hiện đại, đảm bảo độ ổn định hương vị tối đa cho các chuỗi F&B.');
+  const shortDesc = (isChinese && (product.shortDescZh || product.shortDesc_zh)) || product.shortDesc || '';
+  const fullDesc = (isChinese && (product.fullDescZh || product.fullDesc_zh)) || product.fullDesc || shortDesc || (isChinese ? '特級商用茶葉原料，經現代化科技製茶工藝精心烘焙，確保連鎖餐飲四季風味穩定一致。' : 'Dòng trà nguyên liệu cao cấp được tinh tuyển và chế biến theo quy trình công nghệ hiện đại, đảm bảo độ ổn định hương vị tối đa cho các chuỗi F&B.');
   const displayName = (isChinese && (product.nameZh || product.name_zh)) || product.name;
   const displayBadge = (isChinese && (product.badgeZh || product.badge_zh)) || product.badge;
   const image = product.image || 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1000&q=80';
