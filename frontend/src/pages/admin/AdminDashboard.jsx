@@ -1396,7 +1396,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="pt-24 pb-20 bg-[#FAF9F5] min-h-screen text-gray-800">
+    <div className="pt-24 pb-20 bg-[#FAF9F5] min-h-screen text-gray-800 admin-portal">
       <SEO
         title="CASA Portal - Trung Tâm Quản Trị Hệ Thống CRUD"
         description="Bảng điều khiển quản trị toàn diện: CRUD Sản phẩm, Bài viết, FAQ, Máy móc và Phân quyền người dùng."
@@ -2854,7 +2854,7 @@ export default function AdminDashboard() {
                         value={productAiHints}
                         onChange={(e) => setProductAiHints(e.target.value)}
                         placeholder="Gõ từ khóa bạn muốn mô tả... Ví dụ: 'kem muối', 'kem cheese', 'vị đào giòn mọng nước', 'ô long rang đậm vị'..."
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-300/70 bg-white focus:ring-2 focus:ring-tea-emerald/30 outline-none leading-relaxed"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-300/70 bg-white text-gray-900 placeholder-gray-400 font-medium focus:ring-2 focus:ring-tea-emerald/30 outline-none leading-relaxed"
                       />
 
                       {/* Bấm nhanh các từ khóa mẫu */}

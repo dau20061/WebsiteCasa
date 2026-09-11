@@ -26,10 +26,36 @@
   input, textarea, select {
     color: #111827;
   }
-  .dark input,
-  .dark textarea,
-  .dark select {
+
+  /* Public Dark Mode: Only inputs with explicit dark background classes get light text */
+  .dark input[class*="dark:bg-"],
+  .dark textarea[class*="dark:bg-"],
+  .dark select[class*="dark:bg-"] {
     color: #f3f4f6;
+  }
+
+  /* Any input/textarea/select in light containers or Admin Portal ALWAYS has dark text */
+  input.bg-white,
+  textarea.bg-white,
+  select.bg-white,
+  .bg-white input,
+  .bg-white textarea,
+  .bg-white select,
+  .admin-portal input,
+  .admin-portal textarea,
+  .admin-portal select {
+    color: #111827 !important;
+  }
+
+  /* Ensure visible placeholders on white backgrounds */
+  input.bg-white::placeholder,
+  textarea.bg-white::placeholder,
+  .bg-white input::placeholder,
+  .bg-white textarea::placeholder,
+  .admin-portal input::placeholder,
+  .admin-portal textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
   }
 
   /* Select and option dropdown styling across browsers */
@@ -37,8 +63,13 @@
     background-color: #ffffff;
     color: #111827;
   }
-  .dark select option,
-  html.dark select option {
+  select.bg-white option,
+  .bg-white select option,
+  .admin-portal select option {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+  .dark select[class*="dark:bg-"] option {
     background-color: #132018 !important;
     color: #f3f4f6 !important;
   }

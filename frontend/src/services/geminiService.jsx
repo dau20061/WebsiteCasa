@@ -5,9 +5,10 @@
 // ============================================================================
 
 import { aiApi } from '../api/client';
+import { autoDesignProduct, autoDesignArticle } from '../utils/aiDesignHelper';
 
 export const GEMINI_CONFIG = {
-  MODEL_NAME: 'gemini-3.6-flash',
+  MODEL_NAME: 'gemini-3.7-flash',
 };
 
 export function getGeminiApiKey() {
@@ -18,16 +19,101 @@ export function setGeminiApiKey(key) {
   // Handled on backend
 }
 
+export function generateSmartDescriptionFallback(input = {}) {
+  const userInput = (
+    input.text ||
+    input.hints ||
+    input.currentShortDesc ||
+    input.shortDesc ||
+    input.currentFullDesc ||
+    input.fullDesc ||
+    input.name ||
+    ''
+  ).trim();
+
+  const lower = userInput.toLowerCase();
+
+  if (lower.includes('bí đao') || lower.includes('syrup') || lower.includes('siro')) {
+    return {
+      shortDesc: 'CASA Syrup Bí Đao thượng hạng chiết xuất từ bí đao tươi tự nhiên, vị ngọt thanh mát dịu, hương thơm mộc mạc kích thích vị giác.',
+      fullDesc: 'Siro Bí Đao CASA lưu giữ trọn vẹn vị ngọt thanh mát tự nhiên và hương thơm mộc dịu đặc trưng của bí đao tươi thu hoạch theo mùa. Kết cấu sánh óng ánh, hòa quyện mượt mà trong các công thức trà sữa bí đao truyền thống, trà trái cây thanh nhiệt và sâm bí đao hạt chia.\n\nSản phẩm là giải pháp cốt lõi giúp các chuỗi F&B chuẩn hóa hương vị, tối ưu chi phí cost ly và mang đến trải nghiệm đồ uống giải nhiệt tuyệt hảo, sảng khoái cho thực khách.',
+      isAiGenerated: false
+    };
+  }
+
+  if (lower.includes('muối') || lower.includes('kem muối')) {
+    return {
+      shortDesc: 'Lớp kem muối bồng bềnh sánh mịn với vị mặn dịu tinh tế từ muối biển, hòa quyện hoàn hảo cùng vị béo ngậy ngọt thanh đầy mê hoặc.',
+      fullDesc: 'Lớp kem muối sánh đặc mềm mịn tựa nhung, mang đến sự cân bằng vị giác đỉnh cao ngay khi chạm nơi đầu lưỡi. Nốt mặn duyên dáng của muối biển tinh khiết len lỏi khéo léo, kích thích từng gai vị giác bừng tỉnh, đồng thời tôn bật vị béo ngọt tự nhiên của kem tươi lên một tầm cao mới.\n\nSự kết hợp mặn - béo tương phản nhưng hòa quyện tuyệt đối giúp ly đồ uống thêm đượm đà, lưu luyến khó quên và mang đến trải nghiệm thưởng thức đa tầng đầy cuốn hút cho thực khách.',
+      isAiGenerated: false
+    };
+  }
+
+  if (lower.includes('cheese') || lower.includes('phô mai')) {
+    return {
+      shortDesc: 'Lớp kem cheese sánh đặc bồng bềnh với độ béo ngậy thơm lừng phô mai đặc trưng, tan chảy êm ái như nhung trên đầu lưỡi.',
+      fullDesc: 'Gây ấn tượng ngay từ ánh nhìn đầu tiên với lớp kem cheese trắng muốt, bồng bềnh và sánh mịn hoàn hảo. Từng muỗng kem được đánh bông tỉ mỉ, giữ trọn hương thơm phô mai nồng nàn quyến rũ cùng kết cấu mềm mượt đầy đặn.\n\nKhi thưởng thức, vị béo ngậy đậm đà đặc trưng lan tỏa tức thì nơi khoang miệng, hòa quyện cùng chút ngọt thanh và mằn mặn dịu nhẹ đầy tinh tế. Đây chính là lớp topping linh hồn giúp nâng tầm đồ uống cho mọi quán F&B.',
+      isAiGenerated: false
+    };
+  }
+
+  if (lower.includes('long') || lower.includes('oolong') || lower.includes('ô long') || lower.includes('nướng')) {
+    return {
+      shortDesc: 'Trà ô long nướng than hoa thượng hạng với hương thơm khói nồng nàn, nước trà nâu đỏ hổ phách và vị đầm đà sâu lắng.',
+      fullDesc: 'Trải qua nghệ thuật rang ủ than hoa gia truyền, từng búp trà ô long CASA bung tỏa tầng hương khói ấm áp, quyến rũ. Vị trà dày đầm, đậm đà nhưng êm dịu, không gắt chát, để lại hậu vị ngọt bùi kéo dài mê đắm trong mọi công thức trà sữa nướng.',
+      isAiGenerated: false
+    };
+  }
+
+  if (lower.includes('matcha') || lower.includes('trà xanh')) {
+    return {
+      shortDesc: 'Bột matcha nguyên chất thượng hạng với sắc xanh ngọc bích, vị chát êm đượm đà và hậu ngọt thanh mát sâu lắng.',
+      fullDesc: 'Được chế biến từ những búp trà non tuyển chọn, bột matcha CASA sở hữu độ mịn hoàn hảo và hàm lượng diệp lục tự nhiên dồi dào. Hương thơm thanh khiết đánh thức mọi giác quan, hòa quyện tuyệt vời trong các dòng matcha latte, đá xay và trà sữa cao cấp.',
+      isAiGenerated: false
+    };
+  }
+
+  return {
+    shortDesc: `${userInput} - Hương vị đặc trưng lôi cuốn, hòa quyện hoàn hảo giữa các tầng vị giác, mang đến trải nghiệm đồ uống thơm ngon khó cưỡng.`,
+    fullDesc: `Sản phẩm nổi bật với ${userInput}, được nghiên cứu và tinh chỉnh theo tỉ lệ vàng nhằm đánh thức mọi giác quan của thực khách. Từng ngụm thưởng thức mang đến cảm giác tròn trịa, đậm đà và để lại hậu vị ngọt ngào bền lâu.\n\nLựa chọn lý tưởng cho các mô hình quán F&B hiện đại muốn tạo nên món đồ uống Signature độc đáo và giữ chân khách hàng hiệu quả.`,
+    isAiGenerated: false
+  };
+}
+
 export async function generateProductWithGemini(input = {}) {
-  return await aiApi.designProduct(input);
+  try {
+    const res = await aiApi.designProduct(input);
+    if (res && res.name) return res;
+  } catch (err) {
+    console.warn('[generateProductWithGemini] Backend API error, using autoDesignProduct fallback:', err.message);
+  }
+  return autoDesignProduct({
+    name: input.name || input.hints,
+    category: input.category,
+    shortDesc: input.hints || input.shortDesc
+  });
 }
 
 export async function rewriteDescriptionWithGemini(input = {}) {
-  return await aiApi.rewriteDesc(input);
+  try {
+    const res = await aiApi.rewriteDesc(input);
+    if (res && (res.shortDesc || res.fullDesc)) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[rewriteDescriptionWithGemini] Backend API error, using smart client fallback:', err.message);
+  }
+  return generateSmartDescriptionFallback(input);
 }
 
 export async function generateArticleWithGemini(input = {}) {
-  return await aiApi.designNews(input);
+  try {
+    const res = await aiApi.designNews(input);
+    if (res && res.title) return res;
+  } catch (err) {
+    console.warn('[generateArticleWithGemini] Backend API error, using autoDesignArticle fallback:', err.message);
+  }
+  return autoDesignArticle(input);
 }
 
 const ZH_DICTIONARY = [

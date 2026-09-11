@@ -155,11 +155,6 @@ export default function ProductDetail() {
   const relatedProducts = allProducts
     .filter((p) => p.id !== product.id && (p.category === product.category || !product.category))
     .slice(0, 3);
-
-  const handleDownloadDoc = (docType) => {
-    showToast(`Đang tải tài liệu kỹ thuật ${docType} cho ${sku} (TDS / Tiêu chuẩn kiểm nghiệm)...`, 'info');
-  };
-
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
@@ -389,17 +384,6 @@ export default function ProductDetail() {
               </div>
 
               <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 font-medium pt-1">
-                <button
-                  onClick={() => handleDownloadDoc('TDS Spec Sheet')}
-                  className="inline-flex items-center gap-1.5 text-tea-emerald dark:text-tea-mint hover:underline font-semibold"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>
-                    {isChinese
-                      ? `下載規格技術文件 TDS (${sku}.pdf)`
-                      : `Tải tài liệu kỹ thuật TDS (${sku}.pdf)`}
-                  </span>
-                </button>
 
                 <span>
                   {isChinese ? '保存方式：' : 'Bảo quản: '}
