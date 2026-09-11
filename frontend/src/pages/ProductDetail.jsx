@@ -7,7 +7,6 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle2,
-  Download,
   Clock,
   Box,
   Layers,
@@ -18,7 +17,6 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
-import { getRtdbProducts } from '../services/rtdbService';
 import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useToast } from '../components/Toast';
@@ -110,10 +108,6 @@ export default function ProductDetail() {
   }
 
   // Dữ liệu an toàn dự phòng (Safe Defaults) & Song ngữ (Bilingual)
-  const categoryId = product.category || 'tra-den';
-  const categoryName = isChinese
-    ? t(`cat_${categoryId.replace(/-/g, '_')}`, product.categoryName || 'Trà Nguyên Liệu')
-    : (product.categoryName || 'Trà Nguyên Liệu');
   const categoryId = product.category || 'syrup';
 
   const currentCategoryObj = categories.find(
@@ -183,10 +177,6 @@ export default function ProductDetail() {
             { label: 'Tiêu chuẩn kiểm định', value: 'Đạt chuẩn ISO 22000 & HACCP' }
           ]);
 
-  // Sản phẩm liên quan cùng danh mục
-  const relatedProducts = allProducts
-    .filter((p) => p.id !== product.id && (p.category === product.category || !product.category))
-    .slice(0, 3);
   // Lọc sản phẩm cùng danh mục chuẩn xác
   const isSameCategory = (p) => {
     if (!p || !product || p.id === product.id) return false;
@@ -560,14 +550,6 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-tea-dark dark:text-white mb-8">
-              {isChinese ? '同系列相關推薦茶品' : 'Sản phẩm cùng danh mục bạn có thể quan tâm'}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {relatedProducts.map((p) => (
         {/* SẢN PHẨM CÙNG DANH MỤC (RECOMMENDED SAME CATEGORY PRODUCTS) */}
         <div className="mt-20 pt-12 border-t border-gray-200 dark:border-white/10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -615,8 +597,6 @@ export default function ProductDetail() {
                 />
               ))}
             </div>
-          </div>
-        )}
           ) : otherRecommended.length > 0 ? (
             <div className="space-y-6">
               <div className="p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-3">
