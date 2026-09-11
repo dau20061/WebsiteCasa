@@ -1,5 +1,9 @@
 import { generateArticleWithGemini } from '../../backend/src/services/aiService.js';
 
+export const config = {
+  maxDuration: 60,
+};
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -17,7 +21,8 @@ export default async function handler(req, res) {
     const result = await generateArticleWithGemini(req.body || {});
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(500).json({ error: error.message || 'Error processing request' });
+    console.warn('[Serverless design-news.js] Warning:', error.message);
+    return res.status(200).json(req.body || {});
   }
 }
 

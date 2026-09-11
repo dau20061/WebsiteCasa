@@ -13,7 +13,7 @@ try {
 } catch (e) {}
 
 export const GEMINI_CONFIG = {
-  MODEL_NAME: 'gemini-3.7-flash',
+  MODEL_NAME: 'gemini-3.6-flash',
   API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta'
 };
 
@@ -42,8 +42,8 @@ export function setGeminiApiKey(key) {
  */
 async function callGeminiApi({ prompt, systemInstruction = '' }) {
   const apiKey = getGeminiApiKey();
-  // Ưu tiên các model khả dụng trong năm 2026
-  const modelsToTry = ['gemini-3.7-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest', GEMINI_CONFIG.MODEL_NAME];
+  // Ưu tiên các model khả dụng trong năm 2026 (gemini-3.6-flash hoạt động ổn định nhất)
+  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-flash-latest', GEMINI_CONFIG.MODEL_NAME];
   let lastError = null;
 
   for (const model of modelsToTry) {
@@ -70,9 +70,9 @@ async function callGeminiApi({ prompt, systemInstruction = '' }) {
         };
       }
 
-      // Timeout 8.5s cho mỗi lần gọi để failover tức thì nếu model bị nghẽn
+      // Timeout 25s cho mỗi lần gọi để AI có đủ thời gian xử lý bài viết dài và phản hồi đầy đủ
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8500);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -262,7 +262,6 @@ YÊU CẦU ĐẦU RA JSON (không dùng markdown):
     
     // Fallback thông minh cục bộ bám sát đúng từ khóa người dùng
     const lower = userInput.toLowerCase();
-    if (lower.includes('muối') || lower.includes('kem muối')) {
 
     // 1. ĐƯỜNG ĐEN / BROWN SUGAR SYRUP
     if (lower.includes('đường đen') || lower.includes('duong den') || lower.includes('brown sugar')) {
@@ -307,7 +306,6 @@ YÊU CẦU ĐẦU RA JSON (không dùng markdown):
         fullDesc: 'Lớp kem muối sánh đặc mềm mịn tựa nhung, mang đến sự cân bằng vị giác đỉnh cao ngay khi chạm nơi đầu lưỡi. Nốt mặn duyên dáng của muối biển tinh khiết len lỏi khéo léo, kích thích từng gai vị giác bừng tỉnh, đồng thời tôn bật vị béo ngọt tự nhiên của kem tươi lên một tầm cao mới.\n\nSự kết hợp mặn - béo tương phản nhưng hòa quyện tuyệt đối giúp ly đồ uống thêm đượm đà, lưu luyến khó quên và mang đến trải nghiệm thưởng thức đa tầng đầy cuốn hút cho thực khách.',
         isAiGenerated: false
       };
-    } else if (lower.includes('cheese') || lower.includes('phô mai')) {
     }
 
     // 6. KEM CHEESE / PHÔ MAI
@@ -319,7 +317,6 @@ YÊU CẦU ĐẦU RA JSON (không dùng markdown):
       };
     }
 
-    // Fallback chung tôn trọng từ khóa
     // 7. BỘT BÉO / BỘT KEM / NON-DAIRY CREAMER
     if (lower.includes('bột béo') || lower.includes('bot beo') || lower.includes('bột kem') || lower.includes('bot kem') || lower.includes('creamer')) {
       return {
@@ -349,8 +346,6 @@ YÊU CẦU ĐẦU RA JSON (không dùng markdown):
 
     // 10. TỔNG QUÁT: Bám sát đúng từ khóa người dùng vừa nhập
     return {
-      shortDesc: `${userInput} - Hương vị đặc trưng lôi cuốn, hòa quyện hoàn hảo giữa các tầng vị giác, mang đến trải nghiệm đồ uống thơm ngon khó cưỡng.`,
-      fullDesc: `Sản phẩm nổi bật với ${userInput}, được nghiên cứu và tinh chỉnh theo tỉ lệ vàng nhằm đánh thức mọi giác quan của thực khách. Từng ngụm thưởng thức mang đến cảm giác tròn trịa, đậm đà và để lại hậu vị ngọt ngào bền lâu.\n\nLựa chọn lý tưởng cho các mô hình quán F&B hiện đại muốn tạo nên món đồ uống Signature độc đáo và giữ chân khách hàng hiệu quả.`,
       shortDesc: `${userInput} CASA thượng hạng với hương vị chuẩn hóa tự nhiên, cấu trúc cân bằng và tầng hương quyến rũ kích thích vị giác.`,
       fullDesc: `Được tinh tuyển và phát triển bởi đội ngũ R&D CASA TEA, sản phẩm nổi bật với ${userInput}, mang đến trải nghiệm đồ uống thơm ngon tròn vị và để lại hậu vị lưu luyến bền lâu.\n\nGiải pháp hoàn hảo cho các chuỗi F&B và thương hiệu trà sữa hiện đại muốn chuẩn hóa chất lượng pha chế, tối ưu chi phí cost ly và giữ chân khách hàng hiệu quả.`,
       isAiGenerated: false

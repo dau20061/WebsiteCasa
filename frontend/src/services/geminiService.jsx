@@ -267,6 +267,17 @@ const ZH_DICTIONARY = [
   [/bao 25kg/gi, '25公斤大袋裝'],
   [/túi lọc tam giác/gi, '立體三角茶包'],
   [/túi lọc/gi, '原葉茶包'],
+  [/syrup đường đen|siro đường đen/gi, '特級黑糖風味糖漿'],
+  [/đường đen/gi, '黑糖'],
+  [/kem muối biển|kem muối/gi, '特調海鹽奶蓋'],
+  [/kem cheese|phô mai/gi, '香濃芝士奶蓋'],
+  [/trân châu đen/gi, '黑糖珍珠'],
+  [/trân châu/gi, '珍珠粉圓'],
+  [/thạch 3q/gi, '3Q晶球脆圓'],
+  [/công thức pha chế|công thức/gi, '調飲專屬配方'],
+  [/pha chế/gi, '商業調飲'],
+  [/nguyên liệu/gi, '優質原料'],
+  [/hướng dẫn/gi, '操作指南'],
   [/đậm đà/gi, '醇厚濃郁'],
   [/thơm mát/gi, '芬芳清香'],
   [/ngọt thanh/gi, '清甜回甘']
@@ -330,22 +341,62 @@ export async function translateProductToTraditionalChinese(product = {}) {
 }
 
 export async function translateArticleToTraditionalChinese(article = {}) {
-  return await aiApi.translateNewsZh(article);
+  try {
+    const res = await aiApi.translateNewsZh(article);
+    if (res && res.titleZh) return res;
+  } catch (err) {
+    console.warn('[translateArticleToTraditionalChinese] API error, using client fallback:', err.message);
+  }
+  return {
+    titleZh: translateTextFallback(article.title || '') || '經典茶飲資訊與調配秘訣',
+    excerptZh: translateTextFallback(article.excerpt || '') || '深入探索專業調飲工藝與最新市場趨勢。',
+    contentZh: translateTextFallback(article.content || '') || '<p>詳細內容請洽詢專業顧問團隊。</p>'
+  };
 }
 
 export async function translateNewsToTraditionalChinese(article = {}) {
-  return await aiApi.translateNewsZh(article);
+  return await translateArticleToTraditionalChinese(article);
 }
 
 export async function translateFaqToTraditionalChinese(faq = {}) {
-  return await aiApi.translateFaqZh(faq);
+  try {
+    const res = await aiApi.translateFaqZh(faq);
+    if (res && res.questionZh) return res;
+  } catch (err) {
+    console.warn('[translateFaqToTraditionalChinese] API error, using client fallback:', err.message);
+  }
+  return {
+    questionZh: translateTextFallback(faq.question || '') || '常見問題諮詢',
+    answerZh: translateTextFallback(faq.answer || '') || '詳細資訊請聯繫我們獲取專人解答。'
+  };
 }
 
 export async function translateMachineryToTraditionalChinese(machinery = {}) {
-  return await aiApi.translateMachineryZh(machinery);
+  try {
+    const res = await aiApi.translateMachineryZh(machinery);
+    if (res && res.nameZh) return res;
+  } catch (err) {
+    console.warn('[translateMachineryToTraditionalChinese] API error, using client fallback:', err.message);
+  }
+  return {
+    nameZh: translateTextFallback(machinery.name || '') || '專業商用茶飲加工設備',
+    categoryZh: translateTextFallback(machinery.category || '') || '茶飲生產機械',
+    originZh: translateTextFallback(machinery.origin || '') || '進口精密技術設備',
+    capacityZh: machinery.capacity || '',
+    descriptionZh: translateTextFallback(machinery.description || machinery.desc || '') || '高品質工業級生產線專用設備。'
+  };
 }
 
 export async function translateCategoryToTraditionalChinese(category = {}) {
-  return await aiApi.translateCategoryZh(category);
+  try {
+    const res = await aiApi.translateCategoryZh(category);
+    if (res && res.nameZh) return res;
+  } catch (err) {
+    console.warn('[translateCategoryToTraditionalChinese] API error, using client fallback:', err.message);
+  }
+  return {
+    nameZh: translateTextFallback(category.name || '') || '精選茶飲調料分類',
+    descZh: translateTextFallback(category.desc || '') || '專業連鎖店專用原料與客製化解決方案。'
+  };
 }
 

@@ -3,7 +3,7 @@
   "buildCommand": "npm run frontend:build",
   "outputDirectory": "frontend/dist",
   "functions": {
-    "api/**/*.js": {
+    "api/**": {
       "includeFiles": "backend/**"
     }
   },
