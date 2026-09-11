@@ -433,117 +433,133 @@ YÊU CẦU ĐẦU RA ĐÚNG ĐỊNH DẠNG JSON:
 
   try {
     const aiResult = await callGeminiApi({ prompt });
-    if (aiResult && aiResult.nameZh && aiResult.nameZh.trim() !== (product.name || '').trim()) {
+    const hasChinese = (aiResult?.nameZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
+    const isHalfVietnamese = hasVietnamese(aiResult?.nameZh) || hasVietnamese(aiResult?.shortDescZh);
+
+    if (aiResult && aiResult.nameZh && hasChinese && !isHalfVietnamese) {
       return {
-        nameZh: aiResult.nameZh || product.name || '',
-        badgeZh: aiResult.badgeZh || product.badge || '新品上市',
-        shortDescZh: aiResult.shortDescZh || product.shortDesc || '',
-        fullDescZh: aiResult.fullDescZh || product.fullDesc || '',
-        originZh: aiResult.originZh || product.origin || '越南林同省保祿高原產區',
-        applicationsZh: Array.isArray(aiResult.applicationsZh) && aiResult.applicationsZh.length > 0 ? aiResult.applicationsZh : (product.applications || [])
+        nameZh: aiResult.nameZh || '',
+        badgeZh: aiResult.badgeZh || '新品上市',
+        shortDescZh: aiResult.shortDescZh || '',
+        fullDescZh: aiResult.fullDescZh || '',
+        originZh: aiResult.originZh || '越南林同省保祿高原產區',
+        applicationsZh: Array.isArray(aiResult.applicationsZh) && aiResult.applicationsZh.length > 0 ? aiResult.applicationsZh : ['經典原味厚奶茶', '現萃鮮果茶']
       };
     }
   } catch (err) {
     console.warn('[Gemini AI] Lỗi dịch sản phẩm, kích hoạt bộ dịch F&B chuyên nghiệp:', err.message);
   }
 
-  // Fallback sang bộ dịch thuật ngữ F&B Phồn thể chuẩn mực
-  return fallbackProductTranslation(product);
+  // Fallback sang bộ dịch Google Zh-TW sâu + TAIWAN_FB_REFINEMENTS
+  return await fallbackProductTranslation(product);
 }
 
-export function fallbackProductTranslation(product = {}) {
-  const dictionary = [
-    [/syrup bí đao/gi, '特級冬瓜風味糖漿'],
-    [/siro bí đao/gi, '特級冬瓜風味糖漿'],
-    [/bí đao/gi, '冬瓜'],
-    [/syrup/gi, '風味糖漿'],
-    [/siro/gi, '風味糖漿'],
-    [/hàng mới/gi, '新品上市'],
-    [/bán chạy nhất|bán chạy/gi, '熱銷首選'],
-    [/cao cấp/gi, '頂級'],
-    [/thượng hạng/gi, '特選'],
-    [/đặc biệt/gi, '特級'],
-    [/trà lài/gi, '茉莉花綠茶'],
-    [/trà xanh/gi, '特級綠茶'],
-    [/trà sen/gi, '清香蓮花茶'],
-    [/trà đào/gi, '蜜桃紅茶'],
-    [/trà đen|hồng trà/gi, '經典阿薩姆紅茶'],
-    [/trà ô long/gi, '炭焙烏龍茶'],
-    [/ô long/gi, '烏龍茶'],
-    [/bột matcha/gi, '頂級抹茶粉'],
-    [/matcha/gi, '抹茶粉'],
-    [/bột pudding/gi, '特調布丁粉'],
-    [/bột tàu hủ/gi, '豆花專用粉'],
-    [/bột kem béo|bột kem/gi, '特濃調飲奶精粉'],
-    [/topping/gi, '精選配料'],
-    [/cao nguyên bảo lộc, lâm đồng/gi, '越南林同省保祿高原產區'],
-    [/cao nguyên bảo lộc/gi, '越南保祿高原'],
-    [/bảo lộc, lâm đồng/gi, '越南林同省保祿市'],
-    [/bảo lộc/gi, '越南保祿'],
-    [/lâm đồng/gi, '林同省'],
-    [/mộc châu, sơn la/gi, '越南山羅省木州產區'],
-    [/mộc châu/gi, '越南木州'],
-    [/sơn la/gi, '山羅省'],
-    [/việt nam/gi, '越南產地直送'],
-    [/trà sữa đậm vị/gi, '濃醇厚奶茶'],
-    [/trà trái cây tươi/gi, '現萃鮮果茶'],
-    [/trà trái cây/gi, '鮮果茶系列'],
-    [/trà sữa truyền thống/gi, '經典原味奶茶'],
-    [/trà sữa bí đao/gi, '古早味冬瓜奶茶'],
-    [/trà sữa/gi, '風味奶茶'],
-    [/soda đá xay/gi, '創意氣泡冰沙'],
-    [/đá xay/gi, '冰沙系列'],
-    [/gói 1kg \(10 gói\/thùng\)/gi, '1公斤包裝 (每箱10包)'],
-    [/gói 1kg/gi, '1公斤裝'],
-    [/bao 25kg/gi, '25公斤大袋裝'],
-    [/túi lọc tam giác/gi, '立體三角茶包'],
-    [/túi lọc/gi, '原葉茶包'],
-    [/đậm đà/gi, '醇厚濃郁'],
-    [/thơm mát/gi, '芬芳清香'],
-    [/ngọt thanh/gi, '清甜回甘']
-  ];
+// BẢNG TINH CHỈNH THUẬT NGỮ CHUYÊN NGÀNH TRÀ & F&B ĐÀI LOAN
+export const TAIWAN_FB_REFINEMENTS = [
+  [/風味奶茶/g, '厚奶茶'],
+  [/甜奶茶/g, '全糖奶茶'],
+  [/茶精/g, '茶底核心風味'],
+  [/烤煙味/g, '炭焙煙燻香'],
+  [/濃鬱茶/g, '濃郁系茶品'],
+  [/濃茶/g, '濃醇茶飲'],
+  [/公式/g, '調飲配方'],
+  [/主料/g, '核心原料'],
+  [/輔料/g, '精選配料'],
+  [/調料/g, '調飲原料'],
+  [/糖漿/g, '風味糖漿'],
+  [/奶精/g, '植脂末奶精'],
+  [/奶蓋/g, '芝士/海鹽奶蓋'],
+  [/珍珠/g, '黑糖珍珠粉圓'],
+  [/冬瓜糖漿/g, '特級冬瓜風味糖漿'],
+  [/黑糖糖漿/g, '古早味黑糖風味糖漿'],
+  [/保祿/g, '保祿高原'],
+  [/泡茶/g, '萃茶']
+];
 
-  const translateText = (text) => {
-    if (!text) return '';
-    let res = String(text);
-    for (const [regex, rep] of dictionary) {
-      res = res.replace(regex, rep);
-    }
-    return res;
-  };
+export function hasVietnamese(text) {
+  if (!text || typeof text !== 'string') return false;
+  return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text);
+}
 
-  let nameZh = translateText(product.name || '');
-  let badgeZh = translateText(product.badge || '新品上市');
-  let originZh = translateText(product.origin || '越南林同省保祿高原產區');
-  let shortDescZh = translateText(product.shortDesc || '');
-  let fullDescZh = translateText(product.fullDesc || '');
+export async function translateTextToZhTw(text) {
+  if (!text || typeof text !== 'string' || !text.trim()) return '';
 
-  if (nameZh === (product.name || '')) {
-    if (/bí đao/i.test(product.name)) {
-      nameZh = '特級冬瓜風味糖漿';
-    } else if (/matcha/i.test(product.name)) {
-      nameZh = '頂級特選抹茶粉';
-    } else if (/trà/i.test(product.name)) {
-      nameZh = `特選商用${nameZh}`;
+  if (!hasVietnamese(text)) {
+    const chineseChars = text.match(/[\u4e00-\u9fa5]/g) || [];
+    if (chineseChars.length > text.trim().length * 0.5) {
+      return text.trim();
     }
   }
 
-  if (shortDescZh === (product.shortDesc || '') && /bí đao/i.test(product.name)) {
-    shortDescZh = '萃取新鮮冬瓜天然精華，CASA冬瓜糖漿呈現純淨清甜、天然濃郁風味與純樸清新的香氣，徹底喚醒味蕾。';
-  }
-  if (fullDescZh === (product.fullDesc || '') && /bí đao/i.test(product.name)) {
-    fullDescZh = 'CASA特級冬瓜糖漿完美再現傳統古早味冬瓜香，濃郁清甜，色澤晶瑩剔透。口感清爽解渴，尾韻回甘悠長，是調製古早味冬瓜茶、冬瓜鮮奶茶、冬瓜檸檬與各式創意冰飲的最佳專用原料。';
+  try {
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=zh-TW&dt=t&q=' + encodeURIComponent(text.trim());
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Translation API network error');
+    const data = await res.json();
+    let translated = (data[0] || []).map(item => item[0]).join('');
+
+    if (translated && translated.trim()) {
+      for (const [pattern, replacement] of TAIWAN_FB_REFINEMENTS) {
+        translated = translated.replace(pattern, replacement);
+      }
+      return translated.trim();
+    }
+  } catch (err) {
+    console.warn('[translateTextToZhTw backend] Fallback notice:', err.message);
   }
 
-  const applicationsZh = (product.applications || []).map(translateText);
+  return text;
+}
+
+export async function translateHtmlToZhTw(html) {
+  if (!html || typeof html !== 'string' || !html.trim()) return '';
+
+  if (!/<[a-z][\s\S]*>/i.test(html)) {
+    return await translateTextToZhTw(html);
+  }
+
+  const tokens = html.split(/(<[^>]+>)/g);
+  const translatedTokens = await Promise.all(
+    tokens.map(async (token) => {
+      if (token.startsWith('<') && token.endsWith('>')) {
+        return token;
+      }
+      if (token.trim().length === 0) {
+        return token;
+      }
+      const leadingSpace = token.match(/^\s*/)[0];
+      const trailingSpace = token.match(/\s*$/)[0];
+      const translated = await translateTextToZhTw(token.trim());
+      return leadingSpace + translated + trailingSpace;
+    })
+  );
+
+  return translatedTokens.join('');
+}
+
+export async function fallbackProductTranslation(product = {}) {
+  const [nameZh, badgeZh, originZh, shortDescZh, fullDescZh] = await Promise.all([
+    translateTextToZhTw(product.name || ''),
+    translateTextToZhTw(product.badge || '新品上市'),
+    translateTextToZhTw(product.origin || '越南林同省保祿高原產區'),
+    translateTextToZhTw(product.shortDesc || ''),
+    translateTextToZhTw(product.fullDesc || '')
+  ]);
+
+  let applicationsZh = [];
+  if (Array.isArray(product.applications) && product.applications.length > 0) {
+    applicationsZh = await Promise.all(product.applications.map(app => translateTextToZhTw(app)));
+  } else {
+    applicationsZh = ['經典原味厚奶茶', '現萃鮮果茶', '芝士海鹽奶蓋茶'];
+  }
 
   return {
-    nameZh: nameZh || '特選商用茶飲原料',
+    nameZh: nameZh || '特選商用調飲專用原料',
     badgeZh: badgeZh || '新品上市',
+    originZh: originZh || '越南林同省保祿高原產區',
     shortDescZh: shortDescZh || '嚴選頂級產區優質茶葉與調飲原料，風味純正濃醇。',
     fullDescZh: fullDescZh || 'CASA專業調飲原料，專為連鎖茶飲店研發設計，香氣醇厚持久，操作便捷穩定。',
-    originZh: originZh || '越南林同省保祿高原產區',
-    applicationsZh: applicationsZh.length > 0 ? applicationsZh : ['經典原味奶茶', '現萃鮮果茶']
+    applicationsZh
   };
 }
 
@@ -563,6 +579,7 @@ Thông tin bài viết:
 
 QUY TẮC:
 - BẮT BUỘC dùng chữ Hán Phồn thể (繁體中文).
+- Tuyệt đối KHÔNG dùng chữ Giản thể và KHÔNG để sót từ tiếng Việt nào.
 - Giữ nguyên cấu trúc HTML để bài viết hiển thị đẹp mắt.
 
 YÊU CẦU ĐẦU RA JSON:
@@ -575,19 +592,36 @@ YÊU CẦU ĐẦU RA JSON:
 
   try {
     const aiResult = await callGeminiApi({ prompt });
-    return {
-      titleZh: aiResult.titleZh || article.title || '',
-      excerptZh: aiResult.excerptZh || article.excerpt || '',
-      contentZh: aiResult.contentZh || article.content || ''
-    };
+    const hasChinese = (aiResult?.titleZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 2;
+    const isHalfVietnamese = hasVietnamese(aiResult?.titleZh) || hasVietnamese(aiResult?.excerptZh);
+
+    if (aiResult && aiResult.titleZh && hasChinese && !isHalfVietnamese) {
+      return {
+        titleZh: aiResult.titleZh,
+        excerptZh: aiResult.excerptZh || '',
+        contentZh: aiResult.contentZh || ''
+      };
+    }
   } catch (err) {
     console.warn('[Gemini AI] Lỗi dịch bài viết sang tiếng Trung Phồn thể:', err.message);
-    return {
-      titleZh: article.title || '',
-      excerptZh: article.excerpt || '',
-      contentZh: article.content || ''
-    };
   }
+
+  // Fallback sang bộ dịch Google Zh-TW sâu + TAIWAN_FB_REFINEMENTS
+  const [titleZh, excerptZh, contentZh] = await Promise.all([
+    translateTextToZhTw(article.title || ''),
+    translateTextToZhTw(article.excerpt || ''),
+    translateHtmlToZhTw(article.content || '')
+  ]);
+
+  return {
+    titleZh: titleZh || '2026年厚奶茶趨勢：當茶味回歸中心',
+    excerptZh: excerptZh || '新世代消費者逐漸從全糖奶茶轉向帶有明顯炭焙煙燻香或天然花香的濃郁系茶品。這是品牌升級茶底核心風味的絕佳機會。',
+    contentZh: contentZh || '<p>詳細調飲配方與操作步驟請洽詢專業顧問團隊。</p>'
+  };
+}
+
+export async function translateNewsToTraditionalChinese(article = {}) {
+  return await translateArticleToTraditionalChinese(article);
 }
 
 /**
@@ -605,7 +639,7 @@ Thông tin câu hỏi:
 
 QUY TẮC:
 - BẮT BUỘC dùng chữ Hán Phồn thể (繁體中文 - Traditional Chinese).
-- Tuyệt đối KHÔNG dùng chữ Giản thể.
+- Tuyệt đối KHÔNG dùng chữ Giản thể và KHÔNG để sót từ tiếng Việt nào.
 - Câu trả lời ngắn gọn, rành mạch, đúng thuật ngữ thương mại F&B (ví dụ: 起訂量 MOQ, 樣品套件 Sample Kit, 獨家客製配方 OEM/ODM...).
 
 YÊU CẦU ĐẦU RA JSON:
@@ -617,17 +651,28 @@ YÊU CẦU ĐẦU RA JSON:
 
   try {
     const aiResult = await callGeminiApi({ prompt });
-    return {
-      questionZh: aiResult.questionZh || faq.question || '',
-      answerZh: aiResult.answerZh || faq.answer || ''
-    };
+    const hasChinese = (aiResult?.questionZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
+    const isHalfVietnamese = hasVietnamese(aiResult?.questionZh) || hasVietnamese(aiResult?.answerZh);
+
+    if (aiResult && aiResult.questionZh && hasChinese && !isHalfVietnamese) {
+      return {
+        questionZh: aiResult.questionZh,
+        answerZh: aiResult.answerZh || ''
+      };
+    }
   } catch (err) {
     console.warn('[Gemini AI] Lỗi dịch FAQ sang tiếng Trung Phồn thể:', err.message);
-    return {
-      questionZh: faq.question || '',
-      answerZh: faq.answer || ''
-    };
   }
+
+  const [questionZh, answerZh] = await Promise.all([
+    translateTextToZhTw(faq.question || ''),
+    translateTextToZhTw(faq.answer || '')
+  ]);
+
+  return {
+    questionZh: questionZh || '常見商業合作問題諮詢',
+    answerZh: answerZh || '詳細合作流程與原料樣品申請，請隨時聯繫我們的商務代表。'
+  };
 }
 
 /**
@@ -648,6 +693,7 @@ Thông tin máy móc:
 
 QUY TẮC:
 - BẮT BUỘC dùng chữ Hán Phồn thể (繁體中文).
+- Tuyệt đối KHÔNG để sót từ tiếng Việt nào.
 - Dùng đúng thuật ngữ cơ khí chính xác (ví dụ: 色選機, 流化床乾燥系統, 三維多向混合機, 無菌充氮包裝機, 瑞士進口...).
 
 YÊU CẦU ĐẦU RA JSON:
@@ -662,23 +708,36 @@ YÊU CẦU ĐẦU RA JSON:
 
   try {
     const aiResult = await callGeminiApi({ prompt });
-    return {
-      nameZh: aiResult.nameZh || machinery.name || '',
-      categoryZh: aiResult.categoryZh || machinery.category || '',
-      originZh: aiResult.originZh || machinery.origin || '',
-      capacityZh: aiResult.capacityZh || machinery.capacity || '',
-      descriptionZh: aiResult.descriptionZh || machinery.description || machinery.desc || ''
-    };
+    const hasChinese = (aiResult?.nameZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
+    const isHalfVietnamese = hasVietnamese(aiResult?.nameZh) || hasVietnamese(aiResult?.descriptionZh);
+
+    if (aiResult && aiResult.nameZh && hasChinese && !isHalfVietnamese) {
+      return {
+        nameZh: aiResult.nameZh,
+        categoryZh: aiResult.categoryZh || machinery.category || '',
+        originZh: aiResult.originZh || machinery.origin || '',
+        capacityZh: aiResult.capacityZh || machinery.capacity || '',
+        descriptionZh: aiResult.descriptionZh || machinery.description || machinery.desc || ''
+      };
+    }
   } catch (err) {
     console.warn('[Gemini AI] Lỗi dịch máy móc sang tiếng Trung Phồn thể:', err.message);
-    return {
-      nameZh: machinery.name || '',
-      categoryZh: machinery.category || '',
-      originZh: machinery.origin || '',
-      capacityZh: machinery.capacity || '',
-      descriptionZh: machinery.description || machinery.desc || ''
-    };
   }
+
+  const [nameZh, categoryZh, originZh, descriptionZh] = await Promise.all([
+    translateTextToZhTw(machinery.name || ''),
+    translateTextToZhTw(machinery.category || ''),
+    translateTextToZhTw(machinery.origin || ''),
+    translateTextToZhTw(machinery.description || machinery.desc || '')
+  ]);
+
+  return {
+    nameZh: nameZh || '專業商用茶飲加工設備',
+    categoryZh: categoryZh || '茶飲生產機械',
+    originZh: originZh || '進口精密技術設備',
+    capacityZh: machinery.capacity || '',
+    descriptionZh: descriptionZh || '高品質工業級生產線專用設備。'
+  };
 }
 
 /**
@@ -696,6 +755,7 @@ Thông tin danh mục:
 
 QUY TẮC:
 - BẮT BUỘC dùng chữ Hán Phồn thể (繁體中文).
+- Tuyệt đối KHÔNG để sót từ tiếng Việt nào.
 - Dùng từ ngữ sang trọng, chuyên nghiệp chuẩn ngành trà & F&B Đài Loan (ví dụ: 特級阿薩姆與經典紅茶, 高山炭焙烏龍茶, 茉莉花茶與鮮萃綠茶, 特級植脂末與調飲配料...).
 
 YÊU CẦU ĐẦU RA JSON:
@@ -707,17 +767,28 @@ YÊU CẦU ĐẦU RA JSON:
 
   try {
     const aiResult = await callGeminiApi({ prompt });
-    return {
-      nameZh: aiResult.nameZh || category.name || '',
-      descZh: aiResult.descZh || category.desc || ''
-    };
+    const hasChinese = (aiResult?.nameZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
+    const isHalfVietnamese = hasVietnamese(aiResult?.nameZh) || hasVietnamese(aiResult?.descZh);
+
+    if (aiResult && aiResult.nameZh && hasChinese && !isHalfVietnamese) {
+      return {
+        nameZh: aiResult.nameZh,
+        descZh: aiResult.descZh || ''
+      };
+    }
   } catch (err) {
     console.warn('[Gemini AI] Lỗi dịch danh mục sang tiếng Trung Phồn thể:', err.message);
-    return {
-      nameZh: category.name || '',
-      descZh: category.desc || ''
-    };
   }
+
+  const [nameZh, descZh] = await Promise.all([
+    translateTextToZhTw(category.name || ''),
+    translateTextToZhTw(category.desc || '')
+  ]);
+
+  return {
+    nameZh: nameZh || '精選茶飲調料分類',
+    descZh: descZh || '專業連鎖店專用原料與客製化解決方案。'
+  };
 }
 
 
