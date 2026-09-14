@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductCard({ product, onRequestSample }) {
@@ -136,12 +137,15 @@ export default function ProductCard({ product, onRequestSample }) {
 
         {/* Action Buttons */}
         <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center gap-2">
+        <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2">
+          {/* Row 1: Primary Action Button */}
           {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
             <a
               href={product.shopeeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs font-bold transition-all shadow-sm"
+              className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs font-bold transition-all shadow-sm hover:shadow"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
               <span>{isChinese ? '在蝦皮購買' : (isEnglish ? 'Buy on Shopee' : 'Mua trên Shopee')}</span>
@@ -150,6 +154,7 @@ export default function ProductCard({ product, onRequestSample }) {
             <Link
               to={`/contact?product=${encodeURIComponent(displayName)}`}
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-colors shadow-sm"
+              className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-colors shadow-sm hover:shadow"
             >
               <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
               <span>{isChinese ? '聯繫諮詢' : (isEnglish ? 'Contact Us' : 'Liên hệ tư vấn')}</span>
@@ -163,6 +168,17 @@ export default function ProductCard({ product, onRequestSample }) {
             <span>{t('card_detail', 'Chi tiết')}</span>
             <ArrowRight className="w-3 h-3 inline ml-1" />
           </Link>
+          {/* Row 2: Secondary Action Buttons (View Details & Free Sample) */}
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              to={`/products/${id}`}
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-tea-mist dark:bg-[#1A2C21] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-tea-primary dark:text-tea-mint text-xs font-bold transition-colors ${
+                !onRequestSample ? 'col-span-2' : ''
+              }`}
+            >
+              <span>{t('card_detail', 'Chi tiết')}</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
 
           {onRequestSample && product.purchaseAction !== 'shopee' && (
             <button
@@ -173,6 +189,18 @@ export default function ProductCard({ product, onRequestSample }) {
               {t('card_sample', 'Mẫu thử')}
             </button>
           )}
+            {onRequestSample && (
+              <button
+                type="button"
+                onClick={() => onRequestSample(product)}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-tea-leaf/30 dark:border-tea-mint/30 bg-white/50 dark:bg-transparent text-tea-primary dark:text-tea-mint hover:bg-tea-primary hover:text-white dark:hover:bg-tea-green dark:hover:text-tea-dark text-xs font-bold transition-all shadow-2xs"
+                title={isChinese ? '免費索取茶樣' : (isEnglish ? 'Request Free Sample' : 'Đăng ký nhận mẫu thử')}
+              >
+                <Package className="w-3.5 h-3.5" />
+                <span>{isChinese ? '索取樣品' : (isEnglish ? 'Sample' : t('card_sample', 'Mẫu thử'))}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
