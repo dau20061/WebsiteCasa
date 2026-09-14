@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import {
   generateProductWithGemini,
   rewriteDescriptionWithGemini,
@@ -7,7 +7,12 @@ import {
   translateArticleToTraditionalChinese,
   translateFaqToTraditionalChinese,
   translateMachineryToTraditionalChinese,
-  translateCategoryToTraditionalChinese
+  translateCategoryToTraditionalChinese,
+  translateProductToEnglish,
+  translateArticleToEnglish,
+  translateFaqToEnglish,
+  translateMachineryToEnglish,
+  translateCategoryToEnglish
 } from '../services/aiService.js';
 
 const router = Router();
@@ -95,6 +100,57 @@ router.post('/translate-category-zh', async (req, res) => {
     res.json(result);
   } catch (err) {
     console.warn('[AI Route translate-category-zh] Error:', err.message);
+    res.json(req.body || {});
+  }
+});
+
+// ENGLISH TRANSLATION ROUTES
+router.post('/translate-product-en', async (req, res) => {
+  try {
+    const result = await translateProductToEnglish(req.body);
+    res.json(result);
+  } catch (err) {
+    console.warn('[AI Route translate-product-en] Error:', err.message);
+    res.json(req.body || {});
+  }
+});
+
+router.post('/translate-news-en', async (req, res) => {
+  try {
+    const result = await translateArticleToEnglish(req.body);
+    res.json(result);
+  } catch (err) {
+    console.warn('[AI Route translate-news-en] Error:', err.message);
+    res.json(req.body || {});
+  }
+});
+
+router.post('/translate-faq-en', async (req, res) => {
+  try {
+    const result = await translateFaqToEnglish(req.body);
+    res.json(result);
+  } catch (err) {
+    console.warn('[AI Route translate-faq-en] Error:', err.message);
+    res.json(req.body || {});
+  }
+});
+
+router.post('/translate-machinery-en', async (req, res) => {
+  try {
+    const result = await translateMachineryToEnglish(req.body);
+    res.json(result);
+  } catch (err) {
+    console.warn('[AI Route translate-machinery-en] Error:', err.message);
+    res.json(req.body || {});
+  }
+});
+
+router.post('/translate-category-en', async (req, res) => {
+  try {
+    const result = await translateCategoryToEnglish(req.body);
+    res.json(result);
+  } catch (err) {
+    console.warn('[AI Route translate-category-en] Error:', err.message);
     res.json(req.body || {});
   }
 });

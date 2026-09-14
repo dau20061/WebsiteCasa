@@ -5,13 +5,22 @@ import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductCard({ product, onRequestSample }) {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const { id, name, sku, categoryName, badge, shortDesc, image, tasteProfile, tags } = product;
 
-  const displayName = (isChinese && (product.nameZh || product.name_zh)) || name;
-  const displayShortDesc = (isChinese && (product.shortDescZh || product.shortDesc_zh)) || shortDesc;
-  const displayBadge = (isChinese && (product.badgeZh || product.badge_zh)) || badge;
-  const displayCategoryName = isChinese
+  const displayName = isEnglish
+    ? (product.nameEn || product.name_en || name)
+    : (isChinese ? (product.nameZh || product.name_zh || name) : name);
+
+  const displayShortDesc = isEnglish
+    ? (product.shortDescEn || product.shortDesc_en || shortDesc)
+    : (isChinese ? (product.shortDescZh || product.shortDesc_zh || shortDesc) : shortDesc);
+
+  const displayBadge = isEnglish
+    ? (product.badgeEn || product.badge_en || badge)
+    : (isChinese ? (product.badgeZh || product.badge_zh || badge) : badge);
+
+  const displayCategoryName = (isChinese || isEnglish)
     ? t(`cat_${product.category?.replace(/-/g, '_')}`, categoryName)
     : categoryName;
 
@@ -68,7 +77,7 @@ export default function ProductCard({ product, onRequestSample }) {
             className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-[#EE4D2D] text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105"
           >
             <ShoppingBag className="w-3.5 h-3.5 text-orange-400" />
-            <span>{isChinese ? '在蝦皮購買' : 'Mua trên Shopee'}</span>
+            <span>{isChinese ? '在蝦皮購買' : (isEnglish ? 'Buy on Shopee' : 'Mua trên Shopee')}</span>
           </a>
         ) : (
           <Link
@@ -77,7 +86,7 @@ export default function ProductCard({ product, onRequestSample }) {
             className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-tea-primary text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
           >
             <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
-            <span>{isChinese ? '聯繫諮詢' : 'Liên hệ tư vấn'}</span>
+            <span>{isChinese ? '聯繫諮詢' : (isEnglish ? 'Contact Us' : 'Liên hệ tư vấn')}</span>
           </Link>
         )}
       </div>
@@ -135,7 +144,7 @@ export default function ProductCard({ product, onRequestSample }) {
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs font-bold transition-all shadow-sm"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
-              <span>{isChinese ? '在蝦皮購買' : 'Mua trên Shopee'}</span>
+              <span>{isChinese ? '在蝦皮購買' : (isEnglish ? 'Buy on Shopee' : 'Mua trên Shopee')}</span>
             </a>
           ) : (
             <Link
@@ -143,7 +152,7 @@ export default function ProductCard({ product, onRequestSample }) {
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-colors shadow-sm"
             >
               <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
-              <span>{isChinese ? '聯繫諮詢' : 'Liên hệ tư vấn'}</span>
+              <span>{isChinese ? '聯繫諮詢' : (isEnglish ? 'Contact Us' : 'Liên hệ tư vấn')}</span>
             </Link>
           )}
 
@@ -159,7 +168,7 @@ export default function ProductCard({ product, onRequestSample }) {
             <button
               onClick={() => onRequestSample(product)}
               className="px-2.5 py-2.5 rounded-xl border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-primary dark:text-tea-mint hover:bg-tea-primary dark:hover:bg-tea-green hover:text-white text-xs font-bold transition-all whitespace-nowrap"
-              title={isChinese ? '索取樣品' : 'Mẫu thử'}
+              title={isChinese ? '索取樣品' : (isEnglish ? 'Request Sample' : 'Mẫu thử')}
             >
               {t('card_sample', 'Mẫu thử')}
             </button>

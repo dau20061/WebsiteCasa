@@ -12,6 +12,13 @@ const LANGUAGE_OPTIONS = [
     desc: 'Giao diện Tiếng Việt'
   },
   {
+    id: 'en',
+    label: 'English',
+    shortLabel: 'EN',
+    flag: '🇬🇧',
+    desc: 'International English'
+  },
+  {
     id: 'zh',
     label: '繁體中文',
     shortLabel: '繁中',
@@ -74,7 +81,7 @@ export default function LanguageToggle({ variant = 'dropdown', className = '' })
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Chuyển đổi ngôn ngữ (Tiếng Việt / 繁體中文)"
+        aria-label="Chuyển đổi ngôn ngữ (Tiếng Việt / English / 繁體中文)"
         title={`Ngôn ngữ: ${currentOption.label}`}
         className="flex items-center gap-1.5 h-9 px-2.5 rounded-xl bg-white/80 dark:bg-[#132018]/90 text-gray-700 dark:text-gray-200 hover:text-tea-primary dark:hover:text-tea-mint border border-tea-border/60 dark:border-white/10 shadow-sm hover:shadow-tea-sm transition-all duration-200 backdrop-blur-md text-xs font-bold"
       >
@@ -94,7 +101,7 @@ export default function LanguageToggle({ variant = 'dropdown', className = '' })
           >
             <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-white/10 mb-1 flex items-center justify-between">
               <span>Ngôn Ngữ</span>
-              <span className="text-gray-400">語言</span>
+              <span className="text-gray-400">EN / 繁中</span>
             </div>
 
             <div className="space-y-0.5">

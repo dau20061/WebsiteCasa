@@ -5,11 +5,20 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function NewsCard({ article }) {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const { slug, title, category, date, readTime, excerpt, image, author } = article;
 
-  const displayTitle = (isChinese && (article.titleZh || article.title_zh)) || title;
-  const displayExcerpt = (isChinese && (article.excerptZh || article.excerpt_zh)) || excerpt;
+  const displayTitle = isEnglish
+    ? (article.titleEn || article.title_en || title)
+    : (isChinese ? (article.titleZh || article.title_zh || title) : title);
+
+  const displayExcerpt = isEnglish
+    ? (article.excerptEn || article.excerpt_en || excerpt)
+    : (isChinese ? (article.excerptZh || article.excerpt_zh || excerpt) : excerpt);
+
+  const displayCategory = isEnglish
+    ? (article.categoryEn || article.category_en || category)
+    : (isChinese ? (article.categoryZh || article.category_zh || category) : category);
 
   return (
     <motion.article
@@ -31,7 +40,7 @@ export default function NewsCard({ article }) {
         />
         <div className="absolute top-3.5 left-3.5">
           <span className="px-3 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-tea-primary dark:text-tea-mint text-xs font-bold shadow-sm">
-            {(isChinese && (article.categoryZh || article.category_zh)) || category}
+            {displayCategory}
           </span>
         </div>
       </Link>
@@ -45,7 +54,9 @@ export default function NewsCard({ article }) {
             <span>•</span>
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" />
-              {isChinese ? `${readTime?.replace(/[^0-9]/g, '') || '5'} 分鐘閱讀` : readTime}
+              {isChinese
+                ? `${readTime?.replace(/[^0-9]/g, '') || '5'} 分鐘閱讀`
+                : (isEnglish ? `${readTime?.replace(/[^0-9]/g, '') || '5'} min read` : readTime)}
             </span>
           </div>
 
@@ -62,7 +73,7 @@ export default function NewsCard({ article }) {
 
         <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
           <span className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 italic font-medium">
-            {isChinese ? '發布:' : 'Bởi:'} {author.split('(')[0].trim()}
+            {isChinese ? '發布:' : (isEnglish ? 'By:' : 'Bởi:')} {author.split('(')[0].trim()}
           </span>
 
           <Link

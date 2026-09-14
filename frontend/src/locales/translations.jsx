@@ -275,6 +275,145 @@ export const TRANSLATIONS = {
     footer_address: '總部：越南林同省保林縣祿新社第4村',
     footer_branch: '分部：胡志明市與河內',
     footer_copyright: '版權所有 © CASA TEA VIETNAM CO., LTD. 保留所有權利。'
+  },
+
+  en: {
+    // Navigation
+    nav_home: 'Home',
+    nav_about: 'About Us',
+    nav_products: 'Products',
+    nav_machinery: 'Machinery & Certs',
+    nav_news: 'News & Recipes',
+    nav_faq: 'FAQ',
+    nav_contact: 'Contact Us',
+    nav_sample_btn: 'Free Samples',
+    nav_contact_btn: 'Contact Now',
+    nav_hotline: 'B2B Hotline',
+    nav_language: 'Language',
+    nav_theme: 'Display Theme',
+
+    // Hero & Home
+    hero_pill: 'Leading B2B Tea & Beverage Solutions',
+    hero_title_1: 'The Essence of Pure Tea –',
+    hero_title_highlight: 'The Foundation for Exceptional',
+    hero_title_2: 'Beverages',
+    hero_desc: 'Wholesale commercial tea leaves, creamer powders, and customized R&D recipe transfer solutions designed to optimize cup costs for milk tea chains, cafes, and F&B businesses worldwide.',
+    hero_cta_sample: 'Request Free Sample Kit',
+    hero_cta_contact: 'Contact for Wholesale Pricing',
+    hero_stats_experience: 'Years of Tea Crafting Experience',
+    hero_stats_production: 'Tons Annual Capacity',
+    hero_stats_partners: 'Partner Beverage Brands',
+    hero_stats_standards: 'Certified with ISO 22000 & HACCP',
+
+    // Core values
+    values_badge: 'Core Competence',
+    values_title: 'Why Leading F&B Brands Choose CASA?',
+    values_subtitle: 'We strictly oversee the complete value chain from high-mountain tea plantations to every drop of perfected extraction.',
+
+    // Products Catalog & Filter
+    prod_badge: 'Product Portfolio',
+    prod_title: 'Curated Commercial Tea & Beverage Ingredients',
+    prod_subtitle: 'Selected from renowned high-mountain origins and processed with proprietary standardized flavor technology.',
+    prod_view_all: 'View All Products',
+    prod_catalog_badge: 'B2B Product Catalog',
+    prod_catalog_title: 'Commercial Tea Leaves & Beverage Ingredients',
+    prod_catalog_desc: 'Standardized flavor, exceptional stability, and high TDS extraction yield to minimize cup cost for beverage chains.',
+    prod_search_placeholder: 'Search by name, SKU, flavor profile...',
+    prod_sort_label: 'Sort by:',
+    sort_popular: 'Best Seller',
+    sort_body: 'Rich Tea Taste (High Body)',
+    sort_aroma: 'Natural Fragrance (High Aroma)',
+    sort_name: 'Product Name (A-Z)',
+    prod_sku: 'SKU',
+    prod_origin: 'Origin',
+    prod_detail_btn: 'Product Details',
+    prod_request_sample: 'Request Sample',
+    card_aroma: 'Aroma:',
+    card_body: 'Body (Richness):',
+    card_detail: 'View Details',
+    card_sample: 'Sample',
+
+    // Product Categories
+    cat_all: 'All Products',
+    cat_tra_den: 'Black Tea Series',
+    cat_tra_oolong: 'Oolong Tea Series',
+    cat_tra_lai_xanh: 'Jasmine & Green Tea',
+    cat_tra_rang: 'Roasted Tea & Hojicha',
+    cat_tra_trai_cay: 'Fruit Tea Base',
+    cat_bot_pha_che: 'Creamers & Toppings',
+
+    // About Page
+    about_hero_badge: 'CASA Brand Story',
+    about_hero_title_1: 'Pioneering New Standards For',
+    about_hero_title_highlight: 'Commercial Tea Ingredients',
+    about_hero_desc: 'Founded with a vision to elevate tea value, CASA is an industry pioneer utilizing modern manufacturing technology and international quality assurance for the global F&B sector.',
+
+    // Machinery & Certifications
+    mach_hero_badge: 'Production Capacity & Standards',
+    mach_hero_title: 'Modern Machinery & Quality Certifications',
+    mach_hero_desc: 'Closed-loop processing line, vacuum freeze-drying systems, and Sortex optical sorters meeting ISO 22000, HACCP, and FDA standards.',
+
+    // News
+    news_badge: 'Industry Insights & Beverage Trends',
+    news_title: 'Latest News & Barista SOP Recipes',
+    news_subtitle: 'Discover the latest beverage trends, standardized Barista recipes, and tea preservation techniques from the CASA R&D team.',
+    news_view_all: 'View All Articles',
+    news_read_more: 'Read More',
+    news_hero_badge: 'F&B Magazine & Tea Knowledge',
+    news_hero_title: 'News & Beverage Recipes',
+    news_hero_desc: 'Keep up with the dynamic F&B market, emerging ingredient trends, and technical formulation guides from the CASA R&D team.',
+    news_search_placeholder: 'Search articles, recipes...',
+    news_featured_badge: 'Featured Article',
+    news_min_read: 'min read',
+
+    // FAQ Page
+    faq_hero_badge: 'Help & Knowledge Center',
+    faq_hero_title: 'Frequently Asked Questions (FAQ)',
+    faq_hero_desc: 'Detailed answers on wholesale policies, sample kit requests, shipping workflows, and custom R&D formulation services.',
+    faq_search_placeholder: 'Search your question...',
+
+    // Contact Page
+    contact_hero_badge: 'B2B Strategic Partnership',
+    contact_hero_title: 'Connect With The CASA Team',
+    contact_hero_desc: 'Ready to consult on tea ingredient solutions, dispatch free sample kits, and support recipe transfer for your brand.',
+    contact_form_name: 'Full Name *',
+    contact_form_company: 'Brand / Company / Store Name',
+    contact_form_phone: 'Phone Number *',
+    contact_form_email: 'Email Address',
+    contact_form_interest: 'Product Line of Interest',
+    contact_form_msg: 'Detailed requirements or questions',
+    contact_form_submit: 'Submit Inquiry',
+
+    // CTA Section
+    cta_badge: 'Sustainable Partnership & Growth',
+    cta_title: 'Searching for authentic, consistent tea ingredients for your brand?',
+    cta_desc: 'The CASA team is dedicated to providing complimentary sample testing, high-margin recipe formulation, and dependable long-term supply.',
+    cta_btn_sample: 'Request Free Sample Kit',
+    cta_btn_contact: 'Contact for Wholesale Pricing',
+
+    // Sample Request Modal
+    modal_sample_title: 'Apply For Complimentary Sample Kit',
+    modal_sample_subtitle: 'CASA will dispatch a curated kit of 3-5 premium tea and ingredient samples directly to your doorstep.',
+    modal_name: 'Representative Name *',
+    modal_company: 'Brand / Cafe / Enterprise Name *',
+    modal_phone: 'Contact Phone Number *',
+    modal_email: 'Notification Email',
+    modal_interest: 'Product Series of Primary Interest',
+    modal_address: 'Delivery Address (Street, Ward, District, City/Province) *',
+    modal_notes: 'Additional notes on flavor notes, body strength, or custom requirements',
+    modal_submit: 'Submit Sample Request',
+    modal_submitting: 'Submitting request...',
+    modal_cancel: 'Cancel',
+    modal_success: 'Thank you! The CASA R&D team will contact you to confirm and ship your sample kit within 24 hours.',
+
+    // Footer
+    footer_desc: 'Manufacturer and wholesale distributor of commercial tea leaves, creamer powders, and cost-optimized R&D beverage solutions for the F&B industry.',
+    footer_quick_links: 'Quick Links',
+    footer_product_categories: 'Ingredient Categories',
+    footer_contact_info: 'Contact Information',
+    footer_address: 'HQ: Village 4, Loc Tan Commune, Bao Lam District, Lam Dong Province, Vietnam',
+    footer_branch: 'Branches: Ho Chi Minh City & Hanoi',
+    footer_copyright: 'Copyright © CASA TEA VIETNAM CO., LTD. All rights reserved.'
   }
 };
 

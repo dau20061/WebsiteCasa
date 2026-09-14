@@ -791,5 +791,376 @@ YÊU CẦU ĐẦU RA JSON:
   };
 }
 
+// ============================================================================
+// ENGLISH TRANSLATION SUITE (INTERNATIONAL F&B / BUBBLE TEA STANDARDS)
+// ============================================================================
+
+export const GLOBAL_FB_REFINEMENTS_EN = [
+  [/\bconcentrated milk tea\b/gi, 'Rich Milk Tea'],
+  [/\bstrong milk tea\b/gi, 'Signature Rich Milk Tea'],
+  [/\bsweet milk tea\b/gi, 'Classic Sweet Milk Tea'],
+  [/\btea core\b/gi, 'Rich Tea Base'],
+  [/\btea base\b/gi, 'Premium Tea Base'],
+  [/\broasted smoke\b/gi, 'Charcoal Roasted Smoky Aroma'],
+  [/\bsmoky flavor\b/gi, 'Charcoal Roasted Aroma'],
+  [/\bwinter melon\b/gi, 'Winter Melon'],
+  [/\bwinter melon syrup\b/gi, 'Specialty Winter Melon Syrup'],
+  [/\bbrown sugar syrup\b/gi, 'Artisan Brown Sugar Syrup'],
+  [/\bblack sugar\b/gi, 'Taiwanese Brown Sugar'],
+  [/\bjasmine green tea\b/gi, 'Jasmine Blossom Green Tea'],
+  [/\boolong tea\b/gi, 'High-Mountain Oolong Tea'],
+  [/\broasted oolong\b/gi, 'Charcoal Roasted Oolong Tea'],
+  [/\bmatcha powder\b/gi, 'Ceremonial Grade Matcha Powder'],
+  [/\bcheese foam\b/gi, 'Savory Cheese Cold Foam'],
+  [/\bsea salt foam\b/gi, 'Sea Salt Cream Foam'],
+  [/\btapioca pearls\b/gi, 'Brown Sugar Boba Pearls'],
+  [/\bbao loc plateau\b/gi, 'Bao Loc Highlands, Lam Dong'],
+  [/\bbao loc\b/gi, 'Bao Loc Highlands'],
+  [/\blam dong\b/gi, 'Lam Dong Province, Vietnam']
+];
+
+export async function translateTextToEn(text) {
+  if (!text || typeof text !== 'string' || !text.trim()) return '';
+
+  if (!hasVietnamese(text) && /^[\x00-\x7F\s\.,!?'"()\-:;0-9%#&/]+$/.test(text.trim())) {
+    return text.trim();
+  }
+
+  // 1. MyMemory API
+  try {
+    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.trim())}&langpair=vi|en`;
+    const res = await fetch(mmUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (res.ok) {
+      const data = await res.json();
+      let translated = data?.responseData?.translatedText;
+      if (translated && !hasVietnamese(translated)) {
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          translated = translated.replace(pattern, replacement);
+        }
+        return translated.trim();
+      }
+    }
+  } catch (err) {}
+
+  // 2. Google Translate API
+  try {
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=' + encodeURIComponent(text.trim());
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (res.ok) {
+      const data = await res.json();
+      let translated = (data[0] || []).map(item => item[0]).join('');
+      if (translated && !hasVietnamese(translated)) {
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          translated = translated.replace(pattern, replacement);
+        }
+        return translated.trim();
+      }
+    }
+  } catch (err) {}
+
+  return text;
+}
+
+export async function translateHtmlToEn(html) {
+  if (!html || typeof html !== 'string' || !html.trim()) return '';
+
+  if (!/<[a-z][\s\S]*>/i.test(html)) {
+    return await translateTextToEn(html);
+  }
+
+  const tokens = html.split(/(<[^>]+>)/g);
+  const translatedTokens = await Promise.all(
+    tokens.map(async (token) => {
+      if (token.startsWith('<') && token.endsWith('>')) {
+        return token;
+      }
+      if (token.trim().length === 0) {
+        return token;
+      }
+      const leadingSpace = token.match(/^\s*/)[0];
+      const trailingSpace = token.match(/\s*$/)[0];
+      const translated = await translateTextToEn(token.trim());
+      return leadingSpace + translated + trailingSpace;
+    })
+  );
+
+  return translatedTokens.join('');
+}
+
+export async function translateProductToEnglish(product = {}) {
+  const prompt = `
+You are a senior beverage R&D specialist and professional commercial tea master (F&B / Bubble Tea industry).
+Translate the following product information from Vietnamese to professional ENGLISH, using precise B2B beverage and tea industry terminology:
+
+Product Information:
+- Product Name: "${product.name || ''}"
+- Badge: "${product.badge || ''}"
+- Short Description: "${product.shortDesc || ''}"
+- Detailed Description: "${product.fullDesc || ''}"
+- Origin: "${product.origin || ''}"
+- Beverage Applications: ${JSON.stringify(product.applications || [])}
+
+RULES:
+- Translate 100% into fluent, professional English for commercial beverage buyers.
+- Absolutely NO Vietnamese words or characters left in the result.
+- Use authentic beverage industry terms (e.g. High-Mountain Oolong, Specialty Winter Melon Syrup, Rich Tea Base, Boba Pearls, Cold Foam, Creamer Powder).
+
+REQUIRED JSON OUTPUT FORMAT:
+{
+  "nameEn": "Product Name in English",
+  "badgeEn": "Badge in English",
+  "shortDescEn": "Short Description in English",
+  "fullDescEn": "Detailed Description in English",
+  "originEn": "Origin in English",
+  "applicationsEn": ["Application 1 in English", "Application 2 in English"]
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    const isHalfVi = hasVietnamese(aiResult?.nameEn) || hasVietnamese(aiResult?.shortDescEn);
+    if (aiResult && aiResult.nameEn && !isHalfVi) {
+      return {
+        nameEn: aiResult.nameEn || '',
+        badgeEn: aiResult.badgeEn || 'New Arrival',
+        shortDescEn: aiResult.shortDescEn || '',
+        fullDescEn: aiResult.fullDescEn || '',
+        originEn: aiResult.originEn || 'Bao Loc Highlands, Lam Dong, Vietnam',
+        applicationsEn: Array.isArray(aiResult.applicationsEn) && aiResult.applicationsEn.length > 0 ? aiResult.applicationsEn : ['Signature Rich Milk Tea', 'Fresh Fruit Tea']
+      };
+    }
+  } catch (err) {
+    console.warn('[Gemini AI] Error translating product to English:', err.message);
+  }
+
+  return await fallbackProductTranslationEn(product);
+}
+
+export async function fallbackProductTranslationEn(product = {}) {
+  const [nameEn, badgeEn, originEn, shortDescEn, fullDescEn] = await Promise.all([
+    translateTextToEn(product.name || ''),
+    translateTextToEn(product.badge || 'New Arrival'),
+    translateTextToEn(product.origin || 'Bao Loc Highlands, Lam Dong, Vietnam'),
+    translateTextToEn(product.shortDesc || ''),
+    translateTextToEn(product.fullDesc || '')
+  ]);
+
+  let applicationsEn = [];
+  if (Array.isArray(product.applications) && product.applications.length > 0) {
+    applicationsEn = await Promise.all(product.applications.map(app => translateTextToEn(app)));
+  } else {
+    applicationsEn = ['Signature Milk Tea', 'Fresh Fruit Tea', 'Sea Salt Cold Foam Tea'];
+  }
+
+  return {
+    nameEn: nameEn || 'Specialty Commercial Beverage Ingredient',
+    badgeEn: badgeEn || 'New Arrival',
+    originEn: originEn || 'Bao Loc Highlands, Lam Dong, Vietnam',
+    shortDescEn: shortDescEn || 'Selected from premium tea highlands, crafted for consistent commercial beverage standards.',
+    fullDescEn: fullDescEn || 'CASA specialty beverage ingredients engineered for chain operations with long-lasting aroma and operational ease.',
+    applicationsEn
+  };
+}
+
+export async function translateArticleToEnglish(article = {}) {
+  const prompt = `
+You are a senior F&B editor and professional barista specialist.
+Translate the following article from Vietnamese to professional ENGLISH, preserving all HTML markup (<h2>, <p>, <ul>, <li>, <strong>, <table>, etc.):
+
+Article Information:
+- Title: "${article.title || ''}"
+- Excerpt: "${article.excerpt || ''}"
+- Content: ${JSON.stringify(article.content || '')}
+
+RULES:
+- Translate 100% into fluent, engaging English.
+- Absolutely NO Vietnamese words left in the output.
+- Preserve HTML tags and structure intact.
+
+REQUIRED JSON OUTPUT FORMAT:
+{
+  "titleEn": "Article Title in English",
+  "excerptEn": "Excerpt in English",
+  "contentEn": "Complete article content in English (HTML preserved)"
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    const isHalfVi = hasVietnamese(aiResult?.titleEn) || hasVietnamese(aiResult?.excerptEn);
+    if (aiResult && aiResult.titleEn && !isHalfVi) {
+      return {
+        titleEn: aiResult.titleEn,
+        excerptEn: aiResult.excerptEn || '',
+        contentEn: aiResult.contentEn || ''
+      };
+    }
+  } catch (err) {
+    console.warn('[Gemini AI] Error translating article to English:', err.message);
+  }
+
+  const [titleEn, excerptEn, contentEn] = await Promise.all([
+    translateTextToEn(article.title || ''),
+    translateTextToEn(article.excerpt || ''),
+    translateHtmlToEn(article.content || '')
+  ]);
+
+  return {
+    titleEn: titleEn || '2026 Rich Milk Tea Trends: When Tea Essence Takes Center Stage',
+    excerptEn: excerptEn || 'New generation consumers are transitioning from overly sweet drinks to rich, authentic tea profiles with distinct roasted or natural floral aromas.',
+    contentEn: contentEn || '<p>For detailed formulation and standard operating procedures, please consult our R&D advisory team.</p>'
+  };
+}
+
+export async function translateNewsToEnglish(article = {}) {
+  return await translateArticleToEnglish(article);
+}
+
+export async function translateFaqToEnglish(faq = {}) {
+  const prompt = `
+You are a B2B customer advisory expert in the commercial tea and F&B industry.
+Translate the following FAQ question and answer from Vietnamese to professional ENGLISH:
+
+FAQ Information:
+- Question: "${faq.question || ''}"
+- Answer: "${faq.answer || ''}"
+
+RULES:
+- Translate 100% into fluent English.
+- Use accurate commercial F&B trade terminology (e.g. MOQ, Sample Kit, OEM/ODM Custom Formulation).
+
+REQUIRED JSON OUTPUT FORMAT:
+{
+  "questionEn": "Question in English",
+  "answerEn": "Answer in English"
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    const isHalfVi = hasVietnamese(aiResult?.questionEn) || hasVietnamese(aiResult?.answerEn);
+    if (aiResult && aiResult.questionEn && !isHalfVi) {
+      return {
+        questionEn: aiResult.questionEn,
+        answerEn: aiResult.answerEn || ''
+      };
+    }
+  } catch (err) {
+    console.warn('[Gemini AI] Error translating FAQ to English:', err.message);
+  }
+
+  const [questionEn, answerEn] = await Promise.all([
+    translateTextToEn(faq.question || ''),
+    translateTextToEn(faq.answer || '')
+  ]);
+
+  return {
+    questionEn: questionEn || 'Common B2B Partnership Inquiry',
+    answerEn: answerEn || 'For detailed collaboration workflows and sample requests, please reach out to our trade representative.'
+  };
+}
+
+export async function translateMachineryToEnglish(machinery = {}) {
+  const prompt = `
+You are a chief tea processing and food technology engineer.
+Translate the following equipment / machinery information from Vietnamese to professional ENGLISH:
+
+Equipment Information:
+- Name: "${machinery.name || ''}"
+- Category: "${machinery.category || ''}"
+- Origin: "${machinery.origin || ''}"
+- Capacity: "${machinery.capacity || ''}"
+- Description / Technology: "${machinery.description || machinery.desc || ''}"
+
+RULES:
+- Translate 100% into professional English.
+- Use precise mechanical and industrial food processing terms (e.g. Sortex Optical Color Sorter, Fluidized Bed Drying System, 3D Multi-directional Mixer, Aseptic Nitrogen Packing Machine).
+
+REQUIRED JSON OUTPUT FORMAT:
+{
+  "nameEn": "Equipment Name in English",
+  "categoryEn": "Category in English",
+  "originEn": "Origin in English",
+  "capacityEn": "Capacity in English",
+  "descriptionEn": "Description in English"
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    const isHalfVi = hasVietnamese(aiResult?.nameEn) || hasVietnamese(aiResult?.descriptionEn);
+    if (aiResult && aiResult.nameEn && !isHalfVi) {
+      return {
+        nameEn: aiResult.nameEn,
+        categoryEn: aiResult.categoryEn || machinery.category || '',
+        originEn: aiResult.originEn || machinery.origin || '',
+        capacityEn: aiResult.capacityEn || machinery.capacity || '',
+        descriptionEn: aiResult.descriptionEn || machinery.description || machinery.desc || ''
+      };
+    }
+  } catch (err) {
+    console.warn('[Gemini AI] Error translating machinery to English:', err.message);
+  }
+
+  const [nameEn, categoryEn, originEn, descriptionEn] = await Promise.all([
+    translateTextToEn(machinery.name || ''),
+    translateTextToEn(machinery.category || ''),
+    translateTextToEn(machinery.origin || ''),
+    translateTextToEn(machinery.description || machinery.desc || '')
+  ]);
+
+  return {
+    nameEn: nameEn || 'Professional Commercial Tea Processing Equipment',
+    categoryEn: categoryEn || 'Tea Processing Machinery',
+    originEn: originEn || 'Imported Precision Equipment',
+    capacityEn: machinery.capacity || '',
+    descriptionEn: descriptionEn || 'High-performance industrial production line machinery.'
+  };
+}
+
+export async function translateCategoryToEnglish(category = {}) {
+  const prompt = `
+You are a tea evaluation and specialty F&B ingredient master.
+Translate the following product category name and description from Vietnamese to professional ENGLISH:
+
+Category Information:
+- Name: "${category.name || ''}"
+- Description: "${category.desc || ''}"
+
+RULES:
+- Translate 100% into professional, attractive English for commercial buyers.
+
+REQUIRED JSON OUTPUT FORMAT:
+{
+  "nameEn": "Category Name in English",
+  "descEn": "Category Description in English"
+}
+`;
+
+  try {
+    const aiResult = await callGeminiApi({ prompt });
+    const isHalfVi = hasVietnamese(aiResult?.nameEn) || hasVietnamese(aiResult?.descEn);
+    if (aiResult && aiResult.nameEn && !isHalfVi) {
+      return {
+        nameEn: aiResult.nameEn,
+        descEn: aiResult.descEn || ''
+      };
+    }
+  } catch (err) {
+    console.warn('[Gemini AI] Error translating category to English:', err.message);
+  }
+
+  const [nameEn, descEn] = await Promise.all([
+    translateTextToEn(category.name || ''),
+    translateTextToEn(category.desc || '')
+  ]);
+
+  return {
+    nameEn: nameEn || 'Specialty Tea & Beverage Category',
+    descEn: descEn || 'Professional ingredients and custom formulation solutions for beverage chains.'
+  };
+}
+
+
 
 

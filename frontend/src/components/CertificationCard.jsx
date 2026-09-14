@@ -13,14 +13,14 @@ const iconMap = {
 };
 
 export default function CertificationCard({ cert, onSelect }) {
-  const { isChinese } = useLanguage();
+  const { isChinese, isEnglish } = useLanguage();
   const IconComponent = iconMap[cert.icon] || ShieldCheck;
 
-  const displayTitle = (isChinese && cert.titleZh) || cert.title;
-  const displayBadge = (isChinese && cert.badgeZh) || cert.badge;
-  const displayOrg = (isChinese && cert.orgZh) || cert.org;
-  const displayScope = (isChinese && cert.scopeZh) || cert.scope;
-  const displayValidity = (isChinese && cert.validityZh) || cert.validity;
+  const displayTitle = isEnglish ? (cert.titleEn || cert.title) : ((isChinese && cert.titleZh) || cert.title);
+  const displayBadge = isEnglish ? (cert.badgeEn || cert.badge) : ((isChinese && cert.badgeZh) || cert.badge);
+  const displayOrg = isEnglish ? (cert.orgEn || cert.org) : ((isChinese && cert.orgZh) || cert.org);
+  const displayScope = isEnglish ? (cert.scopeEn || cert.scope) : ((isChinese && cert.scopeZh) || cert.scope);
+  const displayValidity = isEnglish ? (cert.validityEn || cert.validity) : ((isChinese && cert.validityZh) || cert.validity);
 
   return (
     <motion.div
@@ -51,7 +51,7 @@ export default function CertificationCard({ cert, onSelect }) {
         </p>
 
         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
-          {isChinese ? '發證機構：' : 'Cơ quan:'} <span className="text-gray-800 dark:text-gray-200 font-semibold">{displayOrg}</span>
+          {isEnglish ? 'Issuing Body:' : (isChinese ? '發證機構：' : 'Cơ quan:')} <span className="text-gray-800 dark:text-gray-200 font-semibold">{displayOrg}</span>
         </p>
 
         {/* Scope snippet */}
@@ -69,13 +69,13 @@ export default function CertificationCard({ cert, onSelect }) {
       {/* Button to open lightbox preview */}
       <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
         <span className="text-[11px] text-gray-600 dark:text-gray-400 font-medium">
-          {isChinese ? '效期：' : 'Hiệu lực:'} {displayValidity}
+          {isEnglish ? 'Validity:' : (isChinese ? '效期：' : 'Hiệu lực:')} {displayValidity}
         </span>
         <button
           onClick={() => onSelect(cert)}
           className="inline-flex items-center gap-1.5 text-xs font-bold text-tea-emerald dark:text-tea-mint hover:text-tea-primary transition-colors"
         >
-          <span>{isChinese ? '檢視證書' : 'Xem chứng chỉ'}</span>
+          <span>{isEnglish ? 'View Certificate' : (isChinese ? '檢視證書' : 'Xem chứng chỉ')}</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </button>
       </div>

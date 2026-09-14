@@ -50,27 +50,33 @@ export default function SEO({
   jsonLd = null
 }) {
   const location = useLocation();
-  const { isChinese } = useLanguage();
+  const { isChinese, isEnglish } = useLanguage();
 
   useEffect(() => {
     // 1. TỐI ƯU TITLE TAG
     const defaultSuffix = isChinese
       ? 'CASA TEA | 專業商用茶飲原料與調飲方案'
-      : 'CASA TEA – Tinh Hoa Trà Nguyên Liệu B2B';
+      : (isEnglish
+        ? 'CASA TEA – Leading B2B Tea & Beverage Solutions'
+        : 'CASA TEA – Tinh Hoa Trà Nguyên Liệu B2B');
     const fullTitle = title ? `${title} | ${defaultSuffix}` : defaultSuffix;
     document.title = fullTitle;
 
     // 2. TỐI ƯU META DESCRIPTION
     const defaultDesc = isChinese
       ? 'CASA TEA – 專業商用茶飲原料、特選原葉茶包、風味糖漿與調飲專用粉研發供應商。符合ISO 22000、HACCP國際標準。'
-      : 'CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP.';
+      : (isEnglish
+        ? 'CASA TEA – Premium manufacturer & wholesale distributor of commercial tea leaves, beverage syrups, and creamer powders for milk tea chains and cafes. ISO 22000, HACCP certified.'
+        : 'CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP.');
     const metaDescription = description || defaultDesc;
     setMetaTag('name', 'description', metaDescription);
 
     // 3. TỐI ƯU META KEYWORDS
     const defaultKeywords = isChinese
       ? '商用茶葉, 奶茶原料, 冬瓜糖漿, 茉莉綠茶, 烏龍茶, 抹茶粉, 越南茶葉供應商, CASA TEA'
-      : 'trà nguyên liệu, trà pha trà sữa, syrup bí đao, siro pha chế, trà đen sỉ, trà ô long, bột béo, nguyên liệu f&b, CASA TEA';
+      : (isEnglish
+        ? 'wholesale tea, commercial tea leaves, bubble tea ingredients, winter melon syrup, oolong tea, matcha powder, b2b beverage solutions, CASA TEA'
+        : 'trà nguyên liệu, trà pha trà sữa, syrup bí đao, siro pha chế, trà đen sỉ, trà ô long, bột béo, nguyên liệu f&b, CASA TEA');
     const metaKeywords = Array.isArray(keywords) ? keywords.join(', ') : (keywords || defaultKeywords);
     setMetaTag('name', 'keywords', metaKeywords);
 
@@ -81,6 +87,7 @@ export default function SEO({
     setLinkTag('canonical', fullCanonical);
     setLinkTag('alternate', fullCanonical, { hreflang: 'vi' });
     setLinkTag('alternate', fullCanonical, { hreflang: 'zh-TW' });
+    setLinkTag('alternate', fullCanonical, { hreflang: 'en' });
     setLinkTag('alternate', fullCanonical, { hreflang: 'x-default' });
 
     // 5. META ROBOTS
@@ -96,7 +103,7 @@ export default function SEO({
     setMetaTag('property', 'og:description', metaDescription);
     setMetaTag('property', 'og:url', fullCanonical);
     setMetaTag('property', 'og:type', ogType);
-    setMetaTag('property', 'og:locale', isChinese ? 'zh_TW' : 'vi_VN');
+    setMetaTag('property', 'og:locale', isChinese ? 'zh_TW' : (isEnglish ? 'en_US' : 'vi_VN'));
 
     const imageToUse = ogImage
       ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`)
@@ -140,7 +147,7 @@ export default function SEO({
         name: fullTitle,
         description: metaDescription,
         url: fullCanonical,
-        inLanguage: isChinese ? 'zh-TW' : 'vi',
+        inLanguage: isChinese ? 'zh-TW' : (isEnglish ? 'en' : 'vi'),
         isPartOf: {
           '@type': 'WebSite',
           name: SITE_NAME,

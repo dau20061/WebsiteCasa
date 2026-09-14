@@ -4,13 +4,23 @@ import { Cpu, Gauge, Globe2, ZoomIn, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function MachineryCard({ item, onSelect }) {
-  const { isChinese } = useLanguage();
+  const { isChinese, isEnglish } = useLanguage();
 
-  const displayName = (isChinese && (item.nameZh || item.name_zh)) || item.name;
-  const displayCategory = (isChinese && (item.categoryZh || item.category_zh)) || item.category;
-  const displayOrigin = (isChinese && (item.originZh || item.origin_zh)) || item.origin;
-  const displayCapacity = (isChinese && (item.capacityZh || item.capacity_zh)) || item.capacity;
-  const displayDesc = (isChinese && (item.descriptionZh || item.descZh || item.description_zh)) || item.description || item.desc;
+  const displayName = isEnglish
+    ? (item.nameEn || item.name_en || item.name)
+    : (isChinese ? (item.nameZh || item.name_zh || item.name) : item.name);
+  const displayCategory = isEnglish
+    ? (item.categoryEn || item.category_en || item.category)
+    : (isChinese ? (item.categoryZh || item.category_zh || item.category) : item.category);
+  const displayOrigin = isEnglish
+    ? (item.originEn || item.origin_en || item.origin)
+    : (isChinese ? (item.originZh || item.origin_zh || item.origin) : item.origin);
+  const displayCapacity = isEnglish
+    ? (item.capacityEn || item.capacity_en || item.capacity)
+    : (isChinese ? (item.capacityZh || item.capacity_zh || item.capacity) : item.capacity);
+  const displayDesc = isEnglish
+    ? (item.descriptionEn || item.descEn || item.description_en || item.description || item.desc)
+    : (isChinese ? (item.descriptionZh || item.descZh || item.description_zh || item.description || item.desc) : (item.description || item.desc));
 
   return (
     <motion.div
@@ -40,7 +50,7 @@ export default function MachineryCard({ item, onSelect }) {
 
           <button
             onClick={() => onSelect(item)}
-            aria-label={isChinese ? '放大查看設備詳情' : 'Phóng to chi tiết máy móc'}
+            aria-label={isChinese ? '放大查看設備詳情' : (isEnglish ? 'Enlarge equipment details' : 'Phóng to chi tiết máy móc')}
             className="absolute bottom-3.5 right-3.5 p-2 rounded-full bg-black/50 hover:bg-tea-emerald text-white backdrop-blur-sm transition-colors"
           >
             <ZoomIn className="w-4 h-4" />
@@ -56,11 +66,11 @@ export default function MachineryCard({ item, onSelect }) {
           <div className="mt-3 space-y-2 text-xs text-gray-600 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <Globe2 className="w-4 h-4 text-tea-emerald dark:text-tea-mint shrink-0" />
-              <span><strong>{isChinese ? '產地：' : 'Xuất xứ:'}</strong> {displayOrigin}</span>
+              <span><strong>{isChinese ? '產地：' : (isEnglish ? 'Origin: ' : 'Xuất xứ: ')}</strong>{displayOrigin}</span>
             </div>
             <div className="flex items-center gap-2">
               <Gauge className="w-4 h-4 text-tea-emerald dark:text-tea-mint shrink-0" />
-              <span><strong>{isChinese ? '產能/規格：' : 'Công suất:'}</strong> {displayCapacity}</span>
+              <span><strong>{isChinese ? '產能/規格：' : (isEnglish ? 'Capacity: ' : 'Công suất: ')}</strong>{displayCapacity}</span>
             </div>
           </div>
 
@@ -86,7 +96,7 @@ export default function MachineryCard({ item, onSelect }) {
           onClick={() => onSelect(item)}
           className="w-full py-2.5 px-4 rounded-xl bg-tea-mist dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-tea-primary dark:text-tea-mint text-xs font-bold transition-colors flex items-center justify-center gap-2"
         >
-          <span>{isChinese ? '查看詳細規格' : 'Xem thông số chi tiết'}</span>
+          <span>{isChinese ? '查看詳細規格' : (isEnglish ? 'View Detailed Specs' : 'Xem thông số chi tiết')}</span>
         </button>
       </div>
     </motion.div>

@@ -458,4 +458,238 @@ export async function translateCategoryToTraditionalChinese(category = {}) {
   };
 }
 
+// ============================================================================
+// ENGLISH TRANSLATION SUITE (INTERNATIONAL F&B / BUBBLE TEA STANDARDS)
+// ============================================================================
+
+export const GLOBAL_FB_REFINEMENTS_EN = [
+  [/\bconcentrated milk tea\b/gi, 'Rich Milk Tea'],
+  [/\bstrong milk tea\b/gi, 'Signature Rich Milk Tea'],
+  [/\bsweet milk tea\b/gi, 'Classic Sweet Milk Tea'],
+  [/\btea core\b/gi, 'Rich Tea Base'],
+  [/\btea base\b/gi, 'Premium Tea Base'],
+  [/\broasted smoke\b/gi, 'Charcoal Roasted Smoky Aroma'],
+  [/\bsmoky flavor\b/gi, 'Charcoal Roasted Aroma'],
+  [/\bwinter melon\b/gi, 'Winter Melon'],
+  [/\bwinter melon syrup\b/gi, 'Specialty Winter Melon Syrup'],
+  [/\bbrown sugar syrup\b/gi, 'Artisan Brown Sugar Syrup'],
+  [/\bblack sugar\b/gi, 'Taiwanese Brown Sugar'],
+  [/\bjasmine green tea\b/gi, 'Jasmine Blossom Green Tea'],
+  [/\boolong tea\b/gi, 'High-Mountain Oolong Tea'],
+  [/\broasted oolong\b/gi, 'Charcoal Roasted Oolong Tea'],
+  [/\bmatcha powder\b/gi, 'Ceremonial Grade Matcha Powder'],
+  [/\bcheese foam\b/gi, 'Savory Cheese Cold Foam'],
+  [/\bsea salt foam\b/gi, 'Sea Salt Cream Foam'],
+  [/\btapioca pearls\b/gi, 'Brown Sugar Boba Pearls'],
+  [/\bbao loc plateau\b/gi, 'Bao Loc Highlands, Lam Dong'],
+  [/\bbao loc\b/gi, 'Bao Loc Highlands'],
+  [/\blam dong\b/gi, 'Lam Dong Province, Vietnam']
+];
+
+export async function translateTextToEn(text) {
+  if (!text || typeof text !== 'string' || !text.trim()) return '';
+
+  if (!hasVietnamese(text) && /^[\x00-\x7F\s\.,!?'"()\-:;0-9%#&/]+$/.test(text.trim())) {
+    return text.trim();
+  }
+
+  // 1. MyMemory API
+  try {
+    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.trim())}&langpair=vi|en`;
+    const res = await fetch(mmUrl);
+    if (res.ok) {
+      const data = await res.json();
+      let translated = data?.responseData?.translatedText;
+      if (translated && !hasVietnamese(translated)) {
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          translated = translated.replace(pattern, replacement);
+        }
+        return translated.trim();
+      }
+    }
+  } catch (err) {}
+
+  // 2. Google Translate API
+  try {
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=' + encodeURIComponent(text.trim());
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      let translated = (data[0] || []).map(item => item[0]).join('');
+      if (translated && !hasVietnamese(translated)) {
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          translated = translated.replace(pattern, replacement);
+        }
+        return translated.trim();
+      }
+    }
+  } catch (err) {}
+
+  return text;
+}
+
+export async function translateHtmlToEn(html) {
+  if (!html || typeof html !== 'string' || !html.trim()) return '';
+
+  if (!/<[a-z][\s\S]*>/i.test(html)) {
+    return await translateTextToEn(html);
+  }
+
+  const tokens = html.split(/(<[^>]+>)/g);
+  const translatedTokens = await Promise.all(
+    tokens.map(async (token) => {
+      if (token.startsWith('<') && token.endsWith('>')) {
+        return token;
+      }
+      if (token.trim().length === 0) {
+        return token;
+      }
+      const leadingSpace = token.match(/^\s*/)[0];
+      const trailingSpace = token.match(/\s*$/)[0];
+      const translated = await translateTextToEn(token.trim());
+      return leadingSpace + translated + trailingSpace;
+    })
+  );
+
+  return translatedTokens.join('');
+}
+
+export async function translateProductToEnglish(product = {}) {
+  // 1. Thử gọi backend API trước
+  try {
+    const res = await aiApi.translateProductEn(product);
+    const isHalfVi = hasVietnamese(res?.nameEn) || hasVietnamese(res?.shortDescEn);
+    if (res && res.nameEn && !isHalfVi) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[translateProductToEnglish] Backend API unreachable, switching to Deep EN engine:', err.message);
+  }
+
+  // 2. Dịch qua client fallback engine
+  const [nameEn, badgeEn, originEn, shortDescEn, fullDescEn] = await Promise.all([
+    translateTextToEn(product.name || ''),
+    translateTextToEn(product.badge || 'New Arrival'),
+    translateTextToEn(product.origin || 'Bao Loc Highlands, Lam Dong, Vietnam'),
+    translateTextToEn(product.shortDesc || ''),
+    translateTextToEn(product.fullDesc || '')
+  ]);
+
+  let applicationsEn = [];
+  if (Array.isArray(product.applications) && product.applications.length > 0) {
+    applicationsEn = await Promise.all(product.applications.map(app => translateTextToEn(app)));
+  } else {
+    applicationsEn = ['Signature Milk Tea', 'Fresh Fruit Tea', 'Sea Salt Cold Foam Tea'];
+  }
+
+  return {
+    nameEn: nameEn || 'Specialty Commercial Beverage Ingredient',
+    badgeEn: badgeEn || 'New Arrival',
+    originEn: originEn || 'Bao Loc Highlands, Lam Dong, Vietnam',
+    shortDescEn: shortDescEn || 'Selected from premium tea highlands, crafted for consistent commercial beverage standards.',
+    fullDescEn: fullDescEn || 'CASA specialty beverage ingredients engineered for chain operations with long-lasting aroma and operational ease.',
+    applicationsEn
+  };
+}
+
+export async function translateArticleToEnglish(article = {}) {
+  try {
+    const res = await aiApi.translateNewsEn(article);
+    const isHalfVi = hasVietnamese(res?.titleEn) || hasVietnamese(res?.excerptEn);
+    if (res && res.titleEn && !isHalfVi) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[translateArticleToEnglish] Backend API unreachable, switching to Deep EN engine:', err.message);
+  }
+
+  const [titleEn, excerptEn, contentEn] = await Promise.all([
+    translateTextToEn(article.title || ''),
+    translateTextToEn(article.excerpt || ''),
+    translateHtmlToEn(article.content || '')
+  ]);
+
+  return {
+    titleEn: titleEn || '2026 Rich Milk Tea Trends: When Tea Essence Takes Center Stage',
+    excerptEn: excerptEn || 'New generation consumers are transitioning from overly sweet drinks to rich, authentic tea profiles with distinct roasted or natural floral aromas.',
+    contentEn: contentEn || '<p>For detailed formulation and standard operating procedures, please consult our R&D advisory team.</p>'
+  };
+}
+
+export async function translateNewsToEnglish(article = {}) {
+  return await translateArticleToEnglish(article);
+}
+
+export async function translateFaqToEnglish(faq = {}) {
+  try {
+    const res = await aiApi.translateFaqEn(faq);
+    const isHalfVi = hasVietnamese(res?.questionEn) || hasVietnamese(res?.answerEn);
+    if (res && res.questionEn && !isHalfVi) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[translateFaqToEnglish] Backend API unreachable, using Deep EN engine:', err.message);
+  }
+
+  const [questionEn, answerEn] = await Promise.all([
+    translateTextToEn(faq.question || ''),
+    translateTextToEn(faq.answer || '')
+  ]);
+
+  return {
+    questionEn: questionEn || 'Common B2B Partnership Inquiry',
+    answerEn: answerEn || 'For detailed collaboration workflows and sample requests, please reach out to our trade representative.'
+  };
+}
+
+export async function translateMachineryToEnglish(machinery = {}) {
+  try {
+    const res = await aiApi.translateMachineryEn(machinery);
+    const isHalfVi = hasVietnamese(res?.nameEn) || hasVietnamese(res?.descriptionEn);
+    if (res && res.nameEn && !isHalfVi) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[translateMachineryToEnglish] Backend API unreachable, using Deep EN engine:', err.message);
+  }
+
+  const [nameEn, categoryEn, originEn, descriptionEn] = await Promise.all([
+    translateTextToEn(machinery.name || ''),
+    translateTextToEn(machinery.category || ''),
+    translateTextToEn(machinery.origin || ''),
+    translateTextToEn(machinery.description || machinery.desc || '')
+  ]);
+
+  return {
+    nameEn: nameEn || 'Professional Commercial Tea Processing Equipment',
+    categoryEn: categoryEn || 'Tea Processing Machinery',
+    originEn: originEn || 'Imported Precision Equipment',
+    capacityEn: machinery.capacity || '',
+    descriptionEn: descriptionEn || 'High-performance industrial production line machinery.'
+  };
+}
+
+export async function translateCategoryToEnglish(category = {}) {
+  try {
+    const res = await aiApi.translateCategoryEn(category);
+    const isHalfVi = hasVietnamese(res?.nameEn) || hasVietnamese(res?.descEn);
+    if (res && res.nameEn && !isHalfVi) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('[translateCategoryToEnglish] Backend API unreachable, using Deep EN engine:', err.message);
+  }
+
+  const [nameEn, descEn] = await Promise.all([
+    translateTextToEn(category.name || ''),
+    translateTextToEn(category.desc || '')
+  ]);
+
+  return {
+    nameEn: nameEn || 'Specialty Tea & Beverage Category',
+    descEn: descEn || 'Professional ingredients and custom formulation solutions for beverage chains.'
+  };
+}
+
+
 

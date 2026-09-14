@@ -12,7 +12,7 @@ import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Products() {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const { openSampleModal } = useAppUI();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('cat') || 'all';
@@ -75,17 +75,21 @@ export default function Products() {
   // Filter & Search logic
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
-      selectedCategory === 'all' || product.category === selectedCategory;
       selectedCategory === 'all' ||
       String(product.category || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim() ||
       String(product.categoryName || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim();
 
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
       searchQuery === '' ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.tags?.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      (product.name && product.name.toLowerCase().includes(q)) ||
+      (product.nameEn && product.nameEn.toLowerCase().includes(q)) ||
+      (product.nameZh && product.nameZh.toLowerCase().includes(q)) ||
+      (product.sku && product.sku.toLowerCase().includes(q)) ||
+      (product.shortDesc && product.shortDesc.toLowerCase().includes(q)) ||
+      (product.shortDescEn && product.shortDescEn.toLowerCase().includes(q)) ||
+      (product.shortDescZh && product.shortDescZh.toLowerCase().includes(q)) ||
+      product.tags?.some((t) => t.toLowerCase().includes(q));
 
     return matchesCategory && matchesSearch;
   });
@@ -99,7 +103,9 @@ export default function Products() {
       return (b.tasteProfile?.aroma || 0) - (a.tasteProfile?.aroma || 0);
     }
     if (sortBy === 'name-asc') {
-      return a.name.localeCompare(b.name);
+      const nameA = isEnglish ? (a.nameEn || a.name) : (isChinese ? (a.nameZh || a.name) : a.name);
+      const nameB = isEnglish ? (b.nameEn || b.name) : (isChinese ? (b.nameZh || b.name) : b.name);
+      return nameA.localeCompare(nameB);
     }
     // 'popular'
     return (b.bestseller ? 1 : 0) - (a.bestseller ? 1 : 0);
@@ -214,7 +220,7 @@ export default function Products() {
                   : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
               }`}
             >
-              {isChinese ? '全部產品' : t('cat_all', 'Tất cả sản phẩm')}
+              {isEnglish ? 'All Products' : (isChinese ? '全部產品' : t('cat_all', 'Tất cả sản phẩm'))}
             </button>
 
             {/* Các tab danh mục động (CRUD) */}
@@ -223,9 +229,9 @@ export default function Products() {
               .sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99))
               .map((cat) => {
                 const catLabelKey = `cat_${cat.id.replace(/-/g, '_')}`;
-                const displayCatName = isChinese
-                  ? (cat.nameZh || t(catLabelKey, cat.name))
-                  : (cat.name || t(catLabelKey, cat.name));
+                const displayCatName = isEnglish
+                  ? (cat.nameEn || t(catLabelKey, cat.name))
+                  : (isChinese ? (cat.nameZh || t(catLabelKey, cat.name)) : (cat.name || t(catLabelKey, cat.name)));
                 return (
                   <button
                     key={cat.id}
@@ -250,13 +256,13 @@ export default function Products() {
           {/* Results counter */}
           <div className="flex items-center justify-between mb-8 text-xs text-gray-600 dark:text-gray-400 font-medium">
             <span>
-              {isChinese ? '顯示 ' : 'Hiển thị '}
+              {isEnglish ? 'Showing ' : (isChinese ? '顯示 ' : 'Hiển thị ')}
               <strong>{sortedProducts.length}</strong>
-              {isChinese ? ' 項相符產品' : ' sản phẩm phù hợp'}
+              {isEnglish ? ' matching products' : (isChinese ? ' 項相符產品' : ' sản phẩm phù hợp')}
             </span>
             {searchQuery && (
               <span>
-                {isChinese ? '搜尋關鍵字：' : 'Từ khóa tìm kiếm: '}
+                {isEnglish ? 'Search keyword: ' : (isChinese ? '搜尋關鍵字：' : 'Từ khóa tìm kiếm: ')}
                 "{searchQuery}"
               </span>
             )}
@@ -266,12 +272,14 @@ export default function Products() {
             <div className="py-20 text-center bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8">
               <Package className="w-12 h-12 text-gray-300 dark:text-gray-500 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-                {isChinese ? '查無符合條件的產品' : 'Không tìm thấy sản phẩm phù hợp'}
+                {isEnglish ? 'No matching products found' : (isChinese ? '查無符合條件的產品' : 'Không tìm thấy sản phẩm phù hợp')}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-sm mx-auto font-medium">
-                {isChinese
-                  ? '請嘗試使用其他關鍵字搜尋，或清除篩選條件以查看完整產品系列。'
-                  : 'Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc để xem toàn bộ danh mục sản phẩm.'}
+                {isEnglish
+                  ? 'Please try searching with different keywords or clear filters to view all products.'
+                  : (isChinese
+                    ? '請嘗試使用其他關鍵字搜尋，或清除篩選條件以查看完整產品系列。'
+                    : 'Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc để xem toàn bộ danh mục sản phẩm.')}
               </p>
               <button
                 onClick={() => {
@@ -282,7 +290,7 @@ export default function Products() {
                 }}
                 className="mt-4 px-5 py-2.5 rounded-xl bg-tea-primary text-white text-xs font-bold"
               >
-                {isChinese ? '查看全部產品' : 'Xem tất cả sản phẩm'}
+                {isEnglish ? 'View all products' : (isChinese ? '查看全部產品' : 'Xem tất cả sản phẩm')}
               </button>
             </div>
           ) : (
@@ -301,19 +309,21 @@ export default function Products() {
           <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-tea-primary to-tea-emerald text-white flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">
               <h3 className="text-xl font-bold">
-                {isChinese ? '尚未找到符合貴品牌專屬風味的茶品？' : 'Chưa tìm thấy gu trà riêng cho chuỗi của bạn?'}
+                {isEnglish ? "Looking for a custom signature tea blend for your brand?" : (isChinese ? '尚未找到符合貴品牌專屬風味的茶品？' : 'Chưa tìm thấy gu trà riêng cho chuỗi của bạn?')}
               </h3>
               <p className="text-xs text-white/80">
-                {isChinese
-                  ? 'CASA R&D 實驗室提供客製化獨家調配 (Blend) 服務，精準客製您的目標風味與濃郁度。'
-                  : 'Phòng Lab R&D của CASA nhận blend phối trộn công thức trà độc quyền theo từng khẩu vị mong muốn.'}
+                {isEnglish
+                  ? 'CASA R&D Laboratory provides bespoke tea blending services precisely formulated to your targeted aroma, body, and cost profile.'
+                  : (isChinese
+                    ? 'CASA R&D 實驗室提供客製化獨家調配 (Blend) 服務，精準客製您的目標風味與濃郁度。'
+                    : 'Phòng Lab R&D của CASA nhận blend phối trộn công thức trà độc quyền theo từng khẩu vị mong muốn.')}
               </p>
             </div>
             <button
               onClick={() => openSampleModal()}
               className="px-6 py-3 rounded-xl bg-white text-tea-primary hover:bg-tea-soft text-xs font-bold transition-all shadow-md shrink-0"
             >
-              {isChinese ? '申請獨家客製打樣' : 'Yêu Cầu Blend Mẫu Độc Quyền'}
+              {isEnglish ? 'Request Custom Blend Sample' : (isChinese ? '申請獨家客製打樣' : 'Yêu Cầu Blend Mẫu Độc Quyền')}
             </button>
           </div>
         </div>

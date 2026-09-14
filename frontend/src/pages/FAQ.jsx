@@ -19,7 +19,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getRtdbFaqs } from '../services/rtdbService';
 
 export default function FAQ() {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,15 +44,18 @@ export default function FAQ() {
   };
 
   const filteredFaqs = faqsList.filter((faq) => {
-    const q = (isChinese && (faq.questionZh || faq.question_zh)) || faq.question || '';
-    const a = (isChinese && (faq.answerZh || faq.answer_zh)) || faq.answer || '';
+    const q = isEnglish ? (faq.questionEn || faq.question || '') : ((isChinese && (faq.questionZh || faq.question_zh)) || faq.question || '');
+    const a = isEnglish ? (faq.answerEn || faq.answer || '') : ((isChinese && (faq.answerZh || faq.answer_zh)) || faq.answer || '');
     const matchesCategory =
       selectedCategory === 'all' || faq.category === selectedCategory;
 
+    const searchStr = searchQuery.toLowerCase();
     const matchesSearch =
       searchQuery === '' ||
-      q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.toLowerCase().includes(searchQuery.toLowerCase());
+      q.toLowerCase().includes(searchStr) ||
+      a.toLowerCase().includes(searchStr) ||
+      (faq.questionEn && faq.questionEn.toLowerCase().includes(searchStr)) ||
+      (faq.answerEn && faq.answerEn.toLowerCase().includes(searchStr));
 
     return matchesCategory && matchesSearch;
   });
@@ -60,7 +63,7 @@ export default function FAQ() {
   const handleAskQuestion = (e) => {
     e.preventDefault();
     if (!questionInput.trim()) return;
-    showToast('Câu hỏi của bạn đã được gửi đến bộ phận kỹ thuật R&D CASA. Chúng tôi sẽ phản hồi sớm nhất!', 'success');
+    showToast(isEnglish ? 'Your question has been sent to CASA R&D team. We will respond shortly!' : (isChinese ? '您的問題已成功送至 CASA 研發技術部，我們將儘速回覆！' : 'Câu hỏi của bạn đã được gửi đến bộ phận kỹ thuật R&D CASA. Chúng tôi sẽ phản hồi sớm nhất!'), 'success');
     setQuestionInput('');
   };
 
@@ -114,9 +117,7 @@ export default function FAQ() {
                     : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
                 }`}
               >
-                {isChinese
-                  ? (cat.id === 'all' ? '全部' : cat.id === 'product' ? '茶品與原料' : cat.id === 'policy' ? '樣品與起訂量' : cat.id === 'storage' ? '保存與效期' : cat.name)
-                  : cat.name}
+                {isEnglish ? (cat.nameEn || cat.name) : (isChinese ? (cat.nameZh || cat.name) : cat.name)}
               </button>
             ))}
           </div>
@@ -141,8 +142,8 @@ export default function FAQ() {
           <div className="space-y-4">
             {filteredFaqs.map((faq) => {
               const isOpen = openItems.includes(faq.id);
-              const displayQuestion = (isChinese && (faq.questionZh || faq.question_zh)) || faq.question;
-              const displayAnswer = (isChinese && (faq.answerZh || faq.answer_zh)) || faq.answer;
+              const displayQuestion = isEnglish ? (faq.questionEn || faq.question) : ((isChinese && (faq.questionZh || faq.question_zh)) || faq.question);
+              const displayAnswer = isEnglish ? (faq.answerEn || faq.answer) : ((isChinese && (faq.answerZh || faq.answer_zh)) || faq.answer);
 
               return (
                 <div
@@ -187,9 +188,11 @@ export default function FAQ() {
 
             {filteredFaqs.length === 0 && (
               <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#132018] rounded-2xl border border-tea-border dark:border-white/10">
-                {isChinese
-                  ? '查無相符的問題。您可以在下方直接向我們提出您的疑問。'
-                  : 'Không tìm thấy câu hỏi phù hợp. Bạn có thể gửi câu hỏi trực tiếp cho chúng tôi bên dưới.'}
+                {isEnglish
+                  ? 'No matching questions found. You can submit your inquiry below.'
+                  : (isChinese
+                    ? '查無相符的問題。您可以在下方直接向我們提出您的疑問。'
+                    : 'Không tìm thấy câu hỏi phù hợp. Bạn có thể gửi câu hỏi trực tiếp cho chúng tôi bên dưới.')}
               </div>
             )}
           </div>
@@ -202,12 +205,14 @@ export default function FAQ() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-tea-dark dark:text-white">
-                  {isChinese ? '仍有其他疑問需要解答？' : 'Vẫn còn câu hỏi thắc mắc khác?'}
+                  {isEnglish ? 'Still have further questions?' : (isChinese ? '仍有其他疑問需要解答？' : 'Vẫn còn câu hỏi thắc mắc khác?')}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-normal">
-                  {isChinese
-                    ? '送出您的問題，CASA 專業調配技術專家將透過電子郵件或電話直接回覆您。'
-                    : 'Gửi câu hỏi của bạn, chuyên gia kỹ thuật của CASA sẽ phản hồi trực tiếp qua email hoặc hotline.'}
+                  {isEnglish
+                    ? 'Submit your inquiry below and CASA tea specialists will get back to you promptly.'
+                    : (isChinese
+                      ? '送出您的問題，CASA 專業調配技術專家將透過電子郵件或電話直接回覆您。'
+                      : 'Gửi câu hỏi của bạn, chuyên gia kỹ thuật của CASA sẽ phản hồi trực tiếp qua email hoặc hotline.')}
                 </p>
               </div>
             </div>
@@ -216,7 +221,7 @@ export default function FAQ() {
               <textarea
                 rows={3}
                 required
-                placeholder={isChinese ? "請在此輸入您的問題（例如：訂購 200kg 原料之配送物流方式與運費為何？）..." : "Nhập câu hỏi của bạn tại đây (VD: Chi phí vận chuyển về Hải Phòng cho đơn 200kg là bao nhiêu?)..."}
+                placeholder={isEnglish ? "Enter your question here (e.g., What are the freight rates and delivery options for a 200kg order?)..." : (isChinese ? "請在此輸入您的問題（例如：訂購 200kg 原料之配送物流方式與運費為何？）..." : "Nhập câu hỏi của bạn tại đây (VD: Chi phí vận chuyển về Hải Phòng cho đơn 200kg là bao nhiêu?)...")}
                 value={questionInput}
                 onChange={(e) => setQuestionInput(e.target.value)}
                 className="w-full p-4 rounded-xl border border-tea-border dark:border-white/10 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 resize-none bg-white dark:bg-[#0B130E] dark:text-white dark:placeholder-gray-400 transition-colors"
@@ -229,7 +234,7 @@ export default function FAQ() {
                 >
                   <PhoneCall className="w-4 h-4" />
                   <span>
-                    {isChinese ? `或直接撥打 B2B 諮詢專線：${COMPANY_INFO.hotline}` : `Hoặc gọi hotline B2B: ${COMPANY_INFO.hotline}`}
+                    {isEnglish ? `Or call our B2B hotline: ${COMPANY_INFO.hotline}` : (isChinese ? `或直接撥打 B2B 諮詢專線：${COMPANY_INFO.hotline}` : `Hoặc gọi hotline B2B: ${COMPANY_INFO.hotline}`)}
                   </span>
                 </a>
 
@@ -238,7 +243,7 @@ export default function FAQ() {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-all shadow-tea-sm"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>{isChinese ? '送出問題' : 'Gửi câu hỏi'}</span>
+                  <span>{isEnglish ? 'Submit Question' : (isChinese ? '送出問題' : 'Gửi câu hỏi')}</span>
                 </button>
               </div>
             </form>

@@ -22,7 +22,7 @@ import { saveRtdbContact } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Contact() {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const productParam = searchParams.get('product') || '';
@@ -51,7 +51,14 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fullName || !formData.phone) {
-      showToast('Vui lòng điền Họ tên và Số điện thoại liên hệ!', 'error');
+      showToast(
+        isEnglish
+          ? 'Please enter your Full Name and Contact Phone Number!'
+          : isChinese
+          ? '請填寫姓名與聯絡電話！'
+          : 'Vui lòng điền Họ tên và Số điện thoại liên hệ!',
+        'error'
+      );
       return;
     }
 
@@ -79,14 +86,33 @@ export default function Contact() {
     }
 
     setSubmitted(true);
-    showToast('Yêu cầu tư vấn đã được gửi thành công! Chuyên viên B2B CASA sẽ phản hồi trong 2 giờ.', 'success');
+    showToast(
+      isEnglish
+        ? 'Inquiry submitted successfully! A CASA B2B specialist will contact you within 2 hours.'
+        : isChinese
+        ? '諮詢需求已成功送出！CASA 專屬業務將於 2 小時內與您聯繫。'
+        : 'Yêu cầu tư vấn đã được gửi thành công! Chuyên viên B2B CASA sẽ phản hồi trong 2 giờ.',
+      'success'
+    );
   };
 
   return (
     <div className="overflow-hidden pb-20">
       <SEO
-        title="Liên Hệ Báo Giá & Đăng Ký Mẫu Thử"
-        description="Liên hệ bộ phận kinh doanh dự án B2B của CASA TEA để nhận bảng giá sỉ trà nguyên liệu, mẫu thử miễn phí và tư vấn giải pháp R&D."
+        title={
+          isEnglish
+            ? 'Contact Wholesale & Sample Request'
+            : isChinese
+            ? '聯絡我們 - 批發諮詢與樣品索取'
+            : 'Liên Hệ Báo Giá & Đăng Ký Mẫu Thử'
+        }
+        description={
+          isEnglish
+            ? 'Contact CASA TEA B2B division for tea ingredient wholesale catalog, complimentary sample kit, and customized R&D formulation.'
+            : isChinese
+            ? '聯絡 CASA TEA 企業大宗採購部，索取原料茶葉批發報價單、免費樣品套件及客製化茶飲研發諮詢。'
+            : 'Liên hệ bộ phận kinh doanh dự án B2B của CASA TEA để nhận bảng giá sỉ trà nguyên liệu, mẫu thử miễn phí và tư vấn giải pháp R&D.'
+        }
       />
 
       {/* 1. HERO HEADER */}
@@ -127,13 +153,15 @@ export default function Contact() {
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-3">
                 <span className="text-xs font-bold text-tea-leaf dark:text-tea-mint uppercase tracking-wider block">
-                  {isChinese ? '工廠與營運據點' : 'Cơ Sở & Trụ Sở Hoạt Động'}
+                  {isEnglish ? 'Facilities & Operating Hubs' : isChinese ? '工廠與營運據點' : 'Cơ Sở & Trụ Sở Hoạt Động'}
                 </span>
                 <h2 className="text-2xl font-bold text-tea-dark dark:text-white">
-                  {isChinese ? '直接聯絡資訊' : 'Thông Tin Liên Lạc Trực Tiếp'}
+                  {isEnglish ? 'Direct Contact Information' : isChinese ? '直接聯絡資訊' : 'Thông Tin Liên Lạc Trực Tiếp'}
                 </h2>
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                  {isChinese
+                  {isEnglish
+                    ? 'We warmly welcome partners to schedule a visit to our Cupping Lab and modern tea processing facility in Bao Loc.'
+                    : isChinese
                     ? '我們誠摯歡迎各位合作夥伴預約參訪位於保祿的專業杯測實驗室 (Cupping Lab) 與現代化製茶廠。'
                     : 'Chúng tôi luôn sẵn sàng đón tiếp quý đối tác đến thăm quan Trung tâm Thử nếm Cupping Lab và Nhà máy chế biến tại Bảo Lộc.'}
                 </p>
@@ -148,7 +176,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <strong className="text-tea-dark dark:text-white block font-bold mb-0.5">
-                      {isChinese ? '總部研發中心 (Innovation Center)：' : 'Trụ Sở Chính (Innovation Center):'}
+                      {isEnglish ? 'Headquarters (Innovation Center):' : isChinese ? '總部研發中心 (Innovation Center)：' : 'Trụ Sở Chính (Innovation Center):'}
                     </strong>
                     <span className="text-gray-700 dark:text-gray-300 leading-relaxed block font-normal">{COMPANY_INFO.headquarters}</span>
                   </div>
@@ -158,15 +186,15 @@ export default function Contact() {
                 <div className="p-5 rounded-2xl bg-[#FAF9F5] dark:bg-[#132018] border border-tea-border dark:border-white/10 space-y-3 transition-colors text-gray-700 dark:text-gray-300">
                   <div className="flex items-center gap-3">
                     <Phone className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                    <span>{isChinese ? 'B2B 諮詢熱線：' : 'Hotline tư vấn B2B: '} <a href={`tel:${COMPANY_INFO.hotline.replace(/\s/g, '')}`} className="font-bold text-tea-primary dark:text-tea-mint hover:underline">{COMPANY_INFO.hotline}</a></span>
+                    <span>{isEnglish ? 'B2B Consultation Hotline: ' : isChinese ? 'B2B 諮詢熱線：' : 'Hotline tư vấn B2B: '} <a href={`tel:${COMPANY_INFO.hotline.replace(/\s/g, '')}`} className="font-bold text-tea-primary dark:text-tea-mint hover:underline">{COMPANY_INFO.hotline}</a></span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                    <span>{isChinese ? '商務合作郵箱：' : 'Email kinh doanh: '} <a href={`mailto:${COMPANY_INFO.salesEmail}`} className="font-bold text-tea-primary dark:text-tea-mint hover:underline">{COMPANY_INFO.salesEmail}</a></span>
+                    <span>{isEnglish ? 'Business Inquiries: ' : isChinese ? '商務合作郵箱：' : 'Email kinh doanh: '} <a href={`mailto:${COMPANY_INFO.salesEmail}`} className="font-bold text-tea-primary dark:text-tea-mint hover:underline">{COMPANY_INFO.salesEmail}</a></span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                    <span>{isChinese ? '服務時間：' : 'Giờ làm việc: '} {COMPANY_INFO.workingHours}</span>
+                    <span>{isEnglish ? 'Working Hours: ' : isChinese ? '服務時間：' : 'Giờ làm việc: '} {COMPANY_INFO.workingHours}</span>
                   </div>
                 </div>
               </div>
@@ -177,13 +205,15 @@ export default function Contact() {
               <div className="mb-6">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-[#0B130E] text-tea-primary dark:text-tea-mint text-xs font-bold border border-tea-border dark:border-white/10 mb-2">
                   <Sparkles className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" />
-                  {isChinese ? '批發報價與索樣' : 'Báo Giá & Mẫu Thử'}
+                  {isEnglish ? 'Wholesale Pricing & Sample Kit' : isChinese ? '批發報價與索樣' : 'Báo Giá & Mẫu Thử'}
                 </span>
                 <h3 className="text-xl sm:text-2xl font-bold text-tea-dark dark:text-white">
-                  {isChinese ? '送出諮詢與大宗批發報價需求' : 'Gửi Yêu Cầu Tư Vấn & Báo Giá Sỉ'}
+                  {isEnglish ? 'Request Wholesale Quotation & Samples' : isChinese ? '送出諮詢與大宗批發報價需求' : 'Gửi Yêu Cầu Tư Vấn & Báo Giá Sỉ'}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-1 font-normal">
-                  {isChinese
+                  {isEnglish
+                    ? 'Fill out the form below to receive tiered volume pricing and register for a complimentary sample tasting kit.'
+                    : isChinese
                     ? '請填寫以下資訊以取得階梯產量批發報價單，並預約免費樣品套件寄送。'
                     : 'Điền thông tin bên dưới để nhận bảng giá chiết khấu theo sản lượng và đăng ký nhận bộ mẫu thử tận nơi.'}
                 </p>
@@ -195,10 +225,12 @@ export default function Contact() {
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
                   <h4 className="text-2xl font-bold text-tea-dark dark:text-white">
-                    {isChinese ? '感謝您的諮詢！' : 'Cảm Ơn Quý Khách!'}
+                    {isEnglish ? 'Thank You for Your Inquiry!' : isChinese ? '感謝您的諮詢！' : 'Cảm Ơn Quý Khách!'}
                   </h4>
                   <p className="text-sm text-gray-700 dark:text-gray-300 max-w-md mx-auto font-normal">
-                    {isChinese
+                    {isEnglish
+                      ? `CASA has received the inquiry from ${formData.company || formData.fullName}. Our regional sales specialist will reach out within 2 business hours.`
+                      : isChinese
                       ? `CASA 已收到 ${formData.company || formData.fullName} 的諮詢需求。專屬業務人員將於 2 個工作小時內與您聯繫。`
                       : `CASA đã tiếp nhận thông tin yêu cầu của ${formData.company || formData.fullName}. Chuyên viên kinh doanh phụ trách khu vực sẽ kết nối qua Zalo/Điện thoại trong vòng 2 giờ làm việc.`}
                   </p>
@@ -218,7 +250,7 @@ export default function Contact() {
                     }}
                     className="px-6 py-2.5 rounded-xl bg-tea-primary text-white text-xs font-bold"
                   >
-                    {isChinese ? '送出其他諮詢需求' : 'Gửi yêu cầu khác'}
+                    {isEnglish ? 'Submit another inquiry' : isChinese ? '送出其他諮詢需求' : 'Gửi yêu cầu khác'}
                   </button>
                 </div>
               ) : (
@@ -229,12 +261,12 @@ export default function Contact() {
                       <div className="flex items-center gap-2.5">
                         <Sparkles className="w-4 h-4 text-tea-emerald dark:text-tea-mint shrink-0" />
                         <span className="text-gray-700 dark:text-gray-200">
-                          {isChinese ? '正在諮詢產品：' : 'Bạn đang yêu cầu tư vấn cho sản phẩm: '}
+                          {isEnglish ? 'Inquiring about product: ' : isChinese ? '正在諮詢產品：' : 'Bạn đang yêu cầu tư vấn cho sản phẩm: '}
                           <strong className="text-tea-dark dark:text-white font-bold">{productParam}</strong>
                         </span>
                       </div>
                       <span className="px-2.5 py-1 rounded-full bg-tea-primary text-white text-[10px] font-bold shrink-0">
-                        {isChinese ? '專屬諮詢' : 'Tư Vấn Sản Phẩm'}
+                        {isEnglish ? 'Dedicated Inquiry' : isChinese ? '專屬諮詢' : 'Tư Vấn Sản Phẩm'}
                       </span>
                     </div>
                   )}
@@ -247,7 +279,7 @@ export default function Contact() {
                       <input
                         type="text"
                         required
-                        placeholder={isChinese ? "例如: 王大明" : "VD: Trần Anh Tuấn"}
+                        placeholder={isEnglish ? "e.g. John Doe" : isChinese ? "例如: 王大明" : "VD: Trần Anh Tuấn"}
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
@@ -261,7 +293,7 @@ export default function Contact() {
                       <input
                         type="tel"
                         required
-                        placeholder={isChinese ? "例如: +886 912 345 678" : "VD: 0988 123 456"}
+                        placeholder={isEnglish ? "e.g. +1 555 123 4567" : isChinese ? "例如: +886 912 345 678" : "VD: 0988 123 456"}
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
@@ -276,7 +308,7 @@ export default function Contact() {
                       </label>
                       <input
                         type="text"
-                        placeholder={isChinese ? "例如: 沐茶茶飲連鎖" : "VD: Chuỗi Trà Sữa Mộc Trà"}
+                        placeholder={isEnglish ? "e.g. Blossom Tea Chain" : isChinese ? "例如: 沐茶茶飲連鎖" : "VD: Chuỗi Trà Sữa Mộc Trà"}
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
@@ -300,7 +332,7 @@ export default function Contact() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                        {isChinese ? '經營模式' : 'Mô hình kinh doanh'}
+                        {isEnglish ? 'Business Model' : isChinese ? '經營模式' : 'Mô hình kinh doanh'}
                       </label>
                       <select
                         value={formData.businessType}
@@ -308,30 +340,30 @@ export default function Contact() {
                         className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white transition-colors cursor-pointer"
                       >
                         <option value="Chuỗi trà sữa (Nhiều chi nhánh)" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
-                          {isChinese ? '連鎖茶飲體系 (多門市)' : 'Chuỗi trà sữa (Nhiều chi nhánh)'}
+                          {isEnglish ? 'Milk Tea Chain (Multi-store)' : isChinese ? '連鎖茶飲體系 (多門市)' : 'Chuỗi trà sữa (Nhiều chi nhánh)'}
                         </option>
                         <option value="Quán cafe / Trà sữa độc lập" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
-                          {isChinese ? '獨立咖啡館 / 風格茶飲店' : 'Quán cafe / Trà sữa độc lập'}
+                          {isEnglish ? 'Independent Cafe / Tea House' : isChinese ? '獨立咖啡館 / 風格茶飲店' : 'Quán cafe / Trà sữa độc lập'}
                         </option>
                         <option value="Xưởng sản xuất đóng chai RTD" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
-                          {isChinese ? '瓶裝即飲 RTD 生產工廠' : 'Xưởng sản xuất đóng chai RTD'}
+                          {isEnglish ? 'Bottled RTD Beverage Plant' : isChinese ? '瓶裝即飲 RTD 生產工廠' : 'Xưởng sản xuất đóng chai RTD'}
                         </option>
                         <option value="Đại lý phân phối nguyên liệu F&B" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
-                          {isChinese ? '餐飲原物料經銷代理商' : 'Đại lý phân phối nguyên liệu F&B'}
+                          {isEnglish ? 'F&B Ingredients Distributor' : isChinese ? '餐飲原物料經銷代理商' : 'Đại lý phân phối nguyên liệu F&B'}
                         </option>
                         <option value="Gia công OEM/ODM thương hiệu riêng" className="bg-white dark:bg-[#132018] text-gray-900 dark:text-gray-100 py-1">
-                          {isChinese ? '自有品牌客製代工 OEM/ODM' : 'Gia công OEM/ODM thương hiệu riêng'}
+                          {isEnglish ? 'Private Label OEM / ODM Processing' : isChinese ? '自有品牌客製代工 OEM/ODM' : 'Gia công OEM/ODM thương hiệu riêng'}
                         </option>
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                        {isChinese ? '感興趣的產品系列' : 'Dòng sản phẩm quan tâm'}
+                        {isEnglish ? 'Product Lines of Interest' : isChinese ? '感興趣的產品系列' : 'Dòng sản phẩm quan tâm'}
                       </label>
                       <input
                         type="text"
-                        placeholder={isChinese ? "例如: 炭焙烏龍茶、阿薩姆紅茶..." : "VD: Trà Oolong Nướng, Trà Đen Assam..."}
+                        placeholder={isEnglish ? "e.g. Roasted Oolong, Assam Black Tea..." : isChinese ? "例如: 炭焙烏龍茶、阿薩姆紅茶..." : "VD: Trà Oolong Nướng, Trà Đen Assam..."}
                         value={formData.productInterest}
                         onChange={(e) => setFormData({ ...formData, productInterest: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
@@ -349,7 +381,9 @@ export default function Contact() {
                       className="w-4 h-4 rounded text-tea-emerald focus:ring-tea-emerald cursor-pointer"
                     />
                     <label htmlFor="sampleCheck" className="text-xs text-tea-dark dark:text-white font-medium cursor-pointer">
-                      {isChinese
+                      {isEnglish
+                        ? 'I would like to receive a complimentary Tea Sample Kit (100g) delivered to our store address.'
+                        : isChinese
                         ? '我想免費索取茶葉體驗套件 (Sample Kit 100g) 寄送至門市地址。'
                         : 'Tôi muốn nhận miễn phí Bộ Mẫu Thử Trà (Sample Kit 100g) gửi về địa chỉ quán.'}
                     </label>
@@ -357,11 +391,11 @@ export default function Contact() {
 
                   <div>
                     <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                      {isChinese ? '詳細需求說明' : 'Nội dung yêu cầu chi tiết'}
+                      {isEnglish ? 'Detailed Requirements & Inquiries' : isChinese ? '詳細需求說明' : 'Nội dung yêu cầu chi tiết'}
                     </label>
                     <textarea
                       rows={3}
-                      placeholder={isChinese ? "請描述預估每月採購量、配送地區或特定風味要求..." : "Mô tả số lượng dự kiến hàng tháng, khu vực giao hàng hoặc yêu cầu đặc biệt về hương vị..."}
+                      placeholder={isEnglish ? "Please describe estimated monthly volume, delivery location, or custom flavor requirements..." : isChinese ? "請描述預估每月採購量、配送地區或特定風味要求..." : "Mô tả số lượng dự kiến hàng tháng, khu vực giao hàng hoặc yêu cầu đặc biệt về hương vị..."}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-tea-border dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#0B130E] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 resize-none transition-colors"
@@ -371,7 +405,7 @@ export default function Contact() {
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                       <ShieldCheck className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                      <span>{isChinese ? '客戶資訊 100% 嚴格保密' : 'Thông tin đối tác được bảo mật 100%'}</span>
+                      <span>{isEnglish ? 'Partner information 100% confidential' : isChinese ? '客戶資訊 100% 嚴格保密' : 'Thông tin đối tác được bảo mật 100%'}</span>
                     </div>
 
                     <button
@@ -379,7 +413,7 @@ export default function Contact() {
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-tea-primary hover:bg-tea-emerald text-white rounded-xl font-bold shadow-tea-sm transition-all hover:shadow-tea-md"
                     >
                       <Send className="w-4 h-4" />
-                      {isChinese ? '送出報價諮詢' : t('contact_form_submit', 'Gửi Yêu Cầu Báo Giá')}
+                      {isEnglish ? 'Submit Price Inquiry' : isChinese ? '送出報價諮詢' : t('contact_form_submit', 'Gửi Yêu Cầu Báo Giá')}
                     </button>
                   </div>
                 </form>
@@ -404,10 +438,10 @@ export default function Contact() {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-tea-dark dark:text-white flex items-center gap-2">
               <MapPin className="w-5 h-5 text-tea-emerald dark:text-tea-mint" />
-              {isChinese ? '總部與生產工廠地理位置' : 'Bản Đồ Vị Trí Trụ Sở & Nhà Máy'}
+              {isEnglish ? 'Headquarters & Factory Location' : isChinese ? '總部與生產工廠地理位置' : 'Bản Đồ Vị Trí Trụ Sở & Nhà Máy'}
             </h3>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {isChinese ? '神浪工業區，平陽省以安市（鄰近胡志明市）' : 'KCN Sóng Thần, Phường Dĩ An, TP.Hồ Chí Minh'}
+              {isEnglish ? 'Song Than Industrial Zone, Di An City, Binh Duong (Adjacent to HCMC)' : isChinese ? '神浪工業區，平陽省以安市（鄰近胡志明市）' : 'KCN Sóng Thần, Phường Dĩ An, TP.Hồ Chí Minh'}
             </span>
           </div>
 

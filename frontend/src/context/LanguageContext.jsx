@@ -2,17 +2,18 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TRANSLATIONS } from '../locales/translations';
 
 const LanguageContext = createContext({
-  language: 'vi', // 'vi' | 'zh'
+  language: 'vi', // 'vi' | 'zh' | 'en'
   setLanguage: () => {},
   t: (key, fallback) => fallback || key,
-  isChinese: false
+  isChinese: false,
+  isEnglish: false
 });
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
     try {
       const saved = localStorage.getItem('casa_language');
-      if (saved === 'vi' || saved === 'zh') {
+      if (saved === 'vi' || saved === 'zh' || saved === 'en') {
         return saved;
       }
     } catch {
@@ -21,17 +22,26 @@ export function LanguageProvider({ children }) {
     return 'vi';
   });
 
+  const getHtmlLang = (lang) => {
+    if (lang === 'zh') return 'zh-TW';
+    if (lang === 'en') return 'en';
+    return 'vi';
+  };
+
   const setLanguage = (newLang) => {
-    if (newLang !== 'vi' && newLang !== 'zh') return;
+    if (newLang !== 'vi' && newLang !== 'zh' && newLang !== 'en') return;
     setLanguageState(newLang);
     try {
       localStorage.setItem('casa_language', newLang);
-      document.documentElement.lang = newLang === 'zh' ? 'zh-TW' : 'vi';
+      document.documentElement.lang = getHtmlLang(newLang);
 
       // Hỗ trợ tự động dịch toàn trang cho nội dung bài viết dài (Google Translate Cookie)
       if (newLang === 'zh') {
         document.cookie = 'googtrans=/vi/zh-TW; path=/;';
         document.cookie = `googtrans=/vi/zh-TW; domain=${window.location.hostname}; path=/;`;
+      } else if (newLang === 'en') {
+        document.cookie = 'googtrans=/vi/en; path=/;';
+        document.cookie = `googtrans=/vi/en; domain=${window.location.hostname}; path=/;`;
       } else {
         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${window.location.hostname}; path=/;`;
@@ -42,7 +52,7 @@ export function LanguageProvider({ children }) {
   };
 
   useEffect(() => {
-    document.documentElement.lang = language === 'zh' ? 'zh-TW' : 'vi';
+    document.documentElement.lang = getHtmlLang(language);
   }, [language]);
 
   const t = (key, fallback = '') => {
@@ -59,7 +69,8 @@ export function LanguageProvider({ children }) {
         language,
         setLanguage,
         t,
-        isChinese: language === 'zh'
+        isChinese: language === 'zh',
+        isEnglish: language === 'en'
       }}
     >
       {children}

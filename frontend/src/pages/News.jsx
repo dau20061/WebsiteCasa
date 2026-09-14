@@ -11,7 +11,7 @@ import { getRtdbNews } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function News() {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -35,10 +35,15 @@ export default function News() {
     const matchesCat =
       selectedCategory === 'all' || article.categorySlug === selectedCategory || article.category === selectedCategory;
 
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
       searchQuery === '' ||
-      article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+      (article.title && article.title.toLowerCase().includes(q)) ||
+      (article.titleEn && article.titleEn.toLowerCase().includes(q)) ||
+      (article.titleZh && article.titleZh.toLowerCase().includes(q)) ||
+      (article.excerpt && article.excerpt.toLowerCase().includes(q)) ||
+      (article.excerptEn && article.excerptEn.toLowerCase().includes(q)) ||
+      (article.excerptZh && article.excerptZh.toLowerCase().includes(q));
 
     return matchesCat && matchesSearch;
   });
@@ -107,7 +112,7 @@ export default function News() {
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center gap-3 text-xs text-tea-leaf dark:text-tea-mint font-bold">
                   <span className="px-3 py-1 rounded-full bg-tea-soft dark:bg-[#0B130E] text-tea-primary dark:text-tea-mint uppercase">
-                    {(isChinese && (featuredArticle.categoryZh || featuredArticle.category_zh)) || featuredArticle.category}
+                    {isEnglish ? (featuredArticle.categoryEn || featuredArticle.category) : ((isChinese && (featuredArticle.categoryZh || featuredArticle.category_zh)) || featuredArticle.category)}
                   </span>
                   <span>•</span>
                   <span>{t('news_featured_badge', 'Bài viết nổi bật')}</span>
@@ -115,12 +120,12 @@ export default function News() {
 
                 <Link to={`/news/${featuredArticle.slug}`}>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-tea-dark dark:text-white hover:text-tea-green dark:hover:text-tea-mint transition-colors leading-tight">
-                    {(isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title}
+                    {isEnglish ? (featuredArticle.titleEn || featuredArticle.title) : ((isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title)}
                   </h2>
                 </Link>
 
                 <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                  {(isChinese && (featuredArticle.excerptZh || featuredArticle.excerpt_zh)) || featuredArticle.excerpt}
+                  {isEnglish ? (featuredArticle.excerptEn || featuredArticle.excerpt) : ((isChinese && (featuredArticle.excerptZh || featuredArticle.excerpt_zh)) || featuredArticle.excerpt)}
                 </p>
 
                 <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 pt-2 font-medium">
@@ -130,7 +135,7 @@ export default function News() {
                   <span>•</span>
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-                    {isChinese ? `${featuredArticle.readTime?.replace(/[^0-9]/g, '') || '5'} 分鐘閱讀` : featuredArticle.readTime}
+                    {isEnglish ? `${featuredArticle.readTime?.replace(/[^0-9]/g, '') || '5'} min read` : (isChinese ? `${featuredArticle.readTime?.replace(/[^0-9]/g, '') || '5'} 分鐘閱讀` : featuredArticle.readTime)}
                   </span>
                 </div>
 
@@ -149,7 +154,7 @@ export default function News() {
                 <div className="rounded-3xl overflow-hidden aspect-[4/3] bg-tea-mist dark:bg-[#0B130E] shadow-tea-sm">
                   <img
                     src={featuredArticle.image}
-                    alt={(isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title}
+                    alt={isEnglish ? (featuredArticle.titleEn || featuredArticle.title) : ((isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title)}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -175,7 +180,7 @@ export default function News() {
                       : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
                   }`}
                 >
-                  {(isChinese && cat.nameZh) || cat.name}
+                  {isEnglish ? (cat.nameEn || cat.name) : ((isChinese && cat.nameZh) || cat.name)}
                 </button>
               ))}
             </div>
@@ -206,7 +211,7 @@ export default function News() {
 
           {filteredArticles.length === 0 && (
             <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8">
-              {isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.'}
+              {isEnglish ? 'No articles found matching your search.' : (isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.')}
             </div>
           )}
         </div>

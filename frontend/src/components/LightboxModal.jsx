@@ -4,7 +4,7 @@ import { X, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function LightboxModal({ isOpen, onClose, data }) {
-  const { isChinese } = useLanguage();
+  const { isChinese, isEnglish } = useLanguage();
 
   // Close on Escape key & lock body scroll
   useEffect(() => {
@@ -22,13 +22,27 @@ export default function LightboxModal({ isOpen, onClose, data }) {
 
   if (!isOpen || !data) return null;
 
-  const displayName = (isChinese && (data.nameZh || data.name_zh || data.titleZh)) || data.name || data.title;
-  const displayCategory = (isChinese && (data.categoryZh || data.category_zh || data.badgeZh)) || data.badge || data.category;
-  const displayOrigin = (isChinese && (data.originZh || data.origin_zh)) || data.origin;
-  const displayCapacity = (isChinese && (data.capacityZh || data.capacity_zh)) || data.capacity;
-  const displayScope = (isChinese && (data.descriptionZh || data.descZh || data.description_zh || data.scopeZh)) || data.scope;
-  const displaySpecs = (isChinese && (data.specsZh || data.specs_zh)) || data.specs;
-  const displayOrg = (isChinese && (data.orgZh || data.org_zh)) || data.org;
+  const displayName = isEnglish
+    ? (data.nameEn || data.name_en || data.titleEn || data.name || data.title)
+    : ((isChinese && (data.nameZh || data.name_zh || data.titleZh)) || data.name || data.title);
+  const displayCategory = isEnglish
+    ? (data.categoryEn || data.category_en || data.badgeEn || data.badge || data.category)
+    : ((isChinese && (data.categoryZh || data.category_zh || data.badgeZh)) || data.badge || data.category);
+  const displayOrigin = isEnglish
+    ? (data.originEn || data.origin_en || data.origin)
+    : ((isChinese && (data.originZh || data.origin_zh)) || data.origin);
+  const displayCapacity = isEnglish
+    ? (data.capacityEn || data.capacity_en || data.capacity)
+    : ((isChinese && (data.capacityZh || data.capacity_zh)) || data.capacity);
+  const displayScope = isEnglish
+    ? (data.descriptionEn || data.descEn || data.description_en || data.scopeEn || data.scope || data.description || data.desc)
+    : ((isChinese && (data.descriptionZh || data.descZh || data.description_zh || data.scopeZh)) || data.scope || data.description || data.desc);
+  const displaySpecs = isEnglish
+    ? (data.specsEn || data.specs_en || data.specs)
+    : ((isChinese && (data.specsZh || data.specs_zh)) || data.specs);
+  const displayOrg = isEnglish
+    ? (data.orgEn || data.org_en || data.org)
+    : ((isChinese && (data.orgZh || data.org_zh)) || data.org);
 
   // Determine if there are actual technical details to show (from machine or certification cards)
   const hasTechnicalDetails = Boolean(
@@ -55,7 +69,7 @@ export default function LightboxModal({ isOpen, onClose, data }) {
         {/* Global Floating Close Button */}
         <button
           onClick={onClose}
-          aria-label={isChinese ? '關閉' : 'Đóng'}
+          aria-label={isChinese ? '關閉' : (isEnglish ? 'Close' : 'Đóng')}
           className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 p-2.5 sm:p-3 bg-black/60 hover:bg-black/90 text-white rounded-full transition-all duration-200 hover:scale-110 shadow-2xl border border-white/20 backdrop-blur-md cursor-pointer"
         >
           <X className="w-6 h-6" />
@@ -126,14 +140,14 @@ export default function LightboxModal({ isOpen, onClose, data }) {
             <div className="p-5 sm:p-7 space-y-3.5 text-gray-800 dark:text-gray-100 overflow-y-auto max-h-[44vh]">
               {displayOrg && (
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-white/10 text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '認證發證機構：' : 'Cơ quan cấp chứng nhận:'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '認證發證機構：' : (isEnglish ? 'Issuing Authority:' : 'Cơ quan cấp chứng nhận:')}</span>
                   <span className="font-semibold text-tea-dark dark:text-white">{displayOrg}</span>
                 </div>
               )}
 
               {data.certNumber && (
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-white/10 text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '文號 / 認證編號：' : 'Số hiệu văn bản:'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '文號 / 認證編號：' : (isEnglish ? 'Certificate / Document ID:' : 'Số hiệu văn bản:')}</span>
                   <span className="font-mono text-xs font-semibold bg-gray-100 dark:bg-black/30 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-md border border-transparent dark:border-white/10">
                     {data.certNumber}
                   </span>
@@ -142,14 +156,14 @@ export default function LightboxModal({ isOpen, onClose, data }) {
 
               {displayOrigin && (
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-white/10 text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '技術產地來源：' : 'Xuất xứ công nghệ:'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '技術產地來源：' : (isEnglish ? 'Technology Origin:' : 'Xuất xứ công nghệ:')}</span>
                   <span className="font-semibold text-tea-emerald dark:text-tea-mint">{displayOrigin}</span>
                 </div>
               )}
 
               {displayCapacity && (
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-white/10 text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '設備產能 / 規格：' : 'Năng lực / Công suất:'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{isChinese ? '設備產能 / 規格：' : (isEnglish ? 'Capacity / Spec:' : 'Năng lực / Công suất:')}</span>
                   <span className="font-semibold text-tea-dark dark:text-white">{displayCapacity}</span>
                 </div>
               )}
@@ -162,13 +176,13 @@ export default function LightboxModal({ isOpen, onClose, data }) {
 
               {displaySpecs && (
                 <div className="p-3 bg-tea-cream dark:bg-black/30 rounded-xl border border-tea-border dark:border-white/10 text-xs text-gray-700 dark:text-gray-300">
-                  <strong className="text-tea-primary dark:text-tea-mint">{isChinese ? '技術規格參數：' : 'Thông số kỹ thuật:'}</strong> {displaySpecs}
+                  <strong className="text-tea-primary dark:text-tea-mint">{isChinese ? '技術規格參數：' : (isEnglish ? 'Technical Parameters:' : 'Thông số kỹ thuật:')}</strong> {displaySpecs}
                 </div>
               )}
 
               {data.details && data.details.length > 0 && (
                 <div className="space-y-2 pt-1">
-                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{isChinese ? '遵循標準與特點：' : 'Tiêu chuẩn tuân thủ:'}</h4>
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{isChinese ? '遵循標準與特點：' : (isEnglish ? 'Compliance & Highlights:' : 'Tiêu chuẩn tuân thủ:')}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {data.details.map((d, i) => (
                       <div key={i} className="flex items-start gap-2 text-xs text-gray-700 dark:text-gray-300">

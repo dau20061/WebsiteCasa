@@ -43,46 +43,58 @@ const HERO_SLIDES = [
     image: heroBannerImg,
     badgeVi: 'CASA TEA & TEA BAGS • PREMIUM QUALITY',
     badgeZh: 'CASA TEA & TEA BAGS • 頂級原茶系列',
+    badgeEn: 'CASA TEA & PYRAMID TEA BAGS • PREMIUM QUALITY',
     titleVi: 'Cốt Trà Nguyên Lá & Túi Lọc Pyramid Tam Giác',
     titleZh: '原葉茶湯與三角立體茶包工藝',
+    titleEn: 'Loose-Leaf Tea & Triangle Pyramid Tea Bag Craft',
     tagVi: '100% Nguyên Liệu Tự Nhiên',
     tagZh: '100% 精選茶葉原料',
+    tagEn: '100% Natural Selected Tea',
   },
   {
     id: 'matcha',
     image: heroMatchaImg,
     badgeVi: 'PREMIUM MATCHA & POWDER • NGUYÊN LIỆU BỘT CHUYÊN DỤNG',
     badgeZh: '頂級抹茶與專業調飲粉料系列',
+    badgeEn: 'PREMIUM MATCHA & POWDER • PROFESSIONAL BEVERAGE BASES',
     titleVi: 'Bột Trà Xanh Matcha & Bột Pha Chế Chuẩn Vị',
     titleZh: '日式極致抹茶與專業飲品專用粉',
+    titleEn: 'Matcha Green Tea Powder & Barista Beverage Mixes',
     tagVi: 'Matcha Tuyển Chọn',
     tagZh: '頂級抹茶原料',
+    tagEn: 'Premium Japanese Matcha',
   },
   {
     id: 'topping',
     image: heroToppingImg,
     badgeVi: 'SIGNATURE TOPPING • BỘ SƯU TẬP TOPPING CAO CẤP',
     badgeZh: '獨家風味配料與晶球寒天系列',
+    badgeEn: 'SIGNATURE TOPPING • PREMIUM TEXTURE COLLECTION',
     titleVi: 'Bộ Sưu Tập Topping & Thạch Dẻo Đa Tầng Cảm Xúc',
     titleZh: '嚴選手搖飲特色配料與豐富口感',
+    titleEn: 'Multi-Layer Topping & Agar Jelly Collection',
     tagVi: 'Topping Chuẩn Chuỗi',
     tagZh: '連鎖專用配料',
+    tagEn: 'Chain-Grade Topping',
   },
   {
     id: 'capsule',
     image: heroCapsuleImg,
     badgeVi: 'INNOVATIVE CAPSULE TEA • CÔNG NGHỆ CHIẾT XUẤT MỚI',
     badgeZh: '創新膠囊萃茶與現代提取科技',
+    badgeEn: 'INNOVATIVE CAPSULE TEA • ADVANCED EXTRACTION TECH',
     titleVi: 'Viên Nén Trà Capsule – Chiết Xuất Nhanh Chuẩn Vị',
     titleZh: '新型茶膠囊系列 – 極速精準萃取',
+    titleEn: 'Capsule Tea System – Rapid Precision Extraction',
     tagVi: 'Công Nghệ Tiên Tiến',
     tagZh: '尖端萃取科技',
+    tagEn: 'Advanced Extraction Tech',
   },
 ];
 
 export default function Home() {
   const { openSampleModal } = useAppUI();
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
   const [activeStep, setActiveStep] = useState(0);
 
   // Auto-sliding Hero Carousel State (4 flagship images)
@@ -148,8 +160,8 @@ export default function Home() {
   return (
     <div className="overflow-hidden relative">
       <SEO
-        title={isChinese ? "首頁 - CASA 專業商用茶葉原料" : "Trang Chủ"}
-        description={isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, bột pha chế cao cấp cho chuỗi trà sữa, quán cafe và ngành F&B toàn quốc."}
+        title={isEnglish ? "Home - CASA B2B Tea & Beverage Raw Materials" : (isChinese ? "首頁 - CASA 專業商用茶葉原料" : "Trang Chủ")}
+        description={isEnglish ? "CASA TEA – Leading B2B manufacturer and wholesale supplier of raw tea, pyramid tea bags, and beverage mixes for milk tea chains and F&B brands." : (isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, bột pha chế cao cấp cho chuỗi trà sữa, quán cafe và ngành F&B toàn quốc.")}
       />
 
       {/* Hiệu Ứng Lá Trà Rơi Nghệ Thuật CASA TEA */}
@@ -174,7 +186,7 @@ export default function Home() {
             >
               <span className="flex h-2.5 w-2.5 rounded-full bg-tea-leaf animate-ping" />
               <span className="text-xs sm:text-sm font-bold text-tea-primary dark:text-tea-mint tracking-wider uppercase">
-                {isChinese ? 'CASA 專業商用茶葉原料與茶包供應商' : t('hero_pill', 'Giải Pháp Trà Nguyên Liệu & Túi Lọc B2B Hàng Đầu')}
+                {isEnglish ? 'CASA Premier B2B Tea & Pyramid Bag Supplier' : (isChinese ? 'CASA 專業商用茶葉原料與茶包供應商' : t('hero_pill', 'Giải Pháp Trà Nguyên Liệu & Túi Lọc B2B Hàng Đầu'))}
               </span>
             </motion.div>
 
@@ -185,7 +197,14 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-[1.14]"
             >
-              {isChinese ? (
+              {isEnglish ? (
+                <>
+                  The Essence of CASA Tea –{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
+                    The Foundation for Exceptional Beverages
+                  </span>
+                </>
+              ) : isChinese ? (
                 <>
                   茶之精華 –{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
@@ -210,7 +229,9 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto font-normal"
             >
-              {isChinese
+              {isEnglish
+                ? 'Specialized in premium commercial loose-leaf tea, pyramid tea bags, and custom blending solutions. Certified ISO 22000 & HACCP, empowering over 2,000+ F&B chains nationwide.'
+                : isChinese
                 ? '專注研發高品質商用原葉茶、三角立體茶包與專業拼配方案。國際標準 ISO 22000、HACCP 認證，助力手搖飲與餐飲連鎖打造爆款特色飲品。'
                 : t('hero_desc', 'Cung cấp trà nguyên liệu tuyển chọn, trà túi lọc tam giác pyramid cao cấp và giải pháp R&D pha chế chuyên sâu. Tiêu chuẩn ISO 22000, HACCP – Đồng hành cùng hơn 2.000+ chuỗi F&B toàn quốc.')}
             </motion.p>
@@ -226,7 +247,7 @@ export default function Home() {
                 to="/products"
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-tea-primary to-tea-green hover:from-tea-emerald hover:to-tea-primary text-white text-sm sm:text-base font-bold shadow-tea-md hover:shadow-tea-lg transition-all hover:-translate-y-0.5 group"
               >
-                <span>{isChinese ? '探索精選產品' : 'Khám phá sản phẩm'}</span>
+                <span>{isEnglish ? 'Explore Products' : (isChinese ? '探索精選產品' : 'Khám phá sản phẩm')}</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
               </Link>
 
@@ -235,14 +256,14 @@ export default function Home() {
                 className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-white/90 dark:bg-[#132018]/90 hover:bg-tea-soft/60 dark:hover:bg-[#1C2F23] text-tea-primary dark:text-tea-mint text-sm sm:text-base font-bold border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-0.5 backdrop-blur-md"
               >
                 <Sparkles className="w-5 h-5 text-tea-leaf dark:text-tea-mint animate-pulse" />
-                <span>{isChinese ? '免費索取茶樣套件' : 'Đăng ký nhận mẫu thử'}</span>
+                <span>{isEnglish ? 'Request Free Sample Kit' : (isChinese ? '免費索取茶樣套件' : 'Đăng ký nhận mẫu thử')}</span>
               </button>
 
               <Link
                 to="/contact"
                 className="inline-flex items-center justify-center px-7 py-4 rounded-2xl text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint hover:bg-black/5 dark:hover:bg-white/5 text-sm sm:text-base font-bold transition-all"
               >
-                {isChinese ? '即刻聯絡諮詢' : 'Liên hệ tư vấn B2B'}
+                {isEnglish ? 'B2B Consultation' : (isChinese ? '即刻聯絡諮詢' : 'Liên hệ tư vấn B2B')}
               </Link>
             </motion.div>
           </div>
@@ -277,7 +298,7 @@ export default function Home() {
                     >
                       <img
                         src={slide.image}
-                        alt={isChinese ? slide.titleZh : slide.titleVi}
+                        alt={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
                         loading="eager"
                         decoding="sync"
                         className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
@@ -296,14 +317,14 @@ export default function Home() {
                 <div className="absolute top-3.5 left-3.5 sm:top-5 sm:left-5 z-20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm font-bold shadow-xl">
                   <span className="flex h-2.5 w-2.5 rounded-full bg-tea-mint animate-ping" />
                   <span>
-                    {isChinese ? HERO_SLIDES[currentSlide].badgeZh : HERO_SLIDES[currentSlide].badgeVi}
+                    {isEnglish ? HERO_SLIDES[currentSlide].badgeEn : (isChinese ? HERO_SLIDES[currentSlide].badgeZh : HERO_SLIDES[currentSlide].badgeVi)}
                   </span>
                 </div>
 
                 {/* Live Corner Tag */}
                 <div className="hidden sm:flex absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white items-center gap-2 text-xs font-bold shadow-lg">
                   <span className="text-amber-400">★</span>
-                  <span>{isChinese ? HERO_SLIDES[currentSlide].tagZh : HERO_SLIDES[currentSlide].tagVi}</span>
+                  <span>{isEnglish ? HERO_SLIDES[currentSlide].tagEn : (isChinese ? HERO_SLIDES[currentSlide].tagZh : HERO_SLIDES[currentSlide].tagVi)}</span>
                 </div>
 
                 {/* Navigation Arrow: Previous */}
@@ -347,7 +368,7 @@ export default function Home() {
                           ? 'w-7 sm:w-9 h-2.5 bg-tea-mint shadow-[0_0_12px_rgba(105,196,150,0.8)]'
                           : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/80'
                       }`}
-                      title={isChinese ? slide.titleZh : slide.titleVi}
+                      title={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
                     />
                   ))}
                 </div>
@@ -387,10 +408,12 @@ export default function Home() {
                 <Leaf className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
-                {isChinese ? '三大經典原茶基底' : '3 Dòng Cốt Trà Chuẩn Vị'}
+                {isEnglish ? '3 Core Tea Bases' : (isChinese ? '三大經典原茶基底' : '3 Dòng Cốt Trà Chuẩn Vị')}
               </h4>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                {isChinese
+                {isEnglish
+                  ? 'Green Tea, Black Tea & Oolong Tea rich in aroma and body, creating the perfect base for signature milk teas & fruit teas.'
+                  : isChinese
                   ? '綠茶 (Green) • 紅茶 (Black) • 烏龍茶 (Oolong) 香氣濃郁飽滿，完美支撐各式手搖特調。'
                   : 'Trà Xanh (Green) • Trà Đen (Black) • Trà Ô Long (Oolong) đậm đà, chuẩn gu người tiêu dùng hiện đại.'}
               </p>
@@ -407,10 +430,12 @@ export default function Home() {
                 <Award className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
-                {isChinese ? '三角立體茶包工藝' : 'Túi Lọc Tam Giác Pyramid'}
+                {isEnglish ? 'Pyramid Tea Bag Craft' : (isChinese ? '三角立體茶包工藝' : 'Túi Lọc Tam Giác Pyramid')}
               </h4>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                {isChinese
+                {isEnglish
+                  ? 'Biodegradable food-grade PLA corn fiber mesh, ensuring complete tea leaf expansion without absorbing natural aromas.'
+                  : isChinese
                   ? '食品級玉米纖維 PLA 環保網布，不吸附茶香，讓原葉在立體空間中完全舒展釋放。'
                   : 'Màng lưới bắp sinh học tự phân hủy, không gian bung tỏa tối đa cho búp trà nguyên bản.'}
               </p>
@@ -427,10 +452,12 @@ export default function Home() {
                 <FlaskConical className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
-                {isChinese ? '高濃度萃取 TDS > 2.8%' : 'Chiết Xuất TDS > 2.8%'}
+                {isEnglish ? 'High Extraction TDS > 2.8%' : (isChinese ? '高濃度萃取 TDS > 2.8%' : 'Chiết Xuất TDS > 2.8%')}
               </h4>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                {isChinese
+                {isEnglish
+                  ? 'Rich, lingering aftertaste that never dilutes with milk or ice; consistent flavor across 1,000+ batches.'
+                  : isChinese
                   ? '茶湯醇厚回甘，加奶加冰不易淡味，1,000 批次風味始終穩定如一。'
                   : 'Cốt trà sánh đậm đặc biệt, không nhạt vị khi kết hợp đá hoặc sữa, 1.000 lô đồng nhất quanh năm.'}
               </p>
@@ -447,10 +474,12 @@ export default function Home() {
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
-                {isChinese ? 'ISO 22000 & HACCP' : 'Chứng Nhận Quốc Tế'}
+                {isEnglish ? 'International Certifications' : (isChinese ? 'ISO 22000 & HACCP' : 'Chứng Nhận Quốc Tế')}
               </h4>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                {isChinese
+                {isEnglish
+                  ? 'Strict adherence to ISO 22000 and HACCP food safety standards, multi-panel zero pesticide residues tested by SGS.'
+                  : isChinese
                   ? '嚴格遵循國際食安管理體系，SGS 多項無農殘檢驗，提供合規合法的批發證明文件。'
                   : 'Đạt chuẩn ISO 22000, HACCP, kiểm nghiệm khắt khe không dư lượng BVTV, an toàn tuyệt đối.'}
               </p>
@@ -472,9 +501,9 @@ export default function Home() {
       <section className="py-20 bg-white dark:bg-[#0C1710] relative transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge={isChinese ? 'B2B 核心價值' : 'Giá Trị Cốt Lõi B2B'}
-            title={isChinese ? '我們為您的品牌帶來什麼？' : 'Chúng tôi mang đến điều gì?'}
-            subtitle={isChinese ? '提供穩固可持續的原物料基石與標準化品質，助各大茶飲品牌征服消費者的味蕾。' : 'Cung cấp nền tảng nguyên liệu bền vững, chất lượng chuẩn mực giúp các thương hiệu đồ uống chinh phục vị giác khách hàng.'}
+            badge={isEnglish ? 'B2B Core Values' : (isChinese ? 'B2B 核心價值' : 'Giá Trị Cốt Lõi B2B')}
+            title={isEnglish ? 'What Do We Bring To Your Brand?' : (isChinese ? '我們為您的品牌帶來什麼？' : 'Chúng tôi mang đến điều gì?')}
+            subtitle={isEnglish ? 'Providing a sustainable ingredient foundation and standardized quality, empowering beverage brands to captivate customers.' : (isChinese ? '提供穩固可持續的原物料基石與標準化品質，助各大茶飲品牌征服消費者的味蕾。' : 'Cung cấp nền tảng nguyên liệu bền vững, chất lượng chuẩn mực giúp các thương hiệu đồ uống chinh phục vị giác khách hàng.')}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -497,15 +526,15 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-xl font-bold text-tea-dark dark:text-white mb-1 group-hover:text-tea-green dark:group-hover:text-tea-mint transition-colors">
-                    {(isChinese && val.titleZh) || val.title}
+                    {(isEnglish && val.titleEn) || (isChinese && val.titleZh) || val.title}
                   </h3>
 
                   <span className="text-xs font-semibold text-tea-emerald dark:text-tea-leaf block mb-3">
-                    {(isChinese && val.subtitleZh) || val.subtitle}
+                    {(isEnglish && val.subtitleEn) || (isChinese && val.subtitleZh) || val.subtitle}
                   </span>
 
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                    {(isChinese && val.descZh) || val.desc}
+                    {(isEnglish && val.descEn) || (isChinese && val.descZh) || val.desc}
                   </p>
                 </motion.div>
               );
@@ -530,13 +559,15 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 bg-tea-soft dark:bg-tea-green/20 text-tea-primary dark:text-tea-mint border border-tea-leaf/20 dark:border-tea-mint/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-tea-leaf dark:bg-tea-mint" />
-                {isChinese ? '最暢銷產品類別' : 'Danh Mục Bán Chạy Nhất'}
+                {isEnglish ? 'Best Selling Categories' : (isChinese ? '最暢銷產品類別' : 'Danh Mục Bán Chạy Nhất')}
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-tea-dark dark:text-white tracking-tight">
-                {isChinese ? '探索我們的商用茶葉原料' : 'Khám phá dòng sản phẩm của chúng tôi'}
+                {isEnglish ? 'Explore Our Commercial Tea Raw Materials' : (isChinese ? '探索我們的商用茶葉原料' : 'Khám phá dòng sản phẩm của chúng tôi')}
               </h2>
               <p className="mt-2 text-gray-700 dark:text-gray-300 text-sm sm:text-base max-w-xl font-normal">
-                {isChinese
+                {isEnglish
+                  ? 'A curated selection of rich tea bases, natural aromas, and professional beverage powder bases trusted by leading F&B chains.'
+                  : isChinese
                   ? '精選濃厚茶底、天然香氣與專業調飲粉料，深受各大餐飲及手搖飲連鎖品牌信賴。'
                   : 'Tuyển chọn những nền trà đậm vị, hương thơm tự nhiên và bột pha chế chuyên dụng được các chuỗi F&B tin dùng nhất.'}
               </p>
@@ -546,7 +577,7 @@ export default function Home() {
               to="/products"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-[#132018] hover:bg-tea-primary dark:hover:bg-tea-green text-tea-dark dark:text-white hover:text-white text-xs font-bold border border-tea-border dark:border-white/10 shadow-tea-sm transition-all hover:shadow-tea-md whitespace-nowrap self-start md:self-auto"
             >
-              <span>{isChinese ? '查看全部 65+ 款產品' : 'Xem tất cả 65+ sản phẩm'}</span>
+              <span>{isEnglish ? 'View all 65+ products' : (isChinese ? '查看全部 65+ 款產品' : 'Xem tất cả 65+ sản phẩm')}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -565,23 +596,23 @@ export default function Home() {
           <div className="mt-12 p-6 rounded-3xl bg-white dark:bg-[#132018] border border-tea-border dark:border-white/10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs font-bold text-tea-dark dark:text-white">
               <Sparkles className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-              <span>{isChinese ? '依原料類別快速瀏覽：' : 'Khám phá theo nhóm nguyên liệu:'}</span>
+              <span>{isEnglish ? 'Browse by raw material category:' : (isChinese ? '依原料類別快速瀏覽：' : 'Khám phá theo nhóm nguyên liệu:')}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Link to="/products?cat=tra-den" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isChinese ? '阿薩姆紅茶' : 'Trà Đen Assam'}
+                {isEnglish ? 'Assam Black Tea' : (isChinese ? '阿薩姆紅茶' : 'Trà Đen Assam')}
               </Link>
               <Link to="/products?cat=tra-oolong" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isChinese ? '炭焙烏龍茶' : 'Trà Ô Long Nướng'}
+                {isEnglish ? 'Roasted Oolong Tea' : (isChinese ? '炭焙烏龍茶' : 'Trà Ô Long Nướng')}
               </Link>
               <Link to="/products?cat=tra-lai-xanh" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isChinese ? '茉莉綠茶' : 'Lục Trà Lài'}
+                {isEnglish ? 'Jasmine Green Tea' : (isChinese ? '茉莉綠茶' : 'Lục Trà Lài')}
               </Link>
               <Link to="/products?cat=tra-rang" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isChinese ? '日式焙茶' : 'Hojicha Chuẩn Nhật'}
+                {isEnglish ? 'Japanese Hojicha' : (isChinese ? '日式焙茶' : 'Hojicha Chuẩn Nhật')}
               </Link>
               <Link to="/products?cat=bot-pha-che" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isChinese ? '特級植脂末' : 'Bột Béo Thực Vật'}
+                {isEnglish ? 'Non-Dairy Creamer' : (isChinese ? '特級植脂末' : 'Bột Béo Thực Vật')}
               </Link>
             </div>
           </div>
@@ -605,9 +636,9 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <SectionHeading
-            badge={isChinese ? '全封閉式現代化產線' : 'Dây Chuyền Khép Kín'}
-            title={isChinese ? '先進製茶工藝，鑄就穩定品質' : 'Công nghệ tạo nên chất lượng'}
-            subtitle={isChinese ? '從晨霧中的鮮嫩茶芽到純淨成品的完整歷程，藉由現代化五步製茶工藝嚴格把關。' : 'Hành trình từ búp chè tươi non sương sớm đến thành phẩm tinh sạch tuyệt đối qua quy trình 5 bước ứng dụng công nghệ hiện đại.'}
+            badge={isEnglish ? 'Closed-Loop Modern Line' : (isChinese ? '全封閉式現代化產線' : 'Dây Chuyền Khép Kín')}
+            title={isEnglish ? 'Advanced Tea Processing Tech, Delivering Consistent Quality' : (isChinese ? '先進製茶工藝，鑄就穩定品質' : 'Công nghệ tạo nên chất lượng')}
+            subtitle={isEnglish ? 'The complete journey from early-morning fresh tea buds to pristine finished product, strictly controlled through a 5-step modernized process.' : (isChinese ? '從晨霧中的鮮嫩茶芽到純淨成品的完整歷程，藉由現代化五步製茶工藝嚴格把關。' : 'Hành trình từ búp chè tươi non sương sớm đến thành phẩm tinh sạch tuyệt đối qua quy trình 5 bước ứng dụng công nghệ hiện đại.')}
             dark={true}
           />
 
@@ -623,9 +654,9 @@ export default function Home() {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <div className="text-[11px] font-mono font-bold opacity-75">{isChinese ? `步驟 ${step.step}` : `BƯỚC ${step.step}`}</div>
+                <div className="text-[11px] font-mono font-bold opacity-75">{isEnglish ? `STEP ${step.step}` : (isChinese ? `步驟 ${step.step}` : `BƯỚC ${step.step}`)}</div>
                 <div className="text-xs sm:text-sm font-bold truncate mt-0.5">
-                  {(isChinese && step.titleZh ? step.titleZh.split('&')[0] : step.title.split('&')[0])}
+                  {(isEnglish && step.titleEn ? step.titleEn.split('&')[0] : (isChinese && step.titleZh ? step.titleZh.split('&')[0] : step.title.split('&')[0]))}
                 </div>
               </button>
             ))}
@@ -636,38 +667,38 @@ export default function Home() {
             <div className="lg:col-span-6 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tea-mint/20 text-tea-mint text-xs font-bold">
                 <Factory className="w-3.5 h-3.5" />
-                <span>{isChinese ? `工藝流程 步驟 ${PRODUCTION_STEPS[activeStep].step} / 05` : `Quy trình Bước ${PRODUCTION_STEPS[activeStep].step} / 05`}</span>
+                <span>{isEnglish ? `Process Step ${PRODUCTION_STEPS[activeStep].step} / 05` : (isChinese ? `工藝流程 步驟 ${PRODUCTION_STEPS[activeStep].step} / 05` : `Quy trình Bước ${PRODUCTION_STEPS[activeStep].step} / 05`)}</span>
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-                {(isChinese && PRODUCTION_STEPS[activeStep].titleZh) || PRODUCTION_STEPS[activeStep].title}
+                {(isEnglish && PRODUCTION_STEPS[activeStep].titleEn) || (isChinese && PRODUCTION_STEPS[activeStep].titleZh) || PRODUCTION_STEPS[activeStep].title}
               </h3>
 
               <h4 className="text-base font-semibold text-tea-mint">
-                {(isChinese && PRODUCTION_STEPS[activeStep].subtitleZh) || PRODUCTION_STEPS[activeStep].subtitle}
+                {(isEnglish && PRODUCTION_STEPS[activeStep].subtitleEn) || (isChinese && PRODUCTION_STEPS[activeStep].subtitleZh) || PRODUCTION_STEPS[activeStep].subtitle}
               </h4>
 
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-                {(isChinese && PRODUCTION_STEPS[activeStep].descZh) || PRODUCTION_STEPS[activeStep].desc}
+                {(isEnglish && PRODUCTION_STEPS[activeStep].descEn) || (isChinese && PRODUCTION_STEPS[activeStep].descZh) || PRODUCTION_STEPS[activeStep].desc}
               </p>
 
               <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-tea-mint font-bold">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{isChinese ? '關鍵控制點 (CCP)：' : 'Điểm kiểm soát then chốt (CCP):'}</span>
+                  <span>{isEnglish ? 'Critical Control Point (CCP):' : (isChinese ? '關鍵控制點 (CCP)：' : 'Điểm kiểm soát then chốt (CCP):')}</span>
                 </div>
                 <p className="text-xs sm:text-sm text-gray-200">
-                  {(isChinese && PRODUCTION_STEPS[activeStep].highlightZh) || PRODUCTION_STEPS[activeStep].highlight}
+                  {(isEnglish && PRODUCTION_STEPS[activeStep].highlightEn) || (isChinese && PRODUCTION_STEPS[activeStep].highlightZh) || PRODUCTION_STEPS[activeStep].highlight}
                 </p>
               </div>
 
               <div className="pt-2 flex items-center gap-6 text-xs text-gray-400">
-                <span>{isChinese ? '規格參數：' : 'Thông số:'} <strong className="text-white">{(isChinese && PRODUCTION_STEPS[activeStep].statsZh) || PRODUCTION_STEPS[activeStep].stats}</strong></span>
+                <span>{isEnglish ? 'Specifications:' : (isChinese ? '規格參數：' : 'Thông số:')} <strong className="text-white">{(isEnglish && PRODUCTION_STEPS[activeStep].statsEn) || (isChinese && PRODUCTION_STEPS[activeStep].statsZh) || PRODUCTION_STEPS[activeStep].stats}</strong></span>
                 <Link
                   to="/machinery-certifications"
                   className="inline-flex items-center gap-1 text-tea-mint hover:underline font-bold"
                 >
-                  <span>{isChinese ? '查看設備詳情' : 'Xem chi tiết máy móc'}</span>
+                  <span>{isEnglish ? 'View machinery details' : (isChinese ? '查看設備詳情' : 'Xem chi tiết máy móc')}</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -677,12 +708,12 @@ export default function Home() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[16/10] bg-gray-900 border border-white/20">
                 <img
                   src={PRODUCTION_STEPS[activeStep].image}
-                  alt={(isChinese && PRODUCTION_STEPS[activeStep].titleZh) || PRODUCTION_STEPS[activeStep].title}
+                  alt={(isEnglish && PRODUCTION_STEPS[activeStep].titleEn) || (isChinese && PRODUCTION_STEPS[activeStep].titleZh) || PRODUCTION_STEPS[activeStep].title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-xs text-white/90">
-                  {isChinese ? 'SCADA 智能中央控制系統' : 'Hệ thống kiểm soát SCADA'}
+                  {isEnglish ? 'SCADA Intelligent Central Control' : (isChinese ? 'SCADA 智能中央控制系統' : 'Hệ thống kiểm soát SCADA')}
                 </div>
               </div>
             </div>
@@ -703,9 +734,9 @@ export default function Home() {
       <section className="py-20 bg-white dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge={isChinese ? '食品安全與衛生標準' : 'An Toàn Vệ Sinh Thực Phẩm'}
-            title={isChinese ? '品質承諾與國際認證' : 'Cam kết chất lượng'}
-            subtitle={isChinese ? 'CASA 所有茶葉與原料產品皆符合越南及國際最嚴格的食品安全法規與品質標準。' : 'Tất cả các sản phẩm trà và bột của CASA đều tuân thủ các chuẩn mực an toàn thực phẩm khắt khe nhất của Việt Nam và quốc tế.'}
+            badge={isEnglish ? 'Food Safety & Hygiene Standards' : (isChinese ? '食品安全與衛生標準' : 'An Toàn Vệ Sinh Thực Phẩm')}
+            title={isEnglish ? 'Quality Commitment & International Certifications' : (isChinese ? '品質承諾與國際認證' : 'Cam kết chất lượng')}
+            subtitle={isEnglish ? 'All CASA tea and ingredient products comply with the strictest Vietnamese and international food safety regulations and standards.' : (isChinese ? 'CASA 所有茶葉與原料產品皆符合越南及國際最嚴格的食品安全法規與品質標準。' : 'Tất cả các sản phẩm trà và bột của CASA đều tuân thủ các chuẩn mực an toàn thực phẩm khắt khe nhất của Việt Nam và quốc tế.')}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -726,10 +757,14 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="text-base font-bold text-tea-dark dark:text-white">
-                  {isChinese ? '需要每批次自我宣告文件與 COA 檢驗報告？' : 'Cần hồ sơ tự công bố & phiếu kiểm nghiệm COA từng lô?'}
+                  {isEnglish ? 'Need self-declaration dossiers & lot-specific COA test reports?' : (isChinese ? '需要每批次自我宣告文件與 COA 檢驗報告？' : 'Cần hồ sơ tự công bố & phiếu kiểm nghiệm COA từng lô?')}
                 </h4>
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-0.5 font-normal">
-                  {isChinese ? 'CASA 提供完整蓋印紙本證明及 PDF 電子檔，協助客戶順利完成各項法規備案與進口手續。' : 'CASA cung cấp đầy đủ bản cứng có dấu mộc và bản PDF cho quý khách hàng hoàn tất thủ tục pháp lý.'}
+                  {isEnglish
+                    ? 'CASA provides official stamped hard copies and digital PDFs to assist clients with smooth regulatory clearance and commercial operations.'
+                    : isChinese
+                    ? 'CASA 提供完整蓋印紙本證明及 PDF 電子檔，協助客戶順利完成各項法規備案與進口手續。'
+                    : 'CASA cung cấp đầy đủ bản cứng có dấu mộc và bản PDF cho quý khách hàng hoàn tất thủ tục pháp lý.'}
                 </p>
               </div>
             </div>
@@ -738,7 +773,7 @@ export default function Home() {
               to="/contact"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-tea-primary dark:bg-tea-green hover:bg-tea-emerald text-white text-xs font-bold transition-colors whitespace-nowrap shadow-tea-sm"
             >
-              {isChinese ? '索取檢驗認證文件' : 'Yêu cầu hồ sơ chứng nhận'}
+              {isEnglish ? 'Request certification documents' : (isChinese ? '索取檢驗認證文件' : 'Yêu cầu hồ sơ chứng nhận')}
             </Link>
           </div>
         </div>
@@ -770,7 +805,7 @@ export default function Home() {
                   {stat.value}
                 </div>
                 <p className="text-xs sm:text-sm text-tea-mint/90 font-medium leading-snug">
-                  {(isChinese && stat.labelZh) || stat.label}
+                  {(isEnglish && stat.labelEn) || (isChinese && stat.labelZh) || stat.label}
                 </p>
               </motion.div>
             ))}
@@ -791,9 +826,9 @@ export default function Home() {
       <section className="py-20 bg-[#FAF9F5] dark:bg-[#0E1711] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge={isChinese ? '長期合作夥伴' : 'Đối Tác Đồng Hành'}
-            title={isChinese ? '超過 1,200+ 家餐飲連鎖品牌共同信賴' : 'Được tin dùng bởi hơn 1.200 chuỗi F&B'}
-            subtitle={isChinese ? '傾聽創辦人與飲品研發專家的真實反饋，見證 CASA 茶葉原料的穩定風味。' : 'Lắng nghe những chia sẻ thực tế từ các nhà sáng lập và chuyên gia R&D đang sử dụng trà nguyên liệu của CASA.'}
+            badge={isEnglish ? 'Trusted Long-Term Partners' : (isChinese ? '長期合作夥伴' : 'Đối Tác Đồng Hành')}
+            title={isEnglish ? 'Trusted by Over 1,200+ F&B Beverage Chains' : (isChinese ? '超過 1,200+ 家餐飲連鎖品牌共同信賴' : 'Được tin dùng bởi hơn 1.200 chuỗi F&B')}
+            subtitle={isEnglish ? 'Hear authentic feedback from founders and R&D beverage experts experiencing CASAs consistent tea flavor.' : (isChinese ? '傾聽創辦人與飲品研發專家的真實反饋，見證 CASA 茶葉原料的穩定風味。' : 'Lắng nghe những chia sẻ thực tế từ các nhà sáng lập và chuyên gia R&D đang sử dụng trà nguyên liệu của CASA.')}
           />
 
           {/* Marquee Partner Brands Simulation */}
@@ -820,7 +855,7 @@ export default function Home() {
                 className="bg-white dark:bg-[#132018] p-7 rounded-3xl border border-tea-border dark:border-white/10 shadow-tea-sm flex flex-col justify-between"
               >
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic mb-6 font-normal">
-                  "{(isChinese && item.contentZh) || item.content}"
+                  "{(isEnglish && item.contentEn) || (isChinese && item.contentZh) || item.content}"
                 </p>
 
                 <div className="flex items-center gap-3.5 pt-4 border-t border-gray-100 dark:border-white/10">
@@ -831,7 +866,7 @@ export default function Home() {
                   />
                   <div>
                     <h4 className="text-sm font-bold text-tea-dark dark:text-white">{item.name}</h4>
-                    <p className="text-[11px] text-gray-600 dark:text-gray-400 line-clamp-1 font-medium">{(isChinese && item.roleZh) || item.role}</p>
+                    <p className="text-[11px] text-gray-600 dark:text-gray-400 line-clamp-1 font-medium">{(isEnglish && item.roleEn) || (isChinese && item.roleZh) || item.role}</p>
                   </div>
                 </div>
               </motion.div>

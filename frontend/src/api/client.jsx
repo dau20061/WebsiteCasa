@@ -114,6 +114,11 @@ export const aiApi = {
   translateFaqZh: (data) => request('/ai/translate-faq-zh', { method: 'POST', body: data }),
   translateMachineryZh: (data) => request('/ai/translate-machinery-zh', { method: 'POST', body: data }),
   translateCategoryZh: (data) => request('/ai/translate-category-zh', { method: 'POST', body: data }),
+  translateProductEn: (data) => request('/ai/translate-product-en', { method: 'POST', body: data }),
+  translateNewsEn: (data) => request('/ai/translate-news-en', { method: 'POST', body: data }),
+  translateFaqEn: (data) => request('/ai/translate-faq-en', { method: 'POST', body: data }),
+  translateMachineryEn: (data) => request('/ai/translate-machinery-en', { method: 'POST', body: data }),
+  translateCategoryEn: (data) => request('/ai/translate-category-en', { method: 'POST', body: data }),
 };
 
 // ----------------------------------------------------------------------------

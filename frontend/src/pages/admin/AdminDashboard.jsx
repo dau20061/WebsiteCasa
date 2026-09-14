@@ -55,7 +55,12 @@ import {
   translateArticleToTraditionalChinese,
   translateFaqToTraditionalChinese,
   translateMachineryToTraditionalChinese,
-  translateCategoryToTraditionalChinese
+  translateCategoryToTraditionalChinese,
+  translateProductToEnglish,
+  translateArticleToEnglish,
+  translateFaqToEnglish,
+  translateMachineryToEnglish,
+  translateCategoryToEnglish
 } from '../../services/geminiService';
 
 import { PRODUCT_CATEGORIES, FAQ_CATEGORIES } from '../../constants/categories';
@@ -93,13 +98,17 @@ export default function AdminDashboard() {
   const [isSyncingRtdb, setIsSyncingRtdb] = useState(false);
   const [isDesigningProduct, setIsDesigningProduct] = useState(false);
   const [isTranslatingProduct, setIsTranslatingProduct] = useState(false);
+  const [isTranslatingProductEn, setIsTranslatingProductEn] = useState(false);
   const [isRewritingDesc, setIsRewritingDesc] = useState(false);
   const [productAiHints, setProductAiHints] = useState('');
   const [productModalTab, setProductModalTab] = useState('edit'); // 'edit' | 'preview'
   const [isDesigningNews, setIsDesigningNews] = useState(false);
   const [isTranslatingNews, setIsTranslatingNews] = useState(false);
+  const [isTranslatingNewsEn, setIsTranslatingNewsEn] = useState(false);
   const [isTranslatingFaq, setIsTranslatingFaq] = useState(false);
+  const [isTranslatingFaqEn, setIsTranslatingFaqEn] = useState(false);
   const [isTranslatingMachinery, setIsTranslatingMachinery] = useState(false);
+  const [isTranslatingMachineryEn, setIsTranslatingMachineryEn] = useState(false);
   const [newsModalTab, setNewsModalTab] = useState('edit'); // 'edit' | 'preview'
 
   // ============================================================================
@@ -118,10 +127,12 @@ export default function AdminDashboard() {
       slug: c.id,
       name: c.name,
       nameZh: '',
+      nameEn: '',
       order: i + 1,
       active: true,
       desc: '',
-      descZh: ''
+      descZh: '',
+      descEn: ''
     }));
   });
 
@@ -131,15 +142,18 @@ export default function AdminDashboard() {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [deleteCategoryModalOpen, setDeleteCategoryModalOpen] = useState(false);
   const [isTranslatingCategory, setIsTranslatingCategory] = useState(false);
+  const [isTranslatingCategoryEn, setIsTranslatingCategoryEn] = useState(false);
 
   const initialCategoryForm = {
     id: '',
     name: '',
     nameZh: '',
+    nameEn: '',
     slug: '',
     order: 1,
     desc: '',
     descZh: '',
+    descEn: '',
     active: true
   };
   const [categoryFormData, setCategoryFormData] = useState(initialCategoryForm);
@@ -162,10 +176,12 @@ export default function AdminDashboard() {
         id: cat.id || '',
         name: cat.name || '',
         nameZh: cat.nameZh || '',
+        nameEn: cat.nameEn || '',
         slug: cat.slug || cat.id || '',
         order: cat.order || 1,
         desc: cat.desc || '',
         descZh: cat.descZh || '',
+        descEn: cat.descEn || '',
         active: cat.active !== false
       });
     } else {
@@ -174,10 +190,12 @@ export default function AdminDashboard() {
         id: '',
         name: '',
         nameZh: '',
+        nameEn: '',
         slug: '',
         order: categories.length + 1,
         desc: '',
         descZh: '',
+        descEn: '',
         active: true
       });
     }
@@ -201,6 +219,38 @@ export default function AdminDashboard() {
       order: Number(categoryFormData.order) || 1,
       active: categoryFormData.active !== false
     };
+
+    // Tự động dịch Trung Phồn thể nếu trống
+    if (!payload.nameZh?.trim()) {
+      try {
+        const zh = await translateCategoryToTraditionalChinese({
+          name: payload.name,
+          desc: payload.desc
+        });
+        if (zh && zh.nameZh) {
+          payload.nameZh = zh.nameZh;
+          payload.descZh = zh.descZh || payload.descZh || '';
+        }
+      } catch (e) {
+        console.warn('Tự động dịch Trung cho danh mục:', e);
+      }
+    }
+
+    // Tự động dịch Tiếng Anh nếu trống
+    if (!payload.nameEn?.trim()) {
+      try {
+        const en = await translateCategoryToEnglish({
+          name: payload.name,
+          desc: payload.desc
+        });
+        if (en && en.nameEn) {
+          payload.nameEn = en.nameEn;
+          payload.descEn = en.descEn || payload.descEn || '';
+        }
+      } catch (e) {
+        console.warn('Tự động dịch Tiếng Anh cho danh mục:', e);
+      }
+    }
 
     try {
       setIsSyncingRtdb(true);
@@ -250,6 +300,32 @@ export default function AdminDashboard() {
       showToast('Lỗi dịch tiếng Trung: ' + err.message, 'error');
     } finally {
       setIsTranslatingCategory(false);
+    }
+  };
+
+  const handleTranslateCategoryEn = async () => {
+    if (!categoryFormData.name.trim()) {
+      showToast('Vui lòng nhập tên danh mục tiếng Việt trước!', 'warning');
+      return;
+    }
+    try {
+      setIsTranslatingCategoryEn(true);
+      const res = await translateCategoryToEnglish({
+        name: categoryFormData.name,
+        desc: categoryFormData.desc
+      });
+      if (res && res.nameEn) {
+        setCategoryFormData((prev) => ({
+          ...prev,
+          nameEn: res.nameEn,
+          descEn: res.descEn || prev.descEn
+        }));
+        showToast('Đã dịch sang Tiếng Anh thành công!', 'success');
+      }
+    } catch (err) {
+      showToast('Lỗi dịch Tiếng Anh: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingCategoryEn(false);
     }
   };
 
@@ -305,23 +381,29 @@ export default function AdminDashboard() {
   const [productFormData, setProductFormData] = useState({
     name: '',
     nameZh: '',
+    nameEn: '',
     sku: '',
     category: 'tra-den',
     categoryName: 'Trà Đen',
     badge: 'Bán chạy',
     badgeZh: '',
+    badgeEn: '',
     shortDesc: '',
     shortDescZh: '',
+    shortDescEn: '',
     fullDesc: '',
     fullDescZh: '',
+    fullDescEn: '',
     origin: 'Bảo Lộc, Lâm Đồng',
     originZh: '',
+    originEn: '',
     image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
     status: 'PUBLISHED',
     purchaseAction: 'contact',
     shopeeUrl: '',
     tasteProfile: { aroma: 85, body: 90, sweetness: 75, color: 'Nâu đỏ ruby' },
     applications: ['Trà sữa truyền thống', 'Trà kem cheese'],
+    applicationsEn: ['Classic Milk Tea', 'Cheese Foam Tea'],
     packaging: ['Gói 1kg (10 gói/thùng)']
   });
 
@@ -343,11 +425,13 @@ export default function AdminDashboard() {
   const [newsFormData, setNewsFormData] = useState({
     title: '',
     titleZh: '',
+    titleEn: '',
     slug: '',
     category: 'cong-thuc',
     categoryName: 'Công Thức Pha Chế',
     excerpt: '',
     excerptZh: '',
+    excerptEn: '',
     author: 'CASA R&D Team',
     readTime: '4 phút',
     date: '05 Tháng 09, 2026',
@@ -355,6 +439,7 @@ export default function AdminDashboard() {
     image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80',
     content: '',
     contentZh: '',
+    contentEn: '',
     tags: ['CASA Tea', 'F&B 2026'],
     featuredHome: false,
     featuredNews: false
@@ -376,8 +461,10 @@ export default function AdminDashboard() {
   const [faqFormData, setFaqFormData] = useState({
     question: '',
     questionZh: '',
+    questionEn: '',
     answer: '',
     answerZh: '',
+    answerEn: '',
     category: 'san-pham'
   });
 
@@ -397,16 +484,21 @@ export default function AdminDashboard() {
   const [machineryFormData, setMachineryFormData] = useState({
     name: '',
     nameZh: '',
+    nameEn: '',
     category: 'Sàng Lọc & Phân Loại',
     categoryZh: '',
+    categoryEn: '',
     origin: 'Thụy Sĩ',
     originZh: '',
+    originEn: '',
     capacity: '2.5 tấn/giờ',
     capacityZh: '',
+    capacityEn: '',
     status: 'Hoạt động 100%',
     image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
     description: '',
-    descriptionZh: ''
+    descriptionZh: '',
+    descriptionEn: ''
   });
 
   useEffect(() => {
@@ -543,11 +635,17 @@ export default function AdminDashboard() {
         purchaseAction: prod.purchaseAction || (prod.shopeeUrl ? 'shopee' : 'contact'),
         shopeeUrl: prod.shopeeUrl || '',
         nameZh: prod.nameZh || '',
+        nameEn: prod.nameEn || '',
         badgeZh: prod.badgeZh || '',
+        badgeEn: prod.badgeEn || '',
         shortDescZh: prod.shortDescZh || '',
+        shortDescEn: prod.shortDescEn || '',
         fullDescZh: prod.fullDescZh || '',
+        fullDescEn: prod.fullDescEn || '',
         originZh: prod.originZh || '',
+        originEn: prod.originEn || '',
         applicationsZh: prod.applicationsZh || [],
+        applicationsEn: prod.applicationsEn || [],
         tasteProfile: prod.tasteProfile || { aroma: 85, body: 90, sweetness: 75, color: 'Nâu đỏ ruby' },
         applications: prod.applications || ['Trà sữa truyền thống'],
         packaging: prod.packaging || ['Gói 1kg'],
@@ -570,11 +668,17 @@ export default function AdminDashboard() {
         fullDesc: '',
         origin: 'Cao nguyên Bảo Lộc, Lâm Đồng',
         nameZh: '',
+        nameEn: '',
         badgeZh: '新品上市',
+        badgeEn: 'New Arrival',
         shortDescZh: '',
+        shortDescEn: '',
         fullDescZh: '',
+        fullDescEn: '',
         originZh: '越南林同省保祿高原產區',
+        originEn: 'Bao Loc Highlands, Lam Dong, Vietnam',
         applicationsZh: ['濃醇厚奶茶', '現萃鮮果茶'],
+        applicationsEn: ['Classic Milk Tea', 'Fresh Fruit Tea'],
         image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
         status: 'PUBLISHED',
         purchaseAction: 'contact',
@@ -700,13 +804,41 @@ export default function AdminDashboard() {
         badgeZh: zhResult.badgeZh || prev.badgeZh,
         shortDescZh: zhResult.shortDescZh || prev.shortDescZh,
         fullDescZh: zhResult.fullDescZh || prev.fullDescZh,
-        originZh: zhResult.originZh || prev.originZh
+        originZh: zhResult.originZh || prev.originZh,
+        applicationsZh: zhResult.applicationsZh || prev.applicationsZh
       }));
       showToast(`✨ Đã dịch hoàn tất sang Trung Phồn Thể: "${zhResult.nameZh}"!`, 'success');
     } catch (err) {
       showToast('Lỗi khi dịch sản phẩm: ' + err.message, 'error');
     } finally {
       setIsTranslatingProduct(false);
+    }
+  };
+
+  // Dịch thông tin sản phẩm sang Tiếng Anh (English) bằng Gemini AI
+  const handleTranslateProductEn = async () => {
+    if (!productFormData.name.trim() && !productFormData.shortDesc.trim()) {
+      showToast('Vui lòng nhập Tên sản phẩm hoặc Mô tả trước khi dịch!', 'warning');
+      return;
+    }
+    setIsTranslatingProductEn(true);
+    try {
+      showToast('Gemini AI đang dịch sản phẩm sang Tiếng Anh (English)...', 'info');
+      const enResult = await translateProductToEnglish(productFormData);
+      setProductFormData((prev) => ({
+        ...prev,
+        nameEn: enResult.nameEn || prev.nameEn,
+        badgeEn: enResult.badgeEn || prev.badgeEn,
+        shortDescEn: enResult.shortDescEn || prev.shortDescEn,
+        fullDescEn: enResult.fullDescEn || prev.fullDescEn,
+        originEn: enResult.originEn || prev.originEn,
+        applicationsEn: enResult.applicationsEn || prev.applicationsEn
+      }));
+      showToast(`✨ Đã dịch hoàn tất sang Tiếng Anh: "${enResult.nameEn}"!`, 'success');
+    } catch (err) {
+      showToast('Lỗi khi dịch sản phẩm sang Tiếng Anh: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingProductEn(false);
     }
   };
 
@@ -731,6 +863,30 @@ export default function AdminDashboard() {
       showToast('Lỗi khi dịch bài viết: ' + err.message, 'error');
     } finally {
       setIsTranslatingNews(false);
+    }
+  };
+
+  // Dịch bài viết sang Tiếng Anh (English) bằng Gemini AI
+  const handleTranslateNewsEn = async () => {
+    if (!newsFormData.title.trim()) {
+      showToast('Vui lòng nhập Tiêu đề bài viết trước khi dịch!', 'warning');
+      return;
+    }
+    setIsTranslatingNewsEn(true);
+    try {
+      showToast('Gemini AI đang dịch bài viết sang Tiếng Anh (English)...', 'info');
+      const enResult = await translateArticleToEnglish(newsFormData);
+      setNewsFormData((prev) => ({
+        ...prev,
+        titleEn: enResult.titleEn || prev.titleEn,
+        excerptEn: enResult.excerptEn || prev.excerptEn,
+        contentEn: enResult.contentEn || prev.contentEn
+      }));
+      showToast(`✨ Đã dịch hoàn tất bài viết sang Tiếng Anh: "${enResult.titleEn}"!`, 'success');
+    } catch (err) {
+      showToast('Lỗi khi dịch bài viết sang Tiếng Anh: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingNewsEn(false);
     }
   };
 
@@ -783,7 +939,23 @@ export default function AdminDashboard() {
         finalData.originZh = zh.originZh;
         finalData.applicationsZh = zh.applicationsZh;
       } catch (e) {
-        console.warn('Tự động dịch ngầm:', e);
+        console.warn('Tự động dịch Trung ngầm:', e);
+      }
+    }
+
+    // TỰ ĐỘNG DỊCH SANG TIẾNG ANH (ENGLISH) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
+    const isEnEmptyOrVietnamese = !finalData.nameEn || !finalData.nameEn.trim() || finalData.nameEn.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+    if (isEnEmptyOrVietnamese) {
+      try {
+        const en = await translateProductToEnglish(finalData);
+        finalData.nameEn = en.nameEn;
+        finalData.badgeEn = en.badgeEn || 'New Arrival';
+        finalData.shortDescEn = en.shortDescEn;
+        finalData.fullDescEn = en.fullDescEn;
+        finalData.originEn = en.originEn;
+        finalData.applicationsEn = en.applicationsEn;
+      } catch (e) {
+        console.warn('Tự động dịch En ngầm:', e);
       }
     }
 
@@ -799,7 +971,7 @@ export default function AdminDashboard() {
       );
       // Ghi trực tiếp lên Firebase Realtime Database
       await saveRtdbProduct(updatedProd);
-      showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
+      showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
     } else {
       // THÊM MỚI (CREATE)
       const newId = `product_${Date.now()}`;
@@ -811,7 +983,7 @@ export default function AdminDashboard() {
       setProducts((prev) => [newProd, ...prev]);
       // Ghi trực tiếp lên Firebase Realtime Database
       await saveRtdbProduct(newProd);
-      showToast(`Đã thêm mới [${finalData.name}] (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
+      showToast(`Đã thêm mới [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
     }
 
     setProductModalOpen(false);
@@ -858,11 +1030,13 @@ export default function AdminDashboard() {
       setNewsFormData({
         title: item.title || '',
         titleZh: item.titleZh || item.title_zh || '',
+        titleEn: item.titleEn || item.title_en || '',
         slug: item.slug || '',
         category: item.category || 'cong-thuc',
         categoryName: item.categoryName || 'Công Thức Pha Chế',
         excerpt: item.excerpt || '',
         excerptZh: item.excerptZh || item.excerpt_zh || '',
+        excerptEn: item.excerptEn || item.excerpt_en || '',
         author: item.author || 'CASA R&D Team',
         readTime: item.readTime || '4 phút',
         date: item.date || '05 Tháng 09, 2026',
@@ -870,6 +1044,7 @@ export default function AdminDashboard() {
         image: item.image || '',
         content: item.content || '',
         contentZh: item.contentZh || item.content_zh || '',
+        contentEn: item.contentEn || item.content_en || '',
         recipeBox: item.recipeBox || null,
         tags: item.tags || [],
         featuredHome: Boolean(item.featuredHome),
@@ -880,11 +1055,13 @@ export default function AdminDashboard() {
       setNewsFormData({
         title: '',
         titleZh: '',
+        titleEn: '',
         slug: `bai-viet-${Date.now()}`,
         category: 'cong-thuc',
         categoryName: 'Công Thức Pha Chế',
         excerpt: '',
         excerptZh: '',
+        excerptEn: '',
         author: userProfile?.displayName || 'CASA R&D Team',
         readTime: '4 phút',
         date: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' }),
@@ -892,6 +1069,7 @@ export default function AdminDashboard() {
         image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80',
         content: '',
         contentZh: '',
+        contentEn: '',
         recipeBox: null,
         tags: ['CASA Tea', 'F&B 2026'],
         featuredHome: false,
@@ -963,6 +1141,18 @@ export default function AdminDashboard() {
         finalData.contentZh = zh.contentZh;
       } catch (e) {
         console.warn('Tự động dịch ngầm bài viết:', e);
+      }
+    }
+
+    // TỰ ĐỘNG DỊCH BÀI VIẾT SANG TIẾNG ANH (ENGLISH) NẾU CHƯA CÓ
+    if (!finalData.titleEn || !finalData.titleEn.trim()) {
+      try {
+        const en = await translateArticleToEnglish(finalData);
+        finalData.titleEn = en.titleEn;
+        finalData.excerptEn = en.excerptEn;
+        finalData.contentEn = en.contentEn;
+      } catch (e) {
+        console.warn('Tự động dịch ngầm bài viết sang tiếng Anh:', e);
       }
     }
 
@@ -1076,13 +1266,15 @@ export default function AdminDashboard() {
       setFaqFormData({
         question: item.question || '',
         questionZh: item.questionZh || item.question_zh || '',
+        questionEn: item.questionEn || item.question_en || '',
         answer: item.answer || '',
         answerZh: item.answerZh || item.answer_zh || '',
+        answerEn: item.answerEn || item.answer_en || '',
         category: item.category || 'san-pham'
       });
     } else {
       setEditingFaq(null);
-      setFaqFormData({ question: '', questionZh: '', answer: '', answerZh: '', category: 'san-pham' });
+      setFaqFormData({ question: '', questionZh: '', questionEn: '', answer: '', answerZh: '', answerEn: '', category: 'san-pham' });
     }
     setFaqModalOpen(true);
   };
@@ -1109,6 +1301,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTranslateFaqEn = async () => {
+    if (!faqFormData.question.trim() && !faqFormData.answer.trim()) {
+      showToast('Vui lòng nhập câu hỏi hoặc câu trả lời trước khi dịch!', 'error');
+      return;
+    }
+    try {
+      setIsTranslatingFaqEn(true);
+      showToast('🤖 AI Gemini đang dịch câu hỏi FAQ sang Tiếng Anh...', 'info');
+      const res = await translateFaqToEnglish(faqFormData);
+      setFaqFormData((prev) => ({
+        ...prev,
+        questionEn: res.questionEn || prev.questionEn,
+        answerEn: res.answerEn || prev.answerEn
+      }));
+      showToast('Đã dịch câu hỏi FAQ sang Tiếng Anh thành công!', 'success');
+    } catch (err) {
+      showToast('Lỗi khi dịch FAQ sang Tiếng Anh: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingFaqEn(false);
+    }
+  };
+
   const handleSaveFaq = async (e) => {
     e.preventDefault();
     if (!faqFormData.question.trim() || !faqFormData.answer.trim()) {
@@ -1126,9 +1340,23 @@ export default function AdminDashboard() {
         finalData.questionZh = zh.questionZh || finalData.questionZh || '';
         finalData.answerZh = zh.answerZh || finalData.answerZh || '';
       } catch (err) {
-        console.warn('Lỗi dịch ngầm FAQ:', err);
+        console.warn('Lỗi dịch ngầm FAQ sang tiếng Trung:', err);
       } finally {
         setIsTranslatingFaq(false);
+      }
+    }
+
+    // Tự động dịch ngầm sang tiếng Anh nếu admin chưa điền
+    if (!finalData.questionEn?.trim() || !finalData.answerEn?.trim()) {
+      try {
+        setIsTranslatingFaqEn(true);
+        const en = await translateFaqToEnglish(finalData);
+        finalData.questionEn = en.questionEn || finalData.questionEn || '';
+        finalData.answerEn = en.answerEn || finalData.answerEn || '';
+      } catch (err) {
+        console.warn('Lỗi dịch ngầm FAQ sang Tiếng Anh:', err);
+      } finally {
+        setIsTranslatingFaqEn(false);
       }
     }
 
@@ -1138,12 +1366,12 @@ export default function AdminDashboard() {
         prev.map((f) => (f.id === editingFaq.id ? updated : f))
       );
       await saveRtdbFaq(updated);
-      showToast('Đã cập nhật câu hỏi FAQ song ngữ lên Realtime Database!', 'success');
+      showToast('Đã cập nhật câu hỏi FAQ đa ngôn ngữ lên Realtime Database!', 'success');
     } else {
       const newFaq = { id: `faq_${Date.now()}`, ...finalData };
       setFaqs((prev) => [newFaq, ...prev]);
       await saveRtdbFaq(newFaq);
-      showToast('Đã thêm câu hỏi FAQ mới song ngữ lên Realtime Database!', 'success');
+      showToast('Đã thêm câu hỏi FAQ mới đa ngôn ngữ lên Realtime Database!', 'success');
     }
     setFaqModalOpen(false);
   };
@@ -1165,32 +1393,42 @@ export default function AdminDashboard() {
       setMachineryFormData({
         name: item.name || '',
         nameZh: item.nameZh || item.name_zh || '',
+        nameEn: item.nameEn || item.name_en || '',
         category: item.category || 'Sàng Lọc & Phân Loại',
         categoryZh: item.categoryZh || item.category_zh || '',
+        categoryEn: item.categoryEn || item.category_en || '',
         origin: item.origin || 'CHLB Đức',
         originZh: item.originZh || item.origin_zh || '',
+        originEn: item.originEn || item.origin_en || '',
         capacity: item.capacity || '3 tấn/giờ',
         capacityZh: item.capacityZh || item.capacity_zh || '',
+        capacityEn: item.capacityEn || item.capacity_en || '',
         status: item.status || 'Hoạt động 100%',
         image: item.image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
         description: item.description || item.desc || '',
-        descriptionZh: item.descriptionZh || item.description_zh || item.descZh || ''
+        descriptionZh: item.descriptionZh || item.description_zh || item.descZh || '',
+        descriptionEn: item.descriptionEn || item.description_en || item.descEn || ''
       });
     } else {
       setEditingMachinery(null);
       setMachineryFormData({
         name: '',
         nameZh: '',
+        nameEn: '',
         category: 'Sàng Lọc & Phân Loại',
         categoryZh: '',
+        categoryEn: '',
         origin: 'CHLB Đức',
         originZh: '',
+        originEn: '',
         capacity: '3 tấn/giờ',
         capacityZh: '',
+        capacityEn: '',
         status: 'Hoạt động 100%',
         image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
         description: '',
-        descriptionZh: ''
+        descriptionZh: '',
+        descriptionEn: ''
       });
     }
     setMachineryModalOpen(true);
@@ -1221,6 +1459,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTranslateMachineryEn = async () => {
+    if (!machineryFormData.name.trim()) {
+      showToast('Vui lòng nhập tên thiết bị trước khi dịch!', 'error');
+      return;
+    }
+    try {
+      setIsTranslatingMachineryEn(true);
+      showToast('🤖 AI Gemini đang dịch thiết bị máy móc sang Tiếng Anh...', 'info');
+      const res = await translateMachineryToEnglish(machineryFormData);
+      setMachineryFormData((prev) => ({
+        ...prev,
+        nameEn: res.nameEn,
+        categoryEn: res.categoryEn,
+        originEn: res.originEn,
+        capacityEn: res.capacityEn,
+        descriptionEn: res.descriptionEn
+      }));
+      showToast('Đã dịch thiết bị máy móc sang Tiếng Anh thành công!', 'success');
+    } catch (err) {
+      showToast('Lỗi khi dịch máy móc sang Tiếng Anh: ' + err.message, 'error');
+    } finally {
+      setIsTranslatingMachineryEn(false);
+    }
+  };
+
   const handleSaveMachinery = async (e) => {
     e.preventDefault();
     if (!machineryFormData.name.trim()) {
@@ -1241,9 +1504,26 @@ export default function AdminDashboard() {
         finalData.capacityZh = zh.capacityZh || finalData.capacityZh || '';
         finalData.descriptionZh = zh.descriptionZh || finalData.descriptionZh || '';
       } catch (err) {
-        console.warn('Lỗi dịch ngầm máy móc:', err);
+        console.warn('Lỗi dịch ngầm máy móc sang tiếng Trung:', err);
       } finally {
         setIsTranslatingMachinery(false);
+      }
+    }
+
+    // Tự động dịch ngầm sang tiếng Anh nếu admin chưa điền
+    if (!finalData.nameEn?.trim()) {
+      try {
+        setIsTranslatingMachineryEn(true);
+        const en = await translateMachineryToEnglish(finalData);
+        finalData.nameEn = en.nameEn || finalData.nameEn || '';
+        finalData.categoryEn = en.categoryEn || finalData.categoryEn || '';
+        finalData.originEn = en.originEn || finalData.originEn || '';
+        finalData.capacityEn = en.capacityEn || finalData.capacityEn || '';
+        finalData.descriptionEn = en.descriptionEn || finalData.descriptionEn || '';
+      } catch (err) {
+        console.warn('Lỗi dịch ngầm máy móc sang Tiếng Anh:', err);
+      } finally {
+        setIsTranslatingMachineryEn(false);
       }
     }
 
@@ -1253,12 +1533,12 @@ export default function AdminDashboard() {
         prev.map((m) => (m.id === editingMachinery.id ? updated : m))
       );
       await saveRtdbMachinery(updated);
-      showToast('Đã cập nhật máy móc song ngữ lên Realtime Database!', 'success');
+      showToast('Đã cập nhật máy móc đa ngôn ngữ lên Realtime Database!', 'success');
     } else {
       const newM = { id: `mach_${Date.now()}`, ...finalData };
       setMachinery((prev) => [newM, ...prev]);
       await saveRtdbMachinery(newM);
-      showToast('Đã thêm thiết bị mới song ngữ lên Realtime Database!', 'success');
+      showToast('Đã thêm thiết bị mới đa ngôn ngữ lên Realtime Database!', 'success');
     }
     setMachineryModalOpen(false);
   };
@@ -2586,6 +2866,31 @@ export default function AdminDashboard() {
                   />
                 </div>
 
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-gray-700 flex items-center gap-1.5">
+                      <span>Tên Tiếng Anh (English)</span>
+                      <span className="text-xs">🇬🇧</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleTranslateCategoryEn}
+                      disabled={isTranslatingCategoryEn || !categoryFormData.name}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200 transition-all disabled:opacity-50"
+                    >
+                      <Sparkles className="w-3 h-3 text-blue-600" />
+                      <span>{isTranslatingCategoryEn ? 'Đang dịch AI...' : 'AI Dịch Tiếng Anh'}</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: Premium Assam & Classic Black Tea"
+                    value={categoryFormData.nameEn || ''}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, nameEn: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">
@@ -2646,6 +2951,17 @@ export default function AdminDashboard() {
                     placeholder="類別詳細應用說明..."
                     value={categoryFormData.descZh}
                     onChange={(e) => setCategoryFormData({ ...categoryFormData, descZh: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">Mô Tả Danh Mục (Tiếng Anh 🇬🇧)</label>
+                  <textarea
+                    rows="2"
+                    placeholder="Summary of product category applications in English..."
+                    value={categoryFormData.descEn || ''}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, descEn: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-tea-emerald/30 outline-none"
                   />
                 </div>
@@ -2914,6 +3230,17 @@ export default function AdminDashboard() {
                         <Sparkles className={`w-3.5 h-3.5 text-purple-200 ${isTranslatingProduct ? 'animate-spin' : ''}`} />
                         <span>{isTranslatingProduct ? 'Đang dịch sang 繁中...' : '🇹🇼 AI Dịch Sang Trung Phồn Thể'}</span>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={handleTranslateProductEn}
+                        disabled={isTranslatingProductEn || isDesigningProduct}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                        title="Dịch toàn bộ thông tin sản phẩm này sang Tiếng Anh (English)"
+                      >
+                        <Sparkles className={`w-3.5 h-3.5 text-blue-200 ${isTranslatingProductEn ? 'animate-spin' : ''}`} />
+                        <span>{isTranslatingProductEn ? 'Đang dịch sang EN...' : '🇬🇧 AI Dịch Sang Tiếng Anh'}</span>
+                      </button>
                     </div>
                   </div>
 
@@ -3013,9 +3340,9 @@ export default function AdminDashboard() {
                           <div className="font-bold flex items-center gap-1.5">
                             <span>📞 Liên hệ tư vấn</span>
                           </div>
-                          <span className="text-[11px] text-gray-500 font-normal block mt-0.5">
-                            Khách bấm sẽ nhảy trực tiếp sang trang Liên hệ (/contact)
-                          </span>
+                          <p className="text-gray-500 text-[11px] mt-0.5">
+                            Dành cho khách chuỗi, quán cafe, đại lý mua sỉ số lượng lớn
+                          </p>
                         </div>
                       </label>
 
@@ -3035,35 +3362,29 @@ export default function AdminDashboard() {
                           className="mt-0.5 text-[#EE4D2D] focus:ring-[#EE4D2D]"
                         />
                         <div className="text-xs">
-                          <div className="font-bold flex items-center gap-1.5 text-gray-900">
-                            <span className="text-[#EE4D2D]">🛍️ Mua trên Shopee</span>
+                          <div className="font-bold flex items-center gap-1.5">
+                            <span>🛒 Bán lẻ qua Shopee Mall</span>
                           </div>
-                          <span className="text-[11px] text-gray-500 font-normal block mt-0.5">
-                            Gắn đường link dẫn tới gian hàng Shopee của bạn
-                          </span>
+                          <p className="text-gray-500 text-[11px] mt-0.5">
+                            Khách bấm nút sẽ dẫn thẳng sang gian hàng Shopee chính hãng
+                          </p>
                         </div>
                       </label>
                     </div>
 
-                    {/* Ô nhập đường link Shopee khi chọn "Mua trên Shopee" */}
                     {productFormData.purchaseAction === 'shopee' && (
                       <div className="pt-2">
-                        <label className="block font-bold text-gray-700 mb-1 text-xs">
-                          Đường Link Sản Phẩm Shopee <span className="text-[#EE4D2D]">*</span>
+                        <label className="block text-xs font-bold text-[#EE4D2D] mb-1">
+                          Đường Dẫn Shopee (Link Sản Phẩm) *
                         </label>
-                        <div className="relative">
-                          <input
-                            type="url"
-                            placeholder="https://shopee.vn/ten-san-pham-i.123456789.987654321..."
-                            value={productFormData.shopeeUrl || ''}
-                            onChange={(e) => setProductFormData({ ...productFormData, shopeeUrl: e.target.value })}
-                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#EE4D2D]/30 focus:border-[#EE4D2D] outline-none text-xs"
-                          />
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm">🛍️</span>
-                        </div>
-                        <p className="text-[11px] text-gray-500 mt-1">
-                          Nút "Mua trên Shopee" sẽ xuất hiện trên thẻ sản phẩm và trang chi tiết, dẫn khách hàng trực tiếp sang Shopee.
-                        </p>
+                        <input
+                          type="url"
+                          required
+                          placeholder="https://shopee.vn/casa-tea-..."
+                          value={productFormData.shopeeUrl || ''}
+                          onChange={(e) => setProductFormData({ ...productFormData, shopeeUrl: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-[#EE4D2D]/30 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#EE4D2D]/30 font-mono"
+                        />
                       </div>
                     )}
                   </div>
@@ -3217,6 +3538,89 @@ export default function AdminDashboard() {
                           value={productFormData.originZh || ''}
                           onChange={(e) => setProductFormData({ ...productFormData, originZh: e.target.value })}
                           className="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-400/30"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BẢN DỊCH TIẾNG ANH (ENGLISH) */}
+                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-3">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🇬🇧</span>
+                        <span className="font-bold text-blue-900 text-xs">
+                          Bản Dịch Tiếng Anh (English)
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleTranslateProductEn}
+                          disabled={isTranslatingProductEn}
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                          title="Dịch toàn bộ thông tin sản phẩm sang Tiếng Anh chuẩn B2B F&B"
+                        >
+                          <Sparkles className={`w-3.5 h-3.5 text-blue-200 ${isTranslatingProductEn ? 'animate-spin' : ''}`} />
+                          <span>{isTranslatingProductEn ? 'Đang dịch AI...' : '✨ Dịch Sang Tiếng Anh Ngay'}</span>
+                        </button>
+                        <span className="text-[10px] text-blue-600 font-medium">
+                          (Tự động dịch khi Lưu nếu để trống)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Tên sản phẩm (English)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Premium Sea Salt Macchiato Cream Powder CASA"
+                          value={productFormData.nameEn || ''}
+                          onChange={(e) => setProductFormData({ ...productFormData, nameEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Huy hiệu nổi bật (English)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Best Seller / New Arrival"
+                          value={productFormData.badgeEn || ''}
+                          onChange={(e) => setProductFormData({ ...productFormData, badgeEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Mô tả ngắn (English)
+                        </label>
+                        <textarea
+                          rows={2}
+                          placeholder="Short product description in English for catalog & overview..."
+                          value={productFormData.shortDescEn || ''}
+                          onChange={(e) => setProductFormData({ ...productFormData, shortDescEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none leading-relaxed focus:ring-2 focus:ring-blue-400/30"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Vùng trồng / Xuất xứ (English)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Bao Loc Highlands, Lam Dong, Vietnam..."
+                          value={productFormData.originEn || ''}
+                          onChange={(e) => setProductFormData({ ...productFormData, originEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-400/30"
                         />
                       </div>
                     </div>
@@ -3497,6 +3901,17 @@ export default function AdminDashboard() {
                             <Sparkles className={`w-3.5 h-3.5 text-purple-200 ${isTranslatingNews ? 'animate-spin' : ''}`} />
                             <span>{isTranslatingNews ? 'Đang dịch sang 繁中...' : '🇹🇼 AI Dịch Sang 繁中'}</span>
                           </button>
+
+                          <button
+                            type="button"
+                            onClick={handleTranslateNewsEn}
+                            disabled={isTranslatingNewsEn || isDesigningNews}
+                            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-95 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer disabled:opacity-50"
+                            title="Dịch bài viết này sang Tiếng Anh (English)"
+                          >
+                            <Sparkles className={`w-3.5 h-3.5 text-blue-200 ${isTranslatingNewsEn ? 'animate-spin' : ''}`} />
+                            <span>{isTranslatingNewsEn ? 'Đang dịch sang EN...' : '🇬🇧 AI Dịch Sang EN'}</span>
+                          </button>
                         </div>
                       </div>
 
@@ -3577,6 +3992,47 @@ export default function AdminDashboard() {
                           value={newsFormData.excerptZh || ''}
                           onChange={(e) => setNewsFormData({ ...newsFormData, excerptZh: e.target.value })}
                           className="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white text-gray-900 placeholder-gray-400 outline-none leading-relaxed focus:ring-2 focus:ring-purple-400/30"
+                        />
+                      </div>
+                    </div>
+
+                    {/* BẢN DỊCH BÀI VIẾT TIẾNG ANH (ENGLISH) */}
+                    <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🇬🇧</span>
+                          <span className="font-bold text-blue-900 text-xs">
+                            Bản Dịch Bài Viết Tiếng Anh (English)
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-blue-600 font-medium">
+                          Tự động dịch bằng AI khi Lưu nếu để trống
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Tiêu đề bài viết (English)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 2026 Roasted Oolong Salted Cheese Foam SOP..."
+                          value={newsFormData.titleEn || ''}
+                          onChange={(e) => setNewsFormData({ ...newsFormData, titleEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                          Tóm tắt bài viết (English)
+                        </label>
+                        <textarea
+                          rows={2}
+                          placeholder="Article summary in English..."
+                          value={newsFormData.excerptEn || ''}
+                          onChange={(e) => setNewsFormData({ ...newsFormData, excerptEn: e.target.value })}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-gray-400 outline-none leading-relaxed focus:ring-2 focus:ring-blue-400/30"
                         />
                       </div>
                     </div>
@@ -4019,6 +4475,20 @@ export default function AdminDashboard() {
                     )}
                     <span>{isTranslatingFaq ? 'AI Đang Dịch...' : 'AI Dịch Sang 繁中'}</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={handleTranslateFaqEn}
+                    disabled={isTranslatingFaqEn}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-[11px] font-bold transition-all border border-blue-200 shadow-sm disabled:opacity-50"
+                    title="Dùng AI dịch câu hỏi và câu trả lời sang Tiếng Anh"
+                  >
+                    {isTranslatingFaqEn ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <span>🇬🇧</span>
+                    )}
+                    <span>{isTranslatingFaqEn ? 'AI Đang Dịch...' : 'AI Dịch Sang EN'}</span>
+                  </button>
                   <button onClick={() => setFaqModalOpen(false)}>
                     <X className="w-5 h-5 text-gray-400" />
                   </button>
@@ -4065,6 +4535,19 @@ export default function AdminDashboard() {
                       className="w-full px-3 py-2 rounded-xl border border-purple-200 bg-white text-gray-900 placeholder-purple-400 outline-none focus:ring-2 focus:ring-purple-400/30"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-blue-800 mb-1 flex items-center gap-1">
+                      <span>Câu Hỏi (English)</span>
+                      <span className="text-[10px] text-blue-600 font-normal">(Tự động dịch nếu trống)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. What is the minimum order quantity (MOQ) for bulk orders?"
+                      value={faqFormData.questionEn || ''}
+                      onChange={(e) => setFaqFormData({ ...faqFormData, questionEn: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -4090,6 +4573,20 @@ export default function AdminDashboard() {
                     value={faqFormData.answerZh || ''}
                     onChange={(e) => setFaqFormData({ ...faqFormData, answerZh: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-purple-200 bg-white text-gray-900 placeholder-purple-400 outline-none focus:ring-2 focus:ring-purple-400/30"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-blue-800 mb-1 flex items-center gap-1">
+                    <span>Câu Trả Lời (English)</span>
+                    <span className="text-[10px] text-blue-600 font-normal">(Tự động dịch nếu trống)</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Detailed answer content in English..."
+                    value={faqFormData.answerEn || ''}
+                    onChange={(e) => setFaqFormData({ ...faqFormData, answerEn: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
                   />
                 </div>
 
@@ -4240,6 +4737,20 @@ export default function AdminDashboard() {
                     )}
                     <span>{isTranslatingMachinery ? 'AI Đang Dịch...' : 'AI Dịch Sang 繁中'}</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={handleTranslateMachineryEn}
+                    disabled={isTranslatingMachineryEn}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-[11px] font-bold transition-all border border-blue-200 shadow-sm disabled:opacity-50"
+                    title="Dùng AI dịch thông tin thiết bị sang Tiếng Anh"
+                  >
+                    {isTranslatingMachineryEn ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <span>🇬🇧</span>
+                    )}
+                    <span>{isTranslatingMachineryEn ? 'AI Đang Dịch...' : 'AI Dịch Sang EN'}</span>
+                  </button>
                   <button onClick={() => setMachineryModalOpen(false)}>
                     <X className="w-5 h-5 text-gray-400" />
                   </button>
@@ -4272,9 +4783,22 @@ export default function AdminDashboard() {
                       className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-white text-gray-900 placeholder-amber-400 outline-none focus:ring-2 focus:ring-amber-400/30"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-blue-800 mb-1 flex items-center gap-1">
+                      <span>Tên Thiết Bị (English)</span>
+                      <span className="text-[10px] text-blue-600 font-normal">(Tự động dịch nếu trống)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Sortex Optical Color Sorter Machine"
+                      value={machineryFormData.nameEn || ''}
+                      onChange={(e) => setMachineryFormData({ ...machineryFormData, nameEn: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">Xuất Xứ (Tiếng Việt)</label>
                     <input
@@ -4295,9 +4819,19 @@ export default function AdminDashboard() {
                       className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-white text-gray-900 placeholder-amber-400 outline-none focus:ring-2 focus:ring-amber-400/30"
                     />
                   </div>
+                  <div>
+                    <label className="block font-bold text-blue-800 mb-1">Xuất Xứ (English)</label>
+                    <input
+                      type="text"
+                      placeholder="Switzerland, Germany..."
+                      value={machineryFormData.originEn || ''}
+                      onChange={(e) => setMachineryFormData({ ...machineryFormData, originEn: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">Công Suất (Tiếng Việt)</label>
                     <input
@@ -4318,13 +4852,23 @@ export default function AdminDashboard() {
                       className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-white text-gray-900 placeholder-amber-400 outline-none focus:ring-2 focus:ring-amber-400/30"
                     />
                   </div>
+                  <div>
+                    <label className="block font-bold text-blue-800 mb-1">Công Suất (English)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 3.5 tons/hour"
+                      value={machineryFormData.capacityEn || ''}
+                      onChange={(e) => setMachineryFormData({ ...machineryFormData, capacityEn: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-3">
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">Mô Tả / Công Nghệ (Tiếng Việt)</label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       placeholder="Mô tả nguyên lý hoạt động, cấp độ công nghệ..."
                       value={machineryFormData.description}
                       onChange={(e) => setMachineryFormData({ ...machineryFormData, description: e.target.value })}
@@ -4337,11 +4881,24 @@ export default function AdminDashboard() {
                       <span className="text-[10px] text-amber-600 font-normal">(Tự động dịch nếu trống)</span>
                     </label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       placeholder="設備詳細運作與技術優勢（繁體中文）..."
                       value={machineryFormData.descriptionZh || ''}
                       onChange={(e) => setMachineryFormData({ ...machineryFormData, descriptionZh: e.target.value })}
                       className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-white text-gray-900 placeholder-amber-400 outline-none focus:ring-2 focus:ring-amber-400/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-blue-800 mb-1 flex items-center gap-1">
+                      <span>Mô Tả (English)</span>
+                      <span className="text-[10px] text-blue-600 font-normal">(Tự động dịch nếu trống)</span>
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="Equipment operation and technical specifications in English..."
+                      value={machineryFormData.descriptionEn || ''}
+                      onChange={(e) => setMachineryFormData({ ...machineryFormData, descriptionEn: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-gray-900 placeholder-blue-400 outline-none focus:ring-2 focus:ring-blue-400/30"
                     />
                   </div>
                 </div>
