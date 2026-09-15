@@ -67,7 +67,7 @@ export const CASA_CERTIFICATES_DATA = [
     badge: 'GMP Certified',
     badgeZh: 'GMP 良好生產規範',
     badgeEn: 'GMP Certified',
-    titleVi: 'Thực Hành Sản Xuất Tốt (GMP)',
+    titleVi: 'Thực Hành Sản Xuất Tốt (GMP)', 
     titleZh: 'GMP 良好生產規範認證 (Good Manufacturing Practice)',
     titleEn: 'Good Manufacturing Practice (GMP)',
     orgVi: 'Tổ chức G-CERTI System Service',

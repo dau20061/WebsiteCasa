@@ -45,7 +45,7 @@ const HERO_SLIDES = [
     badgeZh: 'CASA TEA & TEA BAGS • 頂級原茶系列',
     badgeEn: 'CASA TEA & PYRAMID TEA BAGS • PREMIUM QUALITY',
     titleVi: 'Cốt Trà Nguyên Lá & Túi Lọc Pyramid Tam Giác',
-    titleZh: '原葉茶湯與三角立體茶包工藝',
+      titleZh: '原葉茶湯與三角立體茶包工藝',
     titleEn: 'Loose-Leaf Tea & Triangle Pyramid Tea Bag Craft',
     tagVi: '100% Nguyên Liệu Tự Nhiên',
     tagZh: '100% 精選茶葉原料',
