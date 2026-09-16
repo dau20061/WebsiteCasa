@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:rules": "node tests/security-rules-validation.test.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -127,27 +127,49 @@ export default function ProductDetail() {
       ? (currentCategoryObj?.nameZh || t(`cat_${(product.category || '').replace(/-/g, '_')}`, currentCategoryObj?.name || product.categoryName || 'Trà & Nguyên Liệu'))
       : (currentCategoryObj?.name || product.categoryName || 'Trà & Nguyên Liệu'));
 
+  const isValidText = (str) => {
+    if (!str || typeof str !== 'string' || !str.trim()) return false;
+    const upper = str.toUpperCase();
+    return !upper.includes('QUERY LENGTH LIMIT') &&
+           !upper.includes('MYMEMORY WARNING') &&
+           !upper.includes('MAX ALLOWED QUERY') &&
+           !upper.includes('TRANSLATION LIMIT') &&
+           !upper.includes('INVALID EMAIL');
+  };
+
   const categoryName = displayCategoryName;
   const sku = product.sku || `CS-TEA-${product.id?.slice(-4) || '01'}`;
+
+  const safeOriginEn = (isValidText(product.originEn) && product.originEn) || (isValidText(product.origin_en) && product.origin_en);
   const origin = isEnglish
-    ? ((product.originEn || product.origin_en) || product.origin || 'Selected Bao Loc & Moc Chau Highlands')
+    ? (safeOriginEn || product.origin || 'Selected Bao Loc & Moc Chau Highlands')
     : ((isChinese && (product.originZh || product.origin_zh)) || product.origin || (isChinese ? '精選保祿與木州高山茶園產區' : 'Vùng cao nguyên Bảo Lộc & Mộc Châu tuyển chọn'));
+
   const shelfLife = isEnglish ? '24 months from manufacture date' : (isChinese ? '24 個月' : (product.shelfLife || '24 tháng kể từ ngày sản xuất'));
+
+  const safeStorageEn = (isValidText(product.storageEn) && product.storageEn) || (isValidText(product.storage_en) && product.storage_en);
   const storageText = isEnglish
-    ? ((product.storageEn || product.storage_en) || product.storage || 'Store in a cool, dry place (below 25°C), away from direct sunlight.')
+    ? (safeStorageEn || product.storage || 'Store in a cool, dry place (below 25°C), away from direct sunlight.')
     : ((isChinese && (product.storageZh || product.storage_zh)) || product.storage || (isChinese ? '存放於陰涼乾燥處（25°C以下），避免陽光直射。' : 'Bảo quản nơi khô ráo, thoáng mát (dưới 25°C), tránh ánh nắng trực tiếp.'));
+
+  const safeShortDescEn = (isValidText(product.shortDescEn) && product.shortDescEn) || (isValidText(product.shortDesc_en) && product.shortDesc_en);
   const shortDesc = isEnglish
-    ? (product.shortDescEn || product.shortDesc_en || product.shortDesc || '')
+    ? (safeShortDescEn || product.shortDesc || '')
     : ((isChinese && (product.shortDescZh || product.shortDesc_zh)) || product.shortDesc || '');
+
+  const safeFullDescEn = (isValidText(product.fullDescEn) && product.fullDescEn) || (isValidText(product.fullDesc_en) && product.fullDesc_en);
   const fullDesc = isEnglish
-    ? ((product.fullDescEn || product.fullDesc_en) || product.fullDesc || shortDesc || 'Premium commercial beverage ingredient processed with modern manufacturing technology, ensuring consistent flavor all year round for F&B chains.')
+    ? (safeFullDescEn || safeShortDescEn || product.fullDesc || shortDesc || 'Premium commercial beverage ingredient processed with modern manufacturing technology, ensuring consistent flavor all year round for F&B chains.')
     : ((isChinese && (product.fullDescZh || product.fullDesc_zh)) || product.fullDesc || shortDesc || (isChinese ? '特級商用茶葉原料，經現代化科技製茶工藝精心烘焙，確保連鎖餐飲四季風味穩定一致。' : 'Dòng trà nguyên liệu cao cấp được tinh tuyển và chế biến theo quy trình công nghệ hiện đại, đảm bảo độ ổn định hương vị tối đa cho các chuỗi F&B.'));
+
   const displayName = isEnglish
-    ? (product.nameEn || product.name_en || product.name)
+    ? ((isValidText(product.nameEn) && product.nameEn) || (isValidText(product.name_en) && product.name_en) || product.name)
     : ((isChinese && (product.nameZh || product.name_zh)) || product.name);
+
   const displayBadge = isEnglish
-    ? (product.badgeEn || product.badge_en || product.badge)
+    ? ((isValidText(product.badgeEn) && product.badgeEn) || (isValidText(product.badge_en) && product.badge_en) || product.badge)
     : ((isChinese && (product.badgeZh || product.badge_zh)) || product.badge);
+
   const image = product.image || 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1000&q=80';
 
   const tasteProfile = {
@@ -157,8 +179,12 @@ export default function ProductDetail() {
     color: product.tasteProfile?.color || (isEnglish ? 'Ruby Red with Amber Tint' : (isChinese ? '琥珀紅寶石' : 'Đỏ Ruby Ánh Nâu'))
   };
 
+  const safeApplicationsEn = Array.isArray(product.applicationsEn) && product.applicationsEn.length > 0
+    ? product.applicationsEn.filter(app => isValidText(app))
+    : null;
+
   const applications = Array.isArray(product.applications) && product.applications.length > 0
-    ? (isEnglish && product.applicationsEn ? product.applicationsEn : (isChinese && product.applicationsZh ? product.applicationsZh : product.applications))
+    ? (isEnglish && safeApplicationsEn && safeApplicationsEn.length > 0 ? safeApplicationsEn : (isChinese && product.applicationsZh ? product.applicationsZh : product.applications))
     : (isEnglish
         ? ['Signature Rich Milk Tea Base', 'Cheese Foam Macchiato Tea', 'Slow Cold Brew Tea']
         : (isChinese

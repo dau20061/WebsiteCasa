@@ -87,7 +87,7 @@ export default function Products() {
       (product.nameZh && product.nameZh.toLowerCase().includes(q)) ||
       (product.sku && product.sku.toLowerCase().includes(q)) ||
       (product.shortDesc && product.shortDesc.toLowerCase().includes(q)) ||
-      (product.shortDescEn && product.shortDescEn.toLowerCase().includes(q)) ||
+      (product.shortDescEn && !product.shortDescEn.includes('QUERY LENGTH LIMIT') && product.shortDescEn.toLowerCase().includes(q)) ||
       (product.shortDescZh && product.shortDescZh.toLowerCase().includes(q)) ||
       product.tags?.some((t) => t.toLowerCase().includes(q));
 

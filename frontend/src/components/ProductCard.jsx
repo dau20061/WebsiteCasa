@@ -8,16 +8,26 @@ export default function ProductCard({ product, onRequestSample }) {
   const { t, isChinese, isEnglish } = useLanguage();
   const { id, name, sku, categoryName, badge, shortDesc, image, tasteProfile, tags } = product;
 
+  const isValidText = (str) => {
+    if (!str || typeof str !== 'string' || !str.trim()) return false;
+    const upper = str.toUpperCase();
+    return !upper.includes('QUERY LENGTH LIMIT') &&
+           !upper.includes('MYMEMORY WARNING') &&
+           !upper.includes('MAX ALLOWED QUERY') &&
+           !upper.includes('TRANSLATION LIMIT') &&
+           !upper.includes('INVALID EMAIL');
+  };
+
   const displayName = isEnglish
-    ? (product.nameEn || product.name_en || name)
+    ? ((isValidText(product.nameEn) && product.nameEn) || (isValidText(product.name_en) && product.name_en) || name)
     : (isChinese ? (product.nameZh || product.name_zh || name) : name);
 
   const displayShortDesc = isEnglish
-    ? (product.shortDescEn || product.shortDesc_en || shortDesc)
+    ? ((isValidText(product.shortDescEn) && product.shortDescEn) || (isValidText(product.shortDesc_en) && product.shortDesc_en) || shortDesc)
     : (isChinese ? (product.shortDescZh || product.shortDesc_zh || shortDesc) : shortDesc);
 
   const displayBadge = isEnglish
-    ? (product.badgeEn || product.badge_en || badge)
+    ? ((isValidText(product.badgeEn) && product.badgeEn) || (isValidText(product.badge_en) && product.badge_en) || badge)
     : (isChinese ? (product.badgeZh || product.badge_zh || badge) : badge);
 
   const displayCategoryName = (isChinese || isEnglish)
@@ -135,7 +145,7 @@ export default function ProductCard({ product, onRequestSample }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2">
+        <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2">
           {/* Row 1: Primary Action Button */}
           {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
             <a

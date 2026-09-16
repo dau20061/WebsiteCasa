@@ -819,6 +819,103 @@ export const GLOBAL_FB_REFINEMENTS_EN = [
   [/\blam dong\b/gi, 'Lam Dong Province, Vietnam']
 ];
 
+export function isInvalidEnTranslation(str) {
+  if (!str || typeof str !== 'string' || !str.trim()) return true;
+  const upper = str.toUpperCase();
+  return (
+    upper.includes('QUERY LENGTH LIMIT') ||
+    upper.includes('MYMEMORY WARNING') ||
+    upper.includes('MAX ALLOWED QUERY') ||
+    upper.includes('TRANSLATION LIMIT') ||
+    upper.includes('INVALID EMAIL') ||
+    upper.includes('QUOTA EXCEEDED') ||
+    upper.includes('RESPONSE STATUS') ||
+    upper.includes('LIMIT EXCEEDED') ||
+    upper.includes('TOO MANY REQUESTS') ||
+    upper.includes('PLEASE TRY AGAIN') ||
+    upper.includes('API KEY')
+  );
+}
+
+function chunkText(text, maxLen = 380) {
+  if (!text || text.length <= maxLen) return [text];
+  const chunks = [];
+  const sentences = text.split(/(?<=[.?!;\n])\s+/);
+  let current = '';
+  for (const s of sentences) {
+    if (!s) continue;
+    if ((current + ' ' + s).trim().length <= maxLen) {
+      current = (current ? current + ' ' + s : s).trim();
+    } else {
+      if (current) chunks.push(current);
+      if (s.length <= maxLen) {
+        current = s;
+      } else {
+        const words = s.split(/\s+/);
+        current = '';
+        for (const w of words) {
+          if ((current + ' ' + w).trim().length <= maxLen) {
+            current = (current ? current + ' ' + w : w).trim();
+          } else {
+            if (current) chunks.push(current);
+            current = w;
+          }
+        }
+      }
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+async function translateSingleChunkEn(trimmed) {
+  if (!trimmed) return '';
+  if (!hasVietnamese(trimmed) && /^[\x00-\x7F\s\.,!?'"()\-:;0-9%#&/]+$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  // 1. MyMemory API (strictly under 400 chars, responseStatus verified)
+  try {
+    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=vi|en`;
+    const res = await fetch(mmUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (res.ok) {
+      const data = await res.json();
+      const status = Number(data?.responseStatus);
+      const translated = data?.responseData?.translatedText;
+      if (
+        (status === 200 || !data?.responseStatus) &&
+        translated &&
+        !isInvalidEnTranslation(translated) &&
+        !hasVietnamese(translated)
+      ) {
+        let clean = translated;
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          clean = clean.replace(pattern, replacement);
+        }
+        return clean.trim();
+      }
+    }
+  } catch (err) {}
+
+  // 2. Google Translate API
+  try {
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=' + encodeURIComponent(trimmed);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (res.ok) {
+      const data = await res.json();
+      let translated = (data[0] || []).map(item => item[0]).join('');
+      if (translated && !isInvalidEnTranslation(translated) && !hasVietnamese(translated)) {
+        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
+          translated = translated.replace(pattern, replacement);
+        }
+        return translated.trim();
+      }
+    }
+  } catch (err) {}
+
+  return trimmed;
+}
+
 export async function translateTextToEn(text) {
   if (!text || typeof text !== 'string' || !text.trim()) return '';
 
@@ -826,39 +923,22 @@ export async function translateTextToEn(text) {
     return text.trim();
   }
 
-  // 1. MyMemory API
-  try {
-    const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.trim())}&langpair=vi|en`;
-    const res = await fetch(mmUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    if (res.ok) {
-      const data = await res.json();
-      let translated = data?.responseData?.translatedText;
-      if (translated && !hasVietnamese(translated)) {
-        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
-          translated = translated.replace(pattern, replacement);
-        }
-        return translated.trim();
-      }
+  // Break text into sentence chunks <= 380 chars to never exceed MyMemory 500 limit
+  const chunks = chunkText(text.trim(), 380);
+  if (chunks.length > 1) {
+    const translatedChunks = [];
+    for (const chunk of chunks) {
+      const translated = await translateSingleChunkEn(chunk);
+      translatedChunks.push(translated || chunk);
     }
-  } catch (err) {}
-
-  // 2. Google Translate API
-  try {
-    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=' + encodeURIComponent(text.trim());
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    if (res.ok) {
-      const data = await res.json();
-      let translated = (data[0] || []).map(item => item[0]).join('');
-      if (translated && !hasVietnamese(translated)) {
-        for (const [pattern, replacement] of GLOBAL_FB_REFINEMENTS_EN) {
-          translated = translated.replace(pattern, replacement);
-        }
-        return translated.trim();
-      }
+    const joined = translatedChunks.join(' ').trim();
+    if (joined && !isInvalidEnTranslation(joined)) {
+      return joined;
     }
-  } catch (err) {}
+  }
 
-  return text;
+  const single = await translateSingleChunkEn(text.trim());
+  return isInvalidEnTranslation(single) ? text.trim() : single;
 }
 
 export async function translateHtmlToEn(html) {
@@ -919,7 +999,8 @@ REQUIRED JSON OUTPUT FORMAT:
   try {
     const aiResult = await callGeminiApi({ prompt });
     const isHalfVi = hasVietnamese(aiResult?.nameEn) || hasVietnamese(aiResult?.shortDescEn);
-    if (aiResult && aiResult.nameEn && !isHalfVi) {
+    const hasInvalidEn = isInvalidEnTranslation(aiResult?.nameEn) || isInvalidEnTranslation(aiResult?.shortDescEn) || isInvalidEnTranslation(aiResult?.fullDescEn);
+    if (aiResult && aiResult.nameEn && !isHalfVi && !hasInvalidEn) {
       return {
         nameEn: aiResult.nameEn || '',
         badgeEn: aiResult.badgeEn || 'New Arrival',
@@ -952,12 +1033,18 @@ export async function fallbackProductTranslationEn(product = {}) {
     applicationsEn = ['Signature Milk Tea', 'Fresh Fruit Tea', 'Sea Salt Cold Foam Tea'];
   }
 
+  const safeName = !isInvalidEnTranslation(nameEn) ? nameEn : 'Specialty Commercial Beverage Ingredient';
+  const safeBadge = !isInvalidEnTranslation(badgeEn) ? badgeEn : 'New Arrival';
+  const safeOrigin = !isInvalidEnTranslation(originEn) ? originEn : 'Bao Loc Highlands, Lam Dong, Vietnam';
+  const safeShortDesc = !isInvalidEnTranslation(shortDescEn) ? shortDescEn : 'Selected from premium tea highlands, crafted for consistent commercial beverage standards.';
+  const safeFullDesc = !isInvalidEnTranslation(fullDescEn) ? fullDescEn : (safeShortDesc || 'CASA specialty beverage ingredients engineered for chain operations with long-lasting aroma and operational ease.');
+
   return {
-    nameEn: nameEn || 'Specialty Commercial Beverage Ingredient',
-    badgeEn: badgeEn || 'New Arrival',
-    originEn: originEn || 'Bao Loc Highlands, Lam Dong, Vietnam',
-    shortDescEn: shortDescEn || 'Selected from premium tea highlands, crafted for consistent commercial beverage standards.',
-    fullDescEn: fullDescEn || 'CASA specialty beverage ingredients engineered for chain operations with long-lasting aroma and operational ease.',
+    nameEn: safeName,
+    badgeEn: safeBadge,
+    originEn: safeOrigin,
+    shortDescEn: safeShortDesc,
+    fullDescEn: safeFullDesc,
     applicationsEn
   };
 }
