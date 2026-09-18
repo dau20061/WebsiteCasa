@@ -13,8 +13,6 @@ import {
   HeartHandshake,
   Droplets,
   ExternalLink,
-  ChevronLeft,
-  ChevronRight,
   TrendingUp,
   FlaskConical,
   Factory
@@ -98,40 +96,7 @@ export default function Home() {
   const { t, isChinese, isEnglish } = useLanguage();
   const [activeStep, setActiveStep] = useState(0);
 
-  // Auto-sliding Hero Carousel State (4 flagship images)
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  };
-
-  const goToSlide = (idx) => {
-    setCurrentSlide(idx);
-  };
-
-  // Preload all 4 banner images in browser memory to eliminate image decoding lag
-  useEffect(() => {
-    HERO_SLIDES.forEach((slide) => {
-      const img = new Image();
-      img.src = slide.image;
-    });
-  }, []);
-
-  // Auto-slide effect (changes image every 3.8 seconds with instant 0ms trigger)
-  useEffect(() => {
-    if (!isAutoPlay) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 3800);
-    return () => clearInterval(timer);
-  }, [isAutoPlay, currentSlide]);
-
-  const [products, setProducts] = useState(() => {
+    const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('casa_admin_products');
     return saved ? JSON.parse(saved) : [];
   });
@@ -269,134 +234,8 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Panoramic Flagship Banner Showcase (Auto-sliding Carousel) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.35, ease: 'easeOut' }}
-            className="relative w-full max-w-6xl xl:max-w-7xl mx-auto mt-10 sm:mt-14"
-            onMouseEnter={() => setIsAutoPlay(false)}
-            onMouseLeave={() => setIsAutoPlay(true)}
-          >
-            {/* Ambient Backlight Glow Aura */}
-            <div className="absolute -inset-4 sm:-inset-8 bg-gradient-to-r from-tea-mint/35 via-tea-leaf/30 to-amber-500/25 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
           {/* Panoramic Flagship Banner Showcase (Isolated Auto-sliding Carousel) */}
           <HeroCarousel />
-
-            {/* Master Glass Frame */}
-            <div
-              className="relative p-2.5 sm:p-4 rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-b from-white/90 via-white/50 to-white/20 dark:from-white/15 dark:via-white/5 dark:to-white/5 border-2 border-white/80 dark:border-white/20 shadow-[0_30px_90px_-20px_rgba(15,46,26,0.35)] dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] backdrop-blur-2xl group transition-all duration-700 hover:shadow-tea-glow select-none"
-            >
-              {/* Inner High-Definition Image Holder */}
-              <div className="relative rounded-[1.6rem] sm:rounded-[2.4rem] overflow-hidden aspect-[16/10.3] bg-[#0E2218] shadow-inner">
-                {/* Stacked Pre-rendered Slides for Instant 0ms Latency Crossfade */}
-                {HERO_SLIDES.map((slide, idx) => {
-                  const isActive = idx === currentSlide;
-                  return (
-                    <div
-                      key={slide.id}
-                      className={`absolute inset-0 w-full h-full transition-opacity duration-300 ease-out will-change-[opacity] ${
-                        isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                      }`}
-                    >
-                      <img
-                        src={slide.image}
-                        alt={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
-                        loading="eager"
-                        decoding="sync"
-                        className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
-                      />
-                    </div>
-                  );
-                })}
-
-                {/* Shimmer Light Sweep on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10" />
-
-                {/* Subtle Cinematic Vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none z-10" />
-
-                {/* Live Top Tag */}
-                <div className="absolute top-3.5 left-3.5 sm:top-5 sm:left-5 z-20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm font-bold shadow-xl">
-                  <span className="flex h-2.5 w-2.5 rounded-full bg-tea-mint animate-ping" />
-                  <span>
-                    {isEnglish ? HERO_SLIDES[currentSlide].badgeEn : (isChinese ? HERO_SLIDES[currentSlide].badgeZh : HERO_SLIDES[currentSlide].badgeVi)}
-                  </span>
-                </div>
-
-                {/* Live Corner Tag */}
-                <div className="hidden sm:flex absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white items-center gap-2 text-xs font-bold shadow-lg">
-                  <span className="text-amber-400">★</span>
-                  <span>{isEnglish ? HERO_SLIDES[currentSlide].tagEn : (isChinese ? HERO_SLIDES[currentSlide].tagZh : HERO_SLIDES[currentSlide].tagVi)}</span>
-                </div>
-
-                {/* Navigation Arrow: Previous */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevSlide();
-                  }}
-                  aria-label="Previous image"
-                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-2xl opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
-                >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-
-                {/* Navigation Arrow: Next */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextSlide();
-                  }}
-                  aria-label="Next image"
-                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-2xl opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-
-                {/* Bottom Center Dots & Slide Indicators */}
-                <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/55 backdrop-blur-md border border-white/20 shadow-xl">
-                  {HERO_SLIDES.map((slide, idx) => (
-                    <button
-                      key={slide.id}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        goToSlide(idx);
-                      }}
-                      className={`transition-all duration-300 rounded-full ${
-                        idx === currentSlide
-                          ? 'w-7 sm:w-9 h-2.5 bg-tea-mint shadow-[0_0_12px_rgba(105,196,150,0.8)]'
-                          : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/80'
-                      }`}
-                      title={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
-                    />
-                  ))}
-                </div>
-
-                {/* Bottom Left Slide Counter */}
-                <div className="hidden sm:flex absolute bottom-5 left-5 z-20 px-3 py-1.5 rounded-xl bg-black/55 backdrop-blur-md border border-white/15 text-white/90 text-xs font-mono font-bold items-center gap-1.5 shadow-lg">
-                  <span className="text-tea-mint font-extrabold">0{currentSlide + 1}</span>
-                  <span className="text-white/40">/</span>
-                  <span className="text-white/60">0{HERO_SLIDES.length}</span>
-                </div>
-
-
-                {/* Auto-Slide Progress Bar along bottom edge */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20 overflow-hidden">
-                  <motion.div
-                    key={`${currentSlide}-${isAutoPlay}`}
-                    initial={{ width: '0%' }}
-                    animate={{ width: isAutoPlay ? '100%' : '0%' }}
-                    transition={{ duration: 3.8, ease: 'linear' }}
-                    className="h-full bg-gradient-to-r from-tea-leaf via-tea-mint to-tea-green"
-                  />
-                </div>
-              </div>
-            </div>
-          </motion.div>
 
           {/* Docked 4-Column Luxury Feature Bar (Below the Banner, Clean & Symmetrical) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-10 max-w-6xl xl:max-w-7xl mx-auto">
