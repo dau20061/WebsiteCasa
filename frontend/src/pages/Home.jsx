@@ -26,6 +26,7 @@ import NewsCard from '../components/NewsCard';
 import CertificationCard from '../components/CertificationCard';
 import SEO from '../components/SEO';
 import FallingTeaLeaves from '../components/FallingTeaLeaves';
+import HeroCarousel from '../components/HeroCarousel';
 import { getRtdbProducts, getRtdbNews } from '../services/rtdbService';
 import { CERTIFICATIONS } from '../constants/certifications';
 import { PRODUCTION_STEPS } from '../constants/categories';
@@ -279,6 +280,8 @@ export default function Home() {
           >
             {/* Ambient Backlight Glow Aura */}
             <div className="absolute -inset-4 sm:-inset-8 bg-gradient-to-r from-tea-mint/35 via-tea-leaf/30 to-amber-500/25 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          {/* Panoramic Flagship Banner Showcase (Isolated Auto-sliding Carousel) */}
+          <HeroCarousel />
 
             {/* Master Glass Frame */}
             <div

@@ -10,3 +10,4 @@ coverage/
 .firebase/
 .firebaserc
 .vercel
+.env*
