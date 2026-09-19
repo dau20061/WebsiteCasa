@@ -118,15 +118,12 @@ export default function Home() {
 
   const featuredProducts = products.filter((p) => p.featured !== false).slice(0, 4);
 
-  // Lấy các bài viết được chọn làm nổi bật trang chủ (featuredHome), ưu tiên bài mới cập nhật nhất
   // Lấy các bài viết được chọn làm nổi bật trang chủ (featuredHome)
   const sortByDateDesc = (arr) =>
     [...arr].sort((a, b) => new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0));
 
-  const featuredHomeArticles = sortByDateDesc(
   const featuredArticles = sortByDateDesc(
     news.filter((a) => a.featuredHome === true || (a.featuredHome === undefined && a.featured === true))
-  ).slice(0, 3);
   );
 
   const remainingArticles = sortByDateDesc(
@@ -137,7 +134,6 @@ export default function Home() {
   // - Nếu có từ 3 bài nổi bật trở lên: hiển thị toàn bộ các bài nổi bật được chọn (tối đa 6 bài)
   // - Nếu có ít hơn 3 bài nổi bật: đưa bài nổi bật lên trước và bù thêm bài viết mới nhất để grid luôn đủ 3 bài đẹp mắt
   const displayHomeNews =
-    featuredHomeArticles.length > 0 ? featuredHomeArticles : sortByDateDesc(news).slice(0, 3);
     featuredArticles.length >= 3
       ? featuredArticles.slice(0, 6)
       : [...featuredArticles, ...remainingArticles].slice(0, 3);
@@ -774,7 +770,6 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className={`grid grid-cols-1 md:grid-cols-2 ${displayHomeNews.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6 sm:gap-8`}>
               {displayHomeNews.map((article) => (
                 <NewsCard key={article.id || article.slug} article={article} />
