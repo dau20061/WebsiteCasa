@@ -26,9 +26,17 @@ export default function News() {
     });
   }, []);
 
+  const sortByDateDesc = (arr) =>
+    [...arr].sort((a, b) => new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0));
+
+  const heroCandidates = articles.filter((a) => a.featuredNews === true);
+  const generalFeatured = articles.filter((a) => a.featured === true || a.featuredHome === true);
+
   const featuredArticle =
     articles.find((a) => a.featuredNews === true) ||
     articles.find((a) => a.featured === true) ||
+    sortByDateDesc(heroCandidates)[0] ||
+    sortByDateDesc(generalFeatured)[0] ||
     articles[0];
 
   const filteredArticles = articles.filter((article) => {
@@ -46,6 +54,13 @@ export default function News() {
       (article.excerptZh && article.excerptZh.toLowerCase().includes(q));
 
     return matchesCat && matchesSearch;
+  });
+
+  const sortedArticles = [...filteredArticles].sort((a, b) => {
+    const aFeat = a.featuredNews ? 2 : (a.featuredHome || a.featured ? 1 : 0);
+    const bFeat = b.featuredNews ? 2 : (b.featuredHome || b.featured ? 1 : 0);
+    if (bFeat !== aFeat) return bFeat - aFeat;
+    return new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0);
   });
 
   return (
@@ -205,6 +220,7 @@ export default function News() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredArticles.map((article) => (
+            {sortedArticles.map((article) => (
               <NewsCard key={article.id} article={article} />
             ))}
           </div>

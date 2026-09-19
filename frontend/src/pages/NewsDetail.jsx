@@ -59,6 +59,15 @@ export default function NewsDetail() {
   }
 
   const relatedArticles = allArticles.filter((a) => a.id !== article.id).slice(0, 2);
+  const relatedArticles = allArticles
+    .filter((a) => a.id !== article.id)
+    .sort((a, b) => {
+      const aSameCat = (a.category === article.category || a.categorySlug === article.categorySlug) ? 1 : 0;
+      const bSameCat = (b.category === article.category || b.categorySlug === article.categorySlug) ? 1 : 0;
+      if (bSameCat !== aSameCat) return bSameCat - aSameCat;
+      return new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0);
+    })
+    .slice(0, 2);
 
   const displayTitle = isEnglish ? (article.titleEn || article.title) : ((isChinese && (article.titleZh || article.title_zh)) || article.title);
   const displayExcerpt = isEnglish ? (article.excerptEn || article.excerpt) : ((isChinese && (article.excerptZh || article.excerpt_zh)) || article.excerpt);

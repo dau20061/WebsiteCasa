@@ -72,10 +72,15 @@ export default function Products() {
     }
   };
 
+  // Chuẩn hóa category so sánh không phân biệt hoa thường, dấu gạch nối hay gạch dưới
+  const normCat = (str) => String(str || '').toLowerCase().replace(/[-_\s]+/g, '').trim();
+
   // Filter & Search logic
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedCategory === 'all' ||
+      normCat(product.category) === normCat(selectedCategory) ||
+      normCat(product.categoryName) === normCat(selectedCategory) ||
       String(product.category || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim() ||
       String(product.categoryName || '').toLowerCase().trim() === String(selectedCategory || '').toLowerCase().trim();
 
@@ -238,6 +243,7 @@ export default function Products() {
                     onClick={() => handleCategoryChange(cat.id)}
                     className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                       selectedCategory === cat.id
+                      selectedCategory === cat.id || normCat(selectedCategory) === normCat(cat.id)
                         ? 'bg-tea-primary text-white shadow-tea-sm'
                         : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
                     }`}

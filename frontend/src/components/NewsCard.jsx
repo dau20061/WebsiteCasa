@@ -43,6 +43,14 @@ export default function NewsCard({ article }) {
             {displayCategory}
           </span>
         </div>
+        {(article.featuredHome || article.featuredNews || article.featured) && (
+          <div className="absolute top-3.5 right-3.5">
+            <span className="px-2.5 py-1 rounded-full bg-amber-500/95 dark:bg-amber-600/95 backdrop-blur-md text-white text-[11px] font-bold shadow-sm flex items-center gap-1">
+              <span>⭐</span>
+              <span>{isEnglish ? 'Featured' : (isChinese ? '精選' : 'Nổi bật')}</span>
+            </span>
+          </div>
+        )}
       </Link>
 
       <div className="p-6 flex-1 flex flex-col justify-between">

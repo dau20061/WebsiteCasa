@@ -1156,6 +1156,10 @@ export default function AdminDashboard() {
       }
     }
 
+    const nowIso = new Date().toISOString();
+    const isHero = Boolean(finalData.featuredNews);
+    const isHome = Boolean(finalData.featuredHome);
+
     if (editingNews) {
       const updated = {
         ...editingNews,
@@ -1163,11 +1167,36 @@ export default function AdminDashboard() {
         featured: Boolean(finalData.featuredNews),
         featuredNews: Boolean(finalData.featuredNews),
         featuredHome: Boolean(finalData.featuredHome)
+        featured: isHero,
+        featuredNews: isHero,
+        featuredHome: isHome,
+        updatedAt: nowIso
       };
       setNews((prev) =>
         prev.map((n) => (n.id === editingNews.id ? updated : n))
       );
+
+      let updatedList = news.map((n) => {
+        if (n.id === editingNews.id) return updated;
+        if (isHero && (n.featuredNews || n.featured)) {
+          return { ...n, featuredNews: false, featured: false, updatedAt: nowIso };
+        }
+        return n;
+      });
+
+      setNews(updatedList);
+      try {
+        localStorage.setItem('casa_admin_news', JSON.stringify(updatedList));
+      } catch (_) {}
+
       await saveRtdbNews(updated);
+      if (isHero) {
+        for (const item of updatedList) {
+          if (item.id !== editingNews.id && !item.featuredNews) {
+            await saveRtdbNews(item);
+          }
+        }
+      }
       showToast(`Đã cập nhật bài viết [${finalData.title}] (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
     } else {
       const newArticle = {
@@ -1176,9 +1205,33 @@ export default function AdminDashboard() {
         featured: Boolean(finalData.featuredNews),
         featuredNews: Boolean(finalData.featuredNews),
         featuredHome: Boolean(finalData.featuredHome)
+        featured: isHero,
+        featuredNews: isHero,
+        featuredHome: isHome,
+        updatedAt: nowIso
       };
       setNews((prev) => [newArticle, ...prev]);
+
+      let updatedList = [newArticle, ...news];
+      if (isHero) {
+        updatedList = updatedList.map((n) =>
+          n.id === newArticle.id ? n : { ...n, featuredNews: false, featured: false, updatedAt: nowIso }
+        );
+      }
+
+      setNews(updatedList);
+      try {
+        localStorage.setItem('casa_admin_news', JSON.stringify(updatedList));
+      } catch (_) {}
+
       await saveRtdbNews(newArticle);
+      if (isHero) {
+        for (const item of updatedList) {
+          if (item.id !== newArticle.id && !item.featuredNews) {
+            await saveRtdbNews(item);
+          }
+        }
+      }
       showToast(`Đã xuất bản bài viết mới (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
     }
     setNewsModalOpen(false);
@@ -1187,15 +1240,22 @@ export default function AdminDashboard() {
   // Bật/tắt nhanh nổi bật trên Trang Chủ (Home)
   const handleToggleNewsFeaturedHome = async (newsId) => {
     let updatedArticle = null;
+    const nowIso = new Date().toISOString();
     const updatedList = news.map((item) => {
       if (item.id === newsId) {
         const nextVal = !Boolean(item.featuredHome);
         updatedArticle = { ...item, featuredHome: nextVal };
+        updatedArticle = { ...item, featuredHome: nextVal, updatedAt: nowIso };
         return updatedArticle;
       }
       return item;
     });
+
     setNews(updatedList);
+    try {
+      localStorage.setItem('casa_admin_news', JSON.stringify(updatedList));
+    } catch (_) {}
+
     if (updatedArticle) {
       await saveRtdbNews(updatedArticle);
       showToast(
@@ -1213,6 +1273,7 @@ export default function AdminDashboard() {
     let isNowHero = false;
     const currentItem = news.find((n) => n.id === newsId);
     const willBeHero = !Boolean(currentItem?.featuredNews ?? currentItem?.featured);
+    const nowIso = new Date().toISOString();
 
     const updatedList = news.map((item) => {
       if (item.id === newsId) {
@@ -1222,6 +1283,8 @@ export default function AdminDashboard() {
           ...item,
           featuredNews: willBeHero,
           featured: willBeHero
+          featured: willBeHero,
+          updatedAt: nowIso
         };
       }
       if (willBeHero && (item.featuredNews || item.featured)) {
@@ -1229,14 +1292,21 @@ export default function AdminDashboard() {
           ...item,
           featuredNews: false,
           featured: false
+          featured: false,
+          updatedAt: nowIso
         };
       }
       return item;
     });
 
     setNews(updatedList);
+    try {
+      localStorage.setItem('casa_admin_news', JSON.stringify(updatedList));
+    } catch (_) {}
+
     for (const item of updatedList) {
       if (item.id === newsId || (willBeHero && (item.featuredNews === false))) {
+      if (item.id === newsId || (willBeHero && item.featuredNews === false)) {
         await saveRtdbNews(item);
       }
     }
