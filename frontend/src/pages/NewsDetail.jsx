@@ -58,7 +58,6 @@ export default function NewsDetail() {
     );
   }
 
-  const relatedArticles = allArticles.filter((a) => a.id !== article.id).slice(0, 2);
   const relatedArticles = allArticles
     .filter((a) => a.id !== article.id)
     .sort((a, b) => {

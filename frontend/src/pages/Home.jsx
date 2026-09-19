@@ -118,9 +118,6 @@ export default function Home() {
 
   const featuredProducts = products.filter((p) => p.featured !== false).slice(0, 4);
 
-  // Lấy các bài viết được chọn làm nổi bật trang chủ (featuredHome)
-  const featuredHomeArticles = news.filter(
-    (a) => a.featuredHome === true || (a.featuredHome === undefined && a.featured)
   // Lấy các bài viết được chọn làm nổi bật trang chủ (featuredHome), ưu tiên bài mới cập nhật nhất
   const sortByDateDesc = (arr) =>
     [...arr].sort((a, b) => new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0));
@@ -128,7 +125,6 @@ export default function Home() {
   const featuredHomeArticles = sortByDateDesc(
     news.filter((a) => a.featuredHome === true || (a.featuredHome === undefined && a.featured === true))
   ).slice(0, 3);
-  const displayHomeNews = featuredHomeArticles.length > 0 ? featuredHomeArticles : news.slice(0, 3);
 
   const displayHomeNews =
     featuredHomeArticles.length > 0 ? featuredHomeArticles : sortByDateDesc(news).slice(0, 3);

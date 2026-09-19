@@ -242,7 +242,6 @@ export default function Products() {
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id)}
                     className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                      selectedCategory === cat.id
                       selectedCategory === cat.id || normCat(selectedCategory) === normCat(cat.id)
                         ? 'bg-tea-primary text-white shadow-tea-sm'
                         : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'

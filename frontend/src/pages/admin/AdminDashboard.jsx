@@ -1164,17 +1164,11 @@ export default function AdminDashboard() {
       const updated = {
         ...editingNews,
         ...finalData,
-        featured: Boolean(finalData.featuredNews),
-        featuredNews: Boolean(finalData.featuredNews),
-        featuredHome: Boolean(finalData.featuredHome)
         featured: isHero,
         featuredNews: isHero,
         featuredHome: isHome,
         updatedAt: nowIso
       };
-      setNews((prev) =>
-        prev.map((n) => (n.id === editingNews.id ? updated : n))
-      );
 
       let updatedList = news.map((n) => {
         if (n.id === editingNews.id) return updated;
@@ -1202,15 +1196,11 @@ export default function AdminDashboard() {
       const newArticle = {
         id: `news_${Date.now()}`,
         ...finalData,
-        featured: Boolean(finalData.featuredNews),
-        featuredNews: Boolean(finalData.featuredNews),
-        featuredHome: Boolean(finalData.featuredHome)
         featured: isHero,
         featuredNews: isHero,
         featuredHome: isHome,
         updatedAt: nowIso
       };
-      setNews((prev) => [newArticle, ...prev]);
 
       let updatedList = [newArticle, ...news];
       if (isHero) {
@@ -1244,7 +1234,6 @@ export default function AdminDashboard() {
     const updatedList = news.map((item) => {
       if (item.id === newsId) {
         const nextVal = !Boolean(item.featuredHome);
-        updatedArticle = { ...item, featuredHome: nextVal };
         updatedArticle = { ...item, featuredHome: nextVal, updatedAt: nowIso };
         return updatedArticle;
       }
@@ -1282,7 +1271,6 @@ export default function AdminDashboard() {
         return {
           ...item,
           featuredNews: willBeHero,
-          featured: willBeHero
           featured: willBeHero,
           updatedAt: nowIso
         };
@@ -1291,7 +1279,6 @@ export default function AdminDashboard() {
         return {
           ...item,
           featuredNews: false,
-          featured: false
           featured: false,
           updatedAt: nowIso
         };
@@ -1305,7 +1292,6 @@ export default function AdminDashboard() {
     } catch (_) {}
 
     for (const item of updatedList) {
-      if (item.id === newsId || (willBeHero && (item.featuredNews === false))) {
       if (item.id === newsId || (willBeHero && item.featuredNews === false)) {
         await saveRtdbNews(item);
       }
