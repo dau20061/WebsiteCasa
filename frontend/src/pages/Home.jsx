@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   Droplets,
   ExternalLink,
+  ChevronRight,
   TrendingUp,
   FlaskConical,
   Factory
