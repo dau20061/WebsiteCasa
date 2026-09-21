@@ -244,11 +244,9 @@ function FallingTeaLeaves({
     }
 
     let isVisible = !document.hidden;
-    let isOutOfView = window.scrollY > window.innerHeight * 0.95;
 
     const handleVisibilityChange = () => {
       isVisible = !document.hidden;
-      if (isVisible && !isOutOfView && !animFrameIdRef.current) {
       if (isVisible && !animFrameIdRef.current) {
         lastTime = performance.now();
         animFrameIdRef.current = requestAnimationFrame(render);
@@ -256,20 +254,11 @@ function FallingTeaLeaves({
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Scroll optimization: Pause animation when user scrolls past Hero section (> 95vh)
     // Tương tác luồng gió tự nhiên khi người dùng cuộn trang
     let lastScrollY = window.scrollY;
     let lastScrollTime = performance.now();
 
     const handleScroll = () => {
-      const out = window.scrollY > window.innerHeight * 0.95;
-      if (out !== isOutOfView) {
-        isOutOfView = out;
-        if (!isOutOfView && isVisible && !animFrameIdRef.current) {
-          lastTime = performance.now();
-          animFrameIdRef.current = requestAnimationFrame(render);
-        }
-      }
       const now = performance.now();
       const dt = Math.max(16, now - lastScrollTime);
       const dy = window.scrollY - lastScrollY;
@@ -297,7 +286,6 @@ function FallingTeaLeaves({
     let lastTime = performance.now();
 
     const render = (time) => {
-      if (!isVisible || isOutOfView) {
       if (!isVisible) {
         animFrameIdRef.current = null;
         return;
@@ -369,7 +357,6 @@ function FallingTeaLeaves({
       animFrameIdRef.current = requestAnimationFrame(render);
     };
 
-    if (!isOutOfView && isVisible) {
     if (isVisible) {
       animFrameIdRef.current = requestAnimationFrame(render);
     }
