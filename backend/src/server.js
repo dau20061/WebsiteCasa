@@ -79,10 +79,11 @@ app.use((err, req, res, next) => {
 });
 
 if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
+  const HOST = process.env.HOST || '0.0.0.0';
+  app.listen(PORT, HOST, () => {
     console.log('====================================================');
-    console.log(`CASA TEA Backend Server is running on port ${PORT}`);
-    console.log(`API Base: http://localhost:${PORT}/api`);
+    console.log(`CASA TEA Backend Server is running on http://${HOST}:${PORT}`);
+    console.log(`API Base: http://${HOST}:${PORT}/api`);
     console.log('====================================================');
   });
 }

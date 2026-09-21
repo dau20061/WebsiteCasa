@@ -2,9 +2,10 @@
 
 Tài liệu này cung cấp hướng dẫn chi tiết từ A - Z để đẩy mã nguồn dự án **CASA TEA & BEVERAGE SOLUTIONS** lên **Hostinger**.
 
-Dự án hiện đã được cấu trúc chuẩn hóa, hỗ trợ cả 2 hình thức hosting phổ biến nhất trên Hostinger:
-1. **Cách 1: Hostinger Web Hosting (Shared Hosting / Cloud Hosting / WordPress Hosting)** - Đưa bản dựng tĩnh vào thư mục `public_html` (Nhanh nhất, tiết kiệm, tối ưu SEO & tốc độ LiteSpeed).
-2. **Cách 2: Hostinger VPS / Cloud Server (Chạy Node.js & PM2)** - Đưa toàn bộ mã nguồn fullstack chạy dịch vụ Node.js độc lập.
+Dự án hiện đã được cấu trúc chuẩn hóa, hỗ trợ 3 hình thức triển khai trên Hostinger:
+1. **Cách 1: Hostinger Web Apps (Node.js) - Triển khai tự động bằng Git/GitHub** (Khuyên dùng khi bạn đang ở trang Web Apps trong hPanel).
+2. **Cách 2: Hostinger Web Hosting (Shared/Cloud)** - Đưa bản dựng tĩnh vào `public_html`.
+3. **Cách 3: Hostinger VPS / Cloud Server** - Chạy độc lập bằng PM2 và Nginx Reverse Proxy.
 
 ---
 
@@ -32,9 +33,46 @@ web_casa/
 └── vercel.json                   # Cấu hình dự phòng Vercel (nếu vẫn muốn chạy song song)
 ```
 
+## 🚀 CÁCH 1: TRIỂN KHAI TỰ ĐỘNG BẰNG GITHUB (HOSTINGER WEB APPS / NODE.JS)
+
+Tính năng này có sẵn trên hPanel tại mục **Trang web** ➔ **Web Apps** (giao diện như ảnh trên màn hình của bạn).
+
+### Các bước thực hiện:
+
+#### Bước 1: Bấm nút "Bắt đầu"
+- Tại màn hình **"Triển khai ứng dụng web Node.js trong vài phút"**, bấm vào nút **Bắt đầu**.
+
+#### Bước 2: Kết nối tài khoản GitHub
+- Chọn **Kết nối với GitHub** (Connect GitHub).
+- Đăng nhập và ủy quyền cho Hostinger truy cập vào kho mã nguồn GitHub của bạn.
+
+#### Bước 3: Chọn Kho lưu trữ (Repository) & Nhánh (Branch)
+- **Repository**: Chọn `dau20061/WebsiteCasa` (hoặc tên repo GitHub của bạn).
+- **Branch**: Chọn `main`.
+
+#### Bước 4: Cấu hình Thiết lập Ứng dụng (Build & Deployment Settings)
+Hostinger sẽ hiển thị bảng cấu hình:
+- **Tên ứng dụng / App Name**: Đặt tên bất kỳ (ví dụ: `casa-tea`).
+- **Thư mục gốc (Root Directory)**: Để trống hoặc `./` (thư mục gốc của repository).
+- **Phiên bản Node.js (Node.js Version)**: Chọn phiên bản `20.x` hoặc `18.x` (LTS).
+- **Lệnh cài đặt (Install Command)**: `npm install`
+  *(Nhờ cấu hình `postinstall` có sẵn, hệ thống sẽ tự động cài đặt cả thư viện gốc và thư viện frontend)*.
+- **Lệnh build (Build Command)**: `npm run build`
+  *(Tự động biên dịch mã nguồn React và xuất ra thư mục `frontend/dist`)*.
+- **Lệnh khởi động (Start Command)**: `npm start`
+  *(Khởi chạy `node server.js` - Express Server đã tích hợp sẵn để tự động phục vụ API `/api/*` và giao diện React)*.
+- **Cổng (Port)**: Hostinger tự động gán biến `$PORT` hoặc bạn có thể điền `5000`.
+
+#### Bước 5: Biến môi trường (Environment Variables) - Tùy chọn
+- Thêm các biến môi trường cần thiết nếu có (như `NODE_ENV=production`).
+
+#### Bước 6: Bấm nút "Triển khai" (Deploy)
+- Bấm **Deploy**. Hostinger sẽ tự động clone code, chạy build và đưa website lên hoạt động.
+- **Ưu điểm lớn nhất**: Mỗi khi bạn thực hiện `git push` lên nhánh `main`, Hostinger sẽ **tự động cập nhật phiên bản mới ngay lập tức**!
+
 ---
 
-## 🚀 CÁCH 1: TRIỂN KHAI LÊN HOSTINGER WEB HOSTING (KHUYÊN DÙNG - ĐƠN GIẢN NHẤT)
+## 📁 CÁCH 2: TRIỂN KHAI LÊN HOSTINGER WEB HOSTING (UPLOAD TỆP DIST VÀO PUBLIC_HTML)
 
 Áp dụng cho các gói: **Single/Premium/Business Web Hosting** hoặc **Cloud Startup/Professional** sử dụng bảng điều khiển **hPanel**.
 
