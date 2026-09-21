@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "description": "CASA TEA & BEVERAGE SOLUTIONS - Monorepo Structure with Separated Frontend and Backend",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "build": "npm --prefix frontend run build",
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
-    "start": "npm run dev",
     "backend:dev": "npm --prefix backend run dev",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",

@@ -1,5 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import 'dotenv/config';
 
 import productRoutes from './routes/productRoutes.js';
@@ -29,18 +32,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Mount Routes
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/news', newsRoutes);
-app.use('/api/faq', faqRoutes);
-app.use('/api/faqs', faqRoutes);
-app.use('/api/machinery', machineryRoutes);
-app.use('/api/certifications', certificationRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/users', userRoutes);
-// Mount Routes (support both with /api and without /api for Vercel Serverless Function compatibility)
+// Mount Routes (luôn có tiền tố /api, chỉ hỗ trợ không có tiền tố /api khi chạy trên Vercel Serverless)
 const routeList = [
   ['/products', productRoutes],
   ['/categories', categoryRoutes],
@@ -56,10 +48,26 @@ const routeList = [
 
 for (const [routePath, router] of routeList) {
   app.use(`/api${routePath}`, router);
-  app.use(routePath, router);
+  if (process.env.VERCEL) {
+    app.use(routePath, router);
+  }
 }
 
 // 404 handler
+// Phục vụ giao diện Frontend tĩnh nếu đã build (hỗ trợ Hostinger Node.js, VPS, PM2)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '../../frontend/dist');
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
+// 404 handler for API routes
 app.use((req, res) => {
   res.status(404).json({ error: `Route ${req.originalUrl} not found` });
 });
