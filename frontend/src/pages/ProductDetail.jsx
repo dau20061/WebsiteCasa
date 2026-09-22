@@ -18,6 +18,7 @@ import {
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import { SITE_URL } from '../constants/site';
+import { slugify, getProductSlug } from '../utils/slugify';
 import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useToast } from '../components/Toast';
@@ -43,7 +44,7 @@ export default function ProductDetail() {
   const [isLoading, setIsLoading] = useState(() => {
     const saved = localStorage.getItem('casa_admin_products');
     const list = saved ? JSON.parse(saved) : [];
-    return !list.some((p) => p.id === id);
+    return !list.some((p) => p && (p.id === id || p.slug === id || (p.name && slugify(p.name) === id)));
   });
 
   useEffect(() => {
@@ -70,7 +71,13 @@ export default function ProductDetail() {
       });
   }, [id]);
 
-  const product = allProducts.find((p) => p.id === id);
+  const product = allProducts.find((p) => {
+    if (!p) return false;
+    if (p.id === id) return true;
+    if (p.slug && p.slug === id) return true;
+    if (p.name && slugify(p.name) === id) return true;
+    return false;
+  });
 
   // Màn hình đang tải từ Realtime Database
   if (isLoading) {
@@ -271,6 +278,8 @@ export default function ProductDetail() {
   const otherRecommended = allProducts
     .filter((p) => p.id !== product.id && !sameCategoryProducts.some((sp) => sp.id === p.id))
     .slice(0, Math.max(0, 4 - sameCategoryProducts.length));
+  const productSlug = getProductSlug(product);
+
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
@@ -278,7 +287,7 @@ export default function ProductDetail() {
         title={`${displayName} – ${categoryName} Pha Chế B2B`}
         description={`Cung ứng sỉ ${displayName} (Mã: ${sku}). ${shortDesc || fullDesc?.slice(0, 150)} Đạt chuẩn ISO 22000, HACCP.`}
         keywords={[displayName, categoryName, 'nguyên liệu pha chế', 'trà nguyên liệu', 'mua sỉ F&B', sku, origin]}
-        canonical={`/products/${product.id}`}
+        canonical={`/products/${productSlug}`}
         ogType="product"
         ogImage={image}
         ogImageAlt={`${displayName} - Nguyên Liệu Pha Chế CASA TEA`}
@@ -297,7 +306,7 @@ export default function ProductDetail() {
             category: categoryName,
             offers: {
               '@type': 'Offer',
-              url: `${SITE_URL}/products/${product.id}`,
+              url: `${SITE_URL}/products/${productSlug}`,
               priceCurrency: 'VND',
               price: '0',
               priceValidUntil: '2027-12-31',
@@ -341,7 +350,7 @@ export default function ProductDetail() {
                 '@type': 'ListItem',
                 position: 4,
                 name: displayName,
-                item: `${SITE_URL}/products/${product.id}`
+                item: `${SITE_URL}/products/${productSlug}`
               }
             ]
           }

@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getProductSlug } from '../utils/slugify';
 
 export default function ProductCard({ product, onRequestSample }) {
   const { t, isChinese, isEnglish } = useLanguage();
   const { id, name, sku, categoryName, badge, shortDesc, image, tasteProfile, tags } = product;
+  const productSlug = getProductSlug(product);
+  const productUrl = `/products/${productSlug}`;
 
   const isValidText = (str) => {
     if (!str || typeof str !== 'string' || !str.trim()) return false;
@@ -104,7 +107,7 @@ export default function ProductCard({ product, onRequestSample }) {
       {/* Content */}
       <div className="p-6 flex-1 flex flex-col justify-between">
         <div>
-          <Link to={`/products/${id}`} className="block">
+          <Link to={productUrl} className="block">
             <h3 className="text-lg font-bold text-tea-dark dark:text-white group-hover:text-tea-green dark:group-hover:text-tea-mint transition-colors line-clamp-2 leading-snug">
               {displayName}
             </h3>
@@ -170,7 +173,7 @@ export default function ProductCard({ product, onRequestSample }) {
           {/* Row 2: Secondary Action Buttons (View Details & Free Sample) */}
           <div className="grid grid-cols-2 gap-2">
             <Link
-              to={`/products/${id}`}
+              to={productUrl}
               className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-tea-mist dark:bg-[#1A2C21] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-tea-primary dark:text-tea-mint text-xs font-bold transition-colors ${
                 !onRequestSample ? 'col-span-2' : ''
               }`}

@@ -46,6 +46,7 @@ import {
 } from '../../utils/permissions';
 import { useToast } from '../../components/Toast';
 import SEO from '../../components/SEO';
+import { slugify } from '../../utils/slugify';
 import { autoDesignProduct, autoDesignArticle } from '../../utils/aiDesignHelper';
 import {
   generateProductWithGemini,
@@ -959,11 +960,14 @@ export default function AdminDashboard() {
       }
     }
 
+    const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
+
     if (editingProduct) {
       // SỬA (UPDATE)
       const updatedProd = {
         ...editingProduct,
         ...finalData,
+        slug: cleanSlug || editingProduct.slug || editingProduct.id,
         updatedAt: new Date().toISOString()
       };
       setProducts((prev) =>
@@ -977,6 +981,7 @@ export default function AdminDashboard() {
       const newId = `product_${Date.now()}`;
       const newProd = {
         id: newId,
+        slug: cleanSlug || newId,
         ...finalData,
         createdAt: new Date().toISOString()
       };

@@ -8,6 +8,7 @@ import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { PRODUCT_CATEGORIES } from '../constants/categories';
 import { SITE_URL } from '../constants/site';
+import { getProductSlug } from '../utils/slugify';
 import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
@@ -138,7 +139,7 @@ export default function Products() {
               '@type': 'ListItem',
               position: index + 1,
               name: p.name,
-              url: `${SITE_URL}/products/${p.id}`
+              url: `${SITE_URL}/products/${getProductSlug(p)}`
             }))
           }
         }}
