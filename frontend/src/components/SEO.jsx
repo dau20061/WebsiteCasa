@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '../constants/site';
 
-const SITE_URL = 'https://websiteacasa.vercel.app';
-const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
-const SITE_NAME = 'CASA TEA & BEVERAGE SOLUTIONS';
+export { SITE_URL, SITE_NAME };
+const DEFAULT_IMAGE = DEFAULT_OG_IMAGE;
 
 function setMetaTag(attrName, attrValue, content) {
   if (!content) return;
@@ -58,7 +58,7 @@ export default function SEO({
       ? 'CASA TEA | 專業商用茶飲原料與調飲方案'
       : (isEnglish
         ? 'CASA TEA – Leading B2B Tea & Beverage Solutions'
-        : 'CASA TEA – Tinh Hoa Trà Nguyên Liệu B2B');
+        : 'Nguyên Liệu Pha Chế CASA | Trà Sỉ & Giải Pháp F&B');
     const fullTitle = title ? `${title} | ${defaultSuffix}` : defaultSuffix;
     document.title = fullTitle;
 
@@ -67,7 +67,7 @@ export default function SEO({
       ? 'CASA TEA – 專業商用茶飲原料、特選原葉茶包、風味糖漿與調飲專用粉研發供應商。符合ISO 22000、HACCP國際標準。'
       : (isEnglish
         ? 'CASA TEA – Premium manufacturer & wholesale distributor of commercial tea leaves, beverage syrups, and creamer powders for milk tea chains and cafes. ISO 22000, HACCP certified.'
-        : 'CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP.');
+        : 'CASA TEA – Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP.');
     const metaDescription = description || defaultDesc;
     setMetaTag('name', 'description', metaDescription);
 
@@ -76,7 +76,7 @@ export default function SEO({
       ? '商用茶葉, 奶茶原料, 冬瓜糖漿, 茉莉綠茶, 烏龍茶, 抹茶粉, 越南茶葉供應商, CASA TEA'
       : (isEnglish
         ? 'wholesale tea, commercial tea leaves, bubble tea ingredients, winter melon syrup, oolong tea, matcha powder, b2b beverage solutions, CASA TEA'
-        : 'trà nguyên liệu, trà pha trà sữa, syrup bí đao, siro pha chế, trà đen sỉ, trà ô long, bột béo, nguyên liệu f&b, CASA TEA');
+        : 'nguyên liệu pha chế casa, nguyên liệu pha chế, trà nguyên liệu, trà sỉ trà sữa, syrup bí đao, siro pha chế, trà đen sỉ, trà ô long, bột béo, nguyên liệu f&b, CASA TEA');
     const metaKeywords = Array.isArray(keywords) ? keywords.join(', ') : (keywords || defaultKeywords);
     setMetaTag('name', 'keywords', metaKeywords);
 

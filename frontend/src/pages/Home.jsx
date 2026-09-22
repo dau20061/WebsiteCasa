@@ -141,8 +141,8 @@ export default function Home() {
   return (
     <div className="overflow-hidden relative">
       <SEO
-        title={isEnglish ? "Home - CASA B2B Tea & Beverage Raw Materials" : (isChinese ? "首頁 - CASA 專業商用茶葉原料" : "Trang Chủ")}
-        description={isEnglish ? "CASA TEA – Leading B2B manufacturer and wholesale supplier of raw tea, pyramid tea bags, and beverage mixes for milk tea chains and F&B brands." : (isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ trà nguyên liệu, bột pha chế cao cấp cho chuỗi trà sữa, quán cafe và ngành F&B toàn quốc.")}
+        title={isEnglish ? "CASA - Commercial Beverage & Tea Raw Materials Supplier" : (isChinese ? "CASA TEA | 專業商用茶飲原料與調飲方案" : "Nguyên Liệu Pha Chế CASA | Cung Cấp Sỉ Trà & Giải Pháp F&B")}
+        description={isEnglish ? "CASA TEA – Leading B2B manufacturer and wholesale supplier of raw tea, pyramid tea bags, and beverage mixes for milk tea chains and F&B brands." : (isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, cốt trà nguyên lá, trà túi lọc pyramid, siro và bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc.")}
       />
 
       {/* Hiệu Ứng Lá Trà Rơi Nghệ Thuật CASA TEA */}
@@ -194,11 +194,11 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  Tinh Hoa Trà CASA –{' '}
+                  Nguyên Liệu Pha Chế CASA –{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-tea-primary via-tea-green to-tea-leaf dark:from-tea-mint dark:via-tea-leaf dark:to-tea-soft">
-                    Nền Tảng Cho Những Ly Đồ Uống
+                    Tinh Hoa Trà & Giải Pháp Đồ Uống
                   </span>{' '}
-                  Tuyệt Hảo
+                  Đỉnh Cao
                 </>
               )}
             </motion.h1>

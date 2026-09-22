@@ -7,6 +7,7 @@ import WaveDivider from '../components/WaveDivider';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { PRODUCT_CATEGORIES } from '../constants/categories';
+import { SITE_URL } from '../constants/site';
 import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
@@ -129,7 +130,7 @@ export default function Products() {
           '@type': 'CollectionPage',
           name: 'Danh Mục Trà Nguyên Liệu & Giải Pháp Pha Chế CASA TEA',
           description: 'Cung cấp sỉ trà nguyên liệu, trà búp cao cấp, syrup và bột pha chế cho các chuỗi trà sữa và quán cà phê.',
-          url: 'https://websiteacasa.vercel.app/products',
+          url: `${SITE_URL}/products`,
           mainEntity: {
             '@type': 'ItemList',
             numberOfItems: filteredProducts.length,
@@ -137,7 +138,7 @@ export default function Products() {
               '@type': 'ListItem',
               position: index + 1,
               name: p.name,
-              url: `https://websiteacasa.vercel.app/products/${p.id}`
+              url: `${SITE_URL}/products/${p.id}`
             }))
           }
         }}

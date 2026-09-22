@@ -7,6 +7,7 @@ import NewsCard from '../components/NewsCard';
 import WaveDivider from '../components/WaveDivider';
 import SEO from '../components/SEO';
 import { NEWS_CATEGORIES } from '../constants/categories';
+import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -76,7 +77,7 @@ export default function News() {
           '@type': 'CollectionPage',
           name: 'Tin Tức, Xu Hướng & Công Thức Pha Chế CASA TEA',
           description: 'Cẩm nang F&B toàn diện về nguyên liệu trà, công thức chuẩn vị và giải pháp phát triển menu chuỗi đồ uống.',
-          url: 'https://websiteacasa.vercel.app/news',
+          url: `${SITE_URL}/news`,
           mainEntity: {
             '@type': 'ItemList',
             numberOfItems: filteredArticles.length,
@@ -84,7 +85,7 @@ export default function News() {
               '@type': 'ListItem',
               position: index + 1,
               name: a.title,
-              url: `https://websiteacasa.vercel.app/news/${a.slug || a.id}`
+              url: `${SITE_URL}/news/${a.slug || a.id}`
             }))
           }
         }}

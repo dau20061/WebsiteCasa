@@ -2,6 +2,9 @@
 
 Tài liệu này cung cấp hướng dẫn chi tiết từ A - Z để đẩy mã nguồn dự án **CASA TEA & BEVERAGE SOLUTIONS** lên **Hostinger**.
 
+Dự án hiện đã được cấu trúc chuẩn hóa, hỗ trợ cả 2 hình thức hosting phổ biến nhất trên Hostinger:
+1. **Cách 1: Hostinger Web Hosting (Shared Hosting / Cloud Hosting / WordPress Hosting)** - Đưa bản dựng tĩnh vào thư mục `public_html` (Nhanh nhất, tiết kiệm, tối ưu SEO & tốc độ LiteSpeed).
+2. **Cách 2: Hostinger VPS / Cloud Server (Chạy Node.js & PM2)** - Đưa toàn bộ mã nguồn fullstack chạy dịch vụ Node.js độc lập.
 Dự án hiện đã được cấu trúc chuẩn hóa, hỗ trợ 3 hình thức triển khai trên Hostinger:
 1. **Cách 1: Hostinger Web Apps (Node.js) - Triển khai tự động bằng Git/GitHub** (Khuyên dùng khi bạn đang ở trang Web Apps trong hPanel).
 2. **Cách 2: Hostinger Web Hosting (Shared/Cloud)** - Đưa bản dựng tĩnh vào `public_html`.
@@ -72,6 +75,7 @@ Hostinger sẽ hiển thị bảng cấu hình:
 
 ---
 
+## 🚀 CÁCH 1: TRIỂN KHAI LÊN HOSTINGER WEB HOSTING (KHUYÊN DÙNG - ĐƠN GIẢN NHẤT)
 ## 📁 CÁCH 2: TRIỂN KHAI LÊN HOSTINGER WEB HOSTING (UPLOAD TỆP DIST VÀO PUBLIC_HTML)
 
 Áp dụng cho các gói: **Single/Premium/Business Web Hosting** hoặc **Cloud Startup/Professional** sử dụng bảng điều khiển **hPanel**.

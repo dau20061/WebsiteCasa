@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
+import { SITE_URL } from '../constants/site';
 import { getRtdbProducts, getRtdbCategories } from '../services/rtdbService';
 import { useAppUI } from '../layouts/MainLayout';
 import { useToast } from '../components/Toast';
@@ -296,7 +297,7 @@ export default function ProductDetail() {
             category: categoryName,
             offers: {
               '@type': 'Offer',
-              url: `https://websiteacasa.vercel.app/products/${product.id}`,
+              url: `${SITE_URL}/products/${product.id}`,
               priceCurrency: 'VND',
               price: '0',
               priceValidUntil: '2027-12-31',
@@ -322,25 +323,25 @@ export default function ProductDetail() {
                 '@type': 'ListItem',
                 position: 1,
                 name: isEnglish ? 'Home' : (isChinese ? '首頁' : 'Trang Chủ'),
-                item: 'https://websiteacasa.vercel.app/'
+                item: `${SITE_URL}/`
               },
               {
                 '@type': 'ListItem',
                 position: 2,
                 name: isEnglish ? 'Products' : (isChinese ? '產品中心' : 'Sản Phẩm'),
-                item: 'https://websiteacasa.vercel.app/products'
+                item: `${SITE_URL}/products`
               },
               {
                 '@type': 'ListItem',
                 position: 3,
                 name: categoryName,
-                item: `https://websiteacasa.vercel.app/products?cat=${categoryId}`
+                item: `${SITE_URL}/products?cat=${categoryId}`
               },
               {
                 '@type': 'ListItem',
                 position: 4,
                 name: displayName,
-                item: `https://websiteacasa.vercel.app/products/${product.id}`
+                item: `${SITE_URL}/products/${product.id}`
               }
             ]
           }

@@ -1,6 +1,6 @@
 import { getProducts, getNews } from '../backend/src/services/dbService.js';
 
-const SITE_URL = 'https://websiteacasa.vercel.app';
+const SITE_URL = 'https://nguyenlieuphachecasa.com';
 
 export default async function handler(req, res) {
   try {

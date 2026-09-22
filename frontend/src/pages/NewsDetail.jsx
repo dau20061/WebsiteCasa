@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import NewsCard from '../components/NewsCard';
+import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
 import { useToast } from '../components/Toast';
 import { useLanguage } from '../context/LanguageContext';
@@ -112,10 +113,10 @@ export default function NewsDetail() {
               name: 'CASA TEA & BEVERAGE SOLUTIONS',
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://websiteacasa.vercel.app/logo.png'
+                url: `${SITE_URL}/logo.png`
               }
             },
-            mainEntityOfPage: `https://websiteacasa.vercel.app/news/${article.slug || article.id}`
+            mainEntityOfPage: `${SITE_URL}/news/${article.slug || article.id}`
           },
           {
             '@type': 'BreadcrumbList',
@@ -124,19 +125,19 @@ export default function NewsDetail() {
                 '@type': 'ListItem',
                 position: 1,
                 name: isEnglish ? 'Home' : (isChinese ? '首頁' : 'Trang Chủ'),
-                item: 'https://websiteacasa.vercel.app/'
+                item: `${SITE_URL}/`
               },
               {
                 '@type': 'ListItem',
                 position: 2,
                 name: isEnglish ? 'News & Recipes' : (isChinese ? '資訊與配方' : 'Tin Tức & Công Thức'),
-                item: 'https://websiteacasa.vercel.app/news'
+                item: `${SITE_URL}/news`
               },
               {
                 '@type': 'ListItem',
                 position: 3,
                 name: displayTitle,
-                item: `https://websiteacasa.vercel.app/news/${article.slug || article.id}`
+                item: `${SITE_URL}/news/${article.slug || article.id}`
               }
             ]
           }

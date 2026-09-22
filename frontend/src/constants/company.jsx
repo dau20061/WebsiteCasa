@@ -8,7 +8,7 @@ export const COMPANY_INFO = {
   // phoneDirect: '0908 123 456',
   email: 'contact@casatea.vn',
   salesEmail: 'casakinhdoanh@gmail.com',
-  website: 'https://casatea.vn',
+  website: 'https://nguyenlieuphachecasa.com',
   workingHours: 'Thứ 2 – Thứ 7: 07:30 – 14:30 (Chủ nhật nghỉ)',
   headquarters: '16 Độc Lập, KCN Sóng Thần, Dĩ An, Hồ Chí Minh, Việt Nam',
   factory: 'Lô C4-5, Khu Công Nghiệp Lộc Sơn, Thành Phố Bảo Lộc, Tỉnh Lâm Đồng',
