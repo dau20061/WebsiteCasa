@@ -26,3 +26,4 @@ export function getProductSlug(product) {
   }
   return product.id || '';
 }
+

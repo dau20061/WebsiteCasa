@@ -5,78 +5,97 @@
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>https://nguyenlieuphachecasa.com/</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/products</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=tra-den</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=tra-cao-cap</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=tra-oolong</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=bot-pudding</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=tra-lai-xanh</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=bot-tau-hu</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=tra-rang</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=bot-kem</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=tra-trai-cay</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=syrup</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nguyenlieuphachecasa.com/products?cat=bot-pha-che</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=bot-kem-beo</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=matcha</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.nguyenlieuphachecasa.com/products?cat=topping</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/news</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/news</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/about</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/about</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/machinery-certifications</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/machinery-certifications</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/contact</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/contact</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://nguyenlieuphachecasa.com/faq</loc>
+    <loc>https://www.nguyenlieuphachecasa.com/faq</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
