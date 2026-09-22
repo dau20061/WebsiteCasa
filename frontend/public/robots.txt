@@ -22,4 +22,5 @@ Disallow: /api/
 
 # Sitemap Location
 Sitemap: https://nguyenlieuphachecasa.com/sitemap.xml
+Sitemap: https://www.nguyenlieuphachecasa.com/sitemap.xml
 

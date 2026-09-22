@@ -4,6 +4,7 @@
 // ============================================================================
 
 export const SITE_URL = 'https://nguyenlieuphachecasa.com';
+export const SITE_URL = 'https://www.nguyenlieuphachecasa.com';
 export const SITE_NAME = 'CASA TEA & BEVERAGE SOLUTIONS';
 export const BRAND_KEYWORD = 'Nguyên Liệu Pha Chế CASA';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/logo.png`;
