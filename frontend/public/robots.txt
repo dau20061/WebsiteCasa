@@ -7,8 +7,12 @@ User-agent: *
 Allow: /
 Allow: /products
 Allow: /products/*
+Allow: /product-image/
+Allow: /product-image/*
 Allow: /news
 Allow: /news/*
+Allow: /article-image/
+Allow: /article-image/*
 Allow: /about
 Allow: /contact
 Allow: /machinery-certifications

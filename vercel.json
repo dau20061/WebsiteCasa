@@ -17,7 +17,15 @@
       "destination": "/api/sitemap.js"
     },
     {
-      "source": "/((?!api/|robots\\.txt).*)",
+      "source": "/product-image/(.*)",
+      "destination": "/api/product-image.js?slug=$1"
+    },
+    {
+      "source": "/article-image/(.*)",
+      "destination": "/api/article-image.js?slug=$1"
+    },
+    {
+      "source": "/((?!api/|robots\\.txt|product-image/|article-image/).*)",
       "destination": "/index.html"
     }
   ]

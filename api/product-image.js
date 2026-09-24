@@ -1,0 +1,68 @@
+import { getProducts } from '../backend/src/services/dbService.js';
+
+const SITE_URL = 'https://www.nguyenlieuphachecasa.com';
+
+function slugify(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+export default async function handler(req, res) {
+  try {
+    const rawSlug = req.query.slug || req.query.id || '';
+    const cleanSlug = rawSlug.replace(/\.(webp|png|jpg|jpeg|gif|svg)$/i, '').trim().toLowerCase();
+
+    if (!cleanSlug) {
+      return res.redirect(302, `${SITE_URL}/logo.png`);
+    }
+
+    const products = await getProducts().catch(() => []);
+    const product = (products || []).find((p) => {
+      if (!p) return false;
+      const pSlug = String(p.slug || '').toLowerCase();
+      const pId = String(p.id || '').toLowerCase();
+      const pNameSlug = p.name ? slugify(p.name).toLowerCase() : '';
+      return pSlug === cleanSlug || pId === cleanSlug || pNameSlug === cleanSlug;
+    });
+
+    if (!product || !product.image) {
+      return res.redirect(302, `${SITE_URL}/logo.png`);
+    }
+
+    // Nếu ảnh là URL công khai (http / https) -> Chuyển hướng trực tiếp
+    if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
+      return res.redirect(302, product.image);
+    }
+
+    // Nếu ảnh lưu dạng Base64 Data URL (data:image/...) -> Giải mã buffer nhị phân và trả về ảnh chuẩn
+    if (product.image.startsWith('data:image/')) {
+      const matches = product.image.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
+      if (matches) {
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        res.setHeader('Content-Type', mimeType);
+        res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+        res.setHeader('Content-Length', buffer.length);
+        return res.status(200).send(buffer);
+      }
+    }
+
+    return res.redirect(302, `${SITE_URL}/logo.png`);
+  } catch (error) {
+    console.error('[Product Image Handler Error]:', error);
+    return res.redirect(302, `${SITE_URL}/logo.png`);
+  }
+}
+

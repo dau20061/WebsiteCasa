@@ -93,6 +93,22 @@ export default function NewsDetail() {
     }
   };
 
+  const articleSlug = article.slug || article.id;
+
+  // Chuẩn hóa URL hình ảnh hợp lệ cho Google Schema & OpenGraph
+  const getSeoImageUrl = () => {
+    if (article.image) {
+      if (article.image.startsWith('http://') || article.image.startsWith('https://')) {
+        return article.image;
+      }
+      if (article.image.startsWith('data:image/')) {
+        return `${SITE_URL}/article-image/${articleSlug}.webp`;
+      }
+    }
+    return `${SITE_URL}/logo.png`;
+  };
+  const seoImageUrl = getSeoImageUrl();
+
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG NEWSARTICLE & BREADCRUMBS */}
@@ -100,9 +116,9 @@ export default function NewsDetail() {
         title={`${displayTitle} – CASA TEA`}
         description={displayExcerpt}
         keywords={[displayTitle, article.category, ...(Array.isArray(article.tags) ? article.tags : []), 'công thức pha chế', 'tin tức trà sữa', 'kiến thức F&B', 'CASA TEA']}
-        canonical={`/news/${article.slug || article.id}`}
+        canonical={`/news/${articleSlug}`}
         ogType="article"
-        ogImage={article.image}
+        ogImage={seoImageUrl}
         ogImageAlt={`${displayTitle} – CASA TEA`}
         publishedTime={article.createdAt || '2026-01-01T00:00:00Z'}
         modifiedTime={article.updatedAt || article.createdAt || '2026-01-01T00:00:00Z'}
@@ -113,7 +129,7 @@ export default function NewsDetail() {
             headline: displayTitle,
             description: displayExcerpt,
             keywords: (article.tags && article.tags.length > 0) ? article.tags.join(', ') : undefined,
-            image: [article.image],
+            image: [seoImageUrl],
             datePublished: article.createdAt || '2026-01-01T00:00:00Z',
             dateModified: article.updatedAt || article.createdAt || '2026-01-01T00:00:00Z',
             author: {

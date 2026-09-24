@@ -278,6 +278,21 @@ export default function ProductDetail() {
     .slice(0, Math.max(0, 4 - sameCategoryProducts.length));
   const productSlug = getProductSlug(product);
 
+  // Chuẩn hóa URL hình ảnh hợp lệ cho Google Merchant/Schema & OpenGraph
+  // Google Schema cấm tuyệt đối base64 (data:image/...). Bắt buộc phải là HTTP/HTTPS URL
+  const getSeoImageUrl = () => {
+    if (product.image) {
+      if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
+        return product.image;
+      }
+      if (product.image.startsWith('data:image/')) {
+        return `${SITE_URL}/product-image/${productSlug}.webp`;
+      }
+    }
+    return `${SITE_URL}/logo.png`;
+  };
+  const seoImageUrl = getSeoImageUrl();
+
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
       {/* TECHNICAL SEO: SCHEMA.ORG PRODUCT & BREADCRUMBS */}
@@ -287,13 +302,13 @@ export default function ProductDetail() {
         keywords={[displayName, categoryName, 'nguyên liệu pha chế', 'trà nguyên liệu', 'mua sỉ F&B', sku, origin]}
         canonical={`/products/${productSlug}`}
         ogType="product"
-        ogImage={image}
+        ogImage={seoImageUrl}
         ogImageAlt={`${displayName} - Nguyên Liệu Pha Chế CASA TEA`}
         jsonLd={[
           {
             '@type': 'Product',
             name: displayName,
-            image: [image],
+            image: [seoImageUrl],
             description: fullDesc,
             sku: sku,
             mpn: sku,

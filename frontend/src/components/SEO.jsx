@@ -6,6 +6,44 @@ import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '../constants/site';
 export { SITE_URL, SITE_NAME };
 const DEFAULT_IMAGE = DEFAULT_OG_IMAGE;
 
+export function resolveSafeImageUrl(rawImage) {
+  if (!rawImage || typeof rawImage !== 'string') return DEFAULT_IMAGE;
+  const trimmed = rawImage.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return `${SITE_URL}${trimmed}`;
+  }
+  // Nếu là data:image/... thì không được truyền vào OpenGraph hay Schema (Google cấm tuyệt đối)
+  if (trimmed.startsWith('data:')) {
+    return DEFAULT_IMAGE;
+  }
+  return `${SITE_URL}/${trimmed}`;
+}
+
+function sanitizeJsonLd(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeJsonLd);
+  }
+  const sanitized = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === 'image') {
+      if (typeof value === 'string') {
+        sanitized[key] = resolveSafeImageUrl(value);
+      } else if (Array.isArray(value)) {
+        sanitized[key] = value.map((img) => resolveSafeImageUrl(img));
+      } else {
+        sanitized[key] = sanitizeJsonLd(value);
+      }
+    } else {
+      sanitized[key] = sanitizeJsonLd(value);
+    }
+  }
+  return sanitized;
+}
+
 function setMetaTag(attrName, attrValue, content) {
   if (!content) return;
   let element = document.querySelector(`meta[${attrName}="${attrValue}"]`);
@@ -105,9 +143,7 @@ export default function SEO({
     setMetaTag('property', 'og:type', ogType);
     setMetaTag('property', 'og:locale', isChinese ? 'zh_TW' : (isEnglish ? 'en_US' : 'vi_VN'));
 
-    const imageToUse = ogImage
-      ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`)
-      : DEFAULT_IMAGE;
+    const imageToUse = resolveSafeImageUrl(ogImage);
     setMetaTag('property', 'og:image', imageToUse);
     setMetaTag('property', 'og:image:secure_url', imageToUse);
     setMetaTag('property', 'og:image:alt', ogImageAlt || fullTitle);
@@ -135,9 +171,10 @@ export default function SEO({
     }
 
     if (jsonLd) {
-      const dataToInject = Array.isArray(jsonLd)
-        ? { '@context': 'https://schema.org', '@graph': jsonLd }
-        : { '@context': 'https://schema.org', ...jsonLd };
+      const sanitized = sanitizeJsonLd(jsonLd);
+      const dataToInject = Array.isArray(sanitized)
+        ? { '@context': 'https://schema.org', '@graph': sanitized }
+        : { '@context': 'https://schema.org', ...sanitized };
       scriptTag.textContent = JSON.stringify(dataToInject);
     } else {
       // Default WebPage schema
