@@ -369,11 +369,12 @@ export async function deleteRtdbFaq(faqId) {
 export async function getRtdbMachinery() {
   try {
     const data = await machineryApi.getAll();
-    if (data && Array.isArray(data) && data.length > 0) {
+    if (data && Array.isArray(data)) {
+      const cleaned = data.filter((m) => !String(m.id).startsWith('machinery-0'));
       try {
-        localStorage.setItem('casa_admin_machinery', JSON.stringify(data));
+        localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
       } catch (_) {}
-      return data;
+      return cleaned;
     }
   } catch (err) {
     console.warn('[Frontend Service] getRtdbMachinery via Backend API failed, trying direct RTDB:', err.message);
@@ -381,14 +382,25 @@ export async function getRtdbMachinery() {
 
   try {
     const directData = await fetchDirectRtdb('machinery');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_machinery', JSON.stringify(directData));
-      return directData;
+    if (directData && Array.isArray(directData)) {
+      const cleaned = directData.filter((m) => !String(m.id).startsWith('machinery-0'));
+      try {
+        localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
+      } catch (_) {}
+      return cleaned;
     }
   } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_machinery');
-  return saved ? JSON.parse(saved) : [];
+  if (saved) {
+    try {
+      const list = JSON.parse(saved);
+      const cleaned = Array.isArray(list) ? list.filter((m) => !String(m.id).startsWith('machinery-0')) : [];
+      localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
+      return cleaned;
+    } catch (_) {}
+  }
+  return [];
 }
 
 export async function saveRtdbMachinery(item) {

@@ -189,36 +189,7 @@ export const NEWS_ARTICLES = [
     `,
     recipeBox: null,
     tags: ['An toàn thực phẩm', 'ISO 22000', 'Xuất khẩu trà', 'Kiểm nghiệm QC']
-  },
-  {
-    id: 'casa-khanh-thanh-day-chuyen-say-tang-soi-moi',
-    slug: 'casa-khanh-thanh-day-chuyen-say-tang-soi-moi',
-    title: 'CASA Chính Thức Đưa Vào Vận Hành Dây Chuyền Sấy Tầng Sôi Thế Hệ Mới Công Suất 5.000 Tấn/Năm',
-    titleZh: 'CASA 正式啟用年產5,000噸全新流化床乾燥生產線',
-    category: 'Tin Tức Công Ty & Sự Kiện',
-    categorySlug: 'tin-cong-ty',
-    date: '18 Tháng 12, 2025',
-    readTime: '4 phút đọc',
-    author: 'Ban Truyền Thông Doanh Nghiệp CASA',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80',
-    featured: false,
-    featuredNews: false,
-    featuredHome: false,
-    excerpt: 'Nhà máy chế biến thứ 2 của CASA tại Lâm Đồng đã chính thức hoàn tất giai đoạn chạy thử nghiệm và nghiệm thu bàn giao, nâng tổng năng lực cung ứng nguyên liệu toàn quốc lên gấp đôi.',
-    excerptZh: 'CASA 位於林同省的第二座現代化加工廠順利通過驗收投產，使全國原物料供應能力翻倍提升。',
-    content: `
-      <p class="lead text-lg font-medium text-tea-dark mb-4">
-      <p class="lead text-lg font-medium text-tea-dark dark:text-white mb-4">
-        Sự kiện đánh dấu cột mốc quan trọng trong chiến lược trở thành đơn vị sản xuất và cung ứng nguyên liệu pha chế hàng đầu tại khu vực Đông Nam Á của CASA.
-      </p>
-
-      <p class="mb-4 text-gray-700 leading-relaxed">
-      <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-        Dây chuyền mới được nhập khẩu đồng bộ từ các đối tác chế tạo máy thực phẩm hàng đầu Châu Âu, tự động hóa từ khâu nạp liệu, sấy tầng sôi, tách tạp chất quang học Sortex cho đến đóng gói túi màng nhôm đa lớp hút chân không nạp khí trơ N2.
-      </p>
-    `,
-    recipeBox: null,
-    tags: ['Nhà máy mới', 'Tin doanh nghiệp', 'Mở rộng quy mô', 'Lâm Đồng']
   }
 ];
+
 

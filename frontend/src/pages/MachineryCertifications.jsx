@@ -40,13 +40,30 @@ export default function MachineryCertifications() {
   const [selectedFilter, setSelectedFilter] = useState('all');
 
   const [machineryList, setMachineryList] = useState(() => {
-    const saved = localStorage.getItem('casa_admin_machinery');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('casa_admin_machinery');
+      if (saved) {
+        const list = JSON.parse(saved);
+        return Array.isArray(list) ? list.filter((m) => !String(m.id).startsWith('machinery-0')) : [];
+      }
+    } catch (_) {}
+    return [];
   });
 
   useEffect(() => {
     getRtdbMachinery().then((res) => {
-      if (res && res.length > 0) setMachineryList(res);
+      if (Array.isArray(res)) {
+        const cleaned = res.filter((m) => !String(m.id).startsWith('machinery-0'));
+        setMachineryList(cleaned);
+        try {
+          localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
+        } catch (_) {}
+      } else {
+        setMachineryList([]);
+        try {
+          localStorage.setItem('casa_admin_machinery', JSON.stringify([]));
+        } catch (_) {}
+      }
     });
   }, []);
 
@@ -143,15 +160,31 @@ export default function MachineryCertifications() {
           </div>
 
           {/* Machinery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredMachinery.map((item) => (
-              <MachineryCard
-                key={item.id}
-                item={item}
-                onSelect={(m) => openLightbox(m)}
-              />
-            ))}
-          </div>
+          {filteredMachinery.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-tea-soft/30 dark:bg-[#132018]/60 rounded-3xl border border-dashed border-tea-border dark:border-white/10 max-w-2xl mx-auto">
+              <Cpu className="w-12 h-12 text-tea-leaf/40 dark:text-tea-mint/40 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-tea-dark dark:text-white">
+                {isEnglish ? 'Machinery Information Updating' : (isChinese ? '工廠設備資訊更新中' : 'Danh Mục Thiết Bị Đang Được Cập Nhật')}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+                {isEnglish
+                  ? 'Official factory equipment profiles and specifications are currently being updated.'
+                  : (isChinese
+                    ? '工廠實際引進之現代化製茶設備明細與技術規格資料正在即時更新中。'
+                    : 'Thông tin hệ thống dây chuyền máy móc chế biến thực tế của nhà máy CASA đang được cập nhật.')}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredMachinery.map((item) => (
+                <MachineryCard
+                  key={item.id}
+                  item={item}
+                  onSelect={(m) => openLightbox(m)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
