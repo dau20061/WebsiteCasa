@@ -16,7 +16,6 @@ import {
 import SEO from '../components/SEO';
 import NewsCard from '../components/NewsCard';
 import { SITE_URL } from '../constants/site';
-import { getRtdbNews } from '../services/rtdbService';
 import { getRtdbNews, getRtdbProducts } from '../services/rtdbService';
 import { useToast } from '../components/Toast';
 import { useLanguage } from '../context/LanguageContext';
