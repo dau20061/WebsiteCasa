@@ -218,28 +218,26 @@ export default function ProductDetail() {
         : 'Lọc bỏ bã xong sốc nhiệt ngay bằng 250g đá bi sạch để giữ màu nước trong sáng và khóa trọn hương thơm tinh dầu.')
   };
 
-  const specifications = Array.isArray(product.specifications) && product.specifications.length > 0
+  const rawSpecifications = Array.isArray(product.specifications) && product.specifications.length > 0
     ? product.specifications
     : (isEnglish
         ? [
-            { label: 'Moisture', value: '< 6.5%' },
-            { label: 'Foreign Matter', value: '0% (Sorted via Sortex optical sorter)' },
-            { label: 'Body', value: 'High Body B2B Commercial Grade' },
             { label: 'Food Safety Standards', value: 'ISO 22000 & HACCP compliant' }
           ]
         : (isChinese
             ? [
-                { label: '含水率 (Moisture)', value: '< 6.5%' },
-                { label: '外來異物雜質', value: '0% (通過 Sortex 光學色選剔除)' },
-                { label: '醇厚度 (Body)', value: 'High Body B2B 商用級' },
                 { label: '食品安全認證', value: '符合 ISO 22000 & HACCP 標準' }
               ]
             : [
-                { label: 'Độ ẩm (Moisture)', value: '< 6.5%' },
-                { label: 'Tạp chất lạ', value: '0% (Qua máy tách Sortex quang học)' },
-                { label: 'Độ đầm vị (Body)', value: 'High Body B2B' },
                 { label: 'Tiêu chuẩn kiểm định', value: 'Đạt chuẩn ISO 22000 & HACCP' }
               ]));
+
+  const specifications = rawSpecifications.filter((spec) => {
+    const lbl = String(spec.label || '').toLowerCase();
+    return !lbl.includes('ẩm') && !lbl.includes('moisture') &&
+           !lbl.includes('tạp chất') && !lbl.includes('foreign') &&
+           !lbl.includes('đầm vị') && !lbl.includes('body');
+  });
 
   // Lọc sản phẩm cùng danh mục chuẩn xác
   const isSameCategory = (p) => {
@@ -599,19 +597,21 @@ export default function ProductDetail() {
               </ul>
             </div>
 
-            <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
-                {isEnglish ? 'Laboratory Inspection Metrics:' : (isChinese ? '實驗室檢測技術指標：' : 'Chỉ tiêu kỹ thuật kiểm định:')}
-              </span>
-              <div className="space-y-1.5 text-xs">
-                {specifications.map((spec, i) => (
-                  <div key={i} className="flex justify-between text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-white/5 pb-1">
-                    <span>{spec.label}:</span>
-                    <strong className="text-tea-dark dark:text-white">{spec.value}</strong>
-                  </div>
-                ))}
+            {specifications.length > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
+                  {isEnglish ? 'Laboratory Inspection Metrics:' : (isChinese ? '實驗室檢測技術指標：' : 'Chỉ tiêu kỹ thuật kiểm định:')}
+                </span>
+                <div className="space-y-1.5 text-xs">
+                  {specifications.map((spec, i) => (
+                    <div key={i} className="flex justify-between text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-white/5 pb-1">
+                      <span>{spec.label}:</span>
+                      <strong className="text-tea-dark dark:text-white">{spec.value}</strong>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
