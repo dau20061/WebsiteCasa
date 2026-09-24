@@ -17,8 +17,11 @@ import SEO from '../components/SEO';
 import NewsCard from '../components/NewsCard';
 import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
+import { getRtdbNews, getRtdbProducts } from '../services/rtdbService';
 import { useToast } from '../components/Toast';
 import { useLanguage } from '../context/LanguageContext';
+import ArticleAttachedProducts from '../components/ArticleAttachedProducts';
+import { resolveArticleProducts } from '../utils/articleProductsHelper';
 
 export default function NewsDetail() {
   const { slug } = useParams();
@@ -31,9 +34,17 @@ export default function NewsDetail() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [allProducts, setAllProducts] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_products');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     getRtdbNews().then((res) => {
       if (res && res.length > 0) setAllArticles(res);
+    });
+    getRtdbProducts().then((res) => {
+      if (res && res.length > 0) setAllProducts(res);
     });
   }, []);
 
@@ -73,6 +84,8 @@ export default function NewsDetail() {
   const displayExcerpt = isEnglish ? (article.excerptEn || article.excerpt) : ((isChinese && (article.excerptZh || article.excerpt_zh)) || article.excerpt);
   const displayContent = isEnglish ? (article.contentEn || article.content) : ((isChinese && (article.contentZh || article.content_zh)) || article.content);
   const displayCategory = isEnglish ? (article.categoryEn || article.category) : ((isChinese && (article.categoryZh || article.category_zh)) || article.category);
+
+  const attachedProducts = resolveArticleProducts(article, allProducts);
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -267,6 +280,9 @@ export default function NewsDetail() {
               </div>
             </div>
           )}
+
+          {/* Attached Products in Article / Nguyên Liệu Trong Bài Viết */}
+          <ArticleAttachedProducts products={attachedProducts} />
 
           {/* Tags */}
           {article.tags && (

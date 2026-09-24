@@ -48,6 +48,7 @@ import { useToast } from '../../components/Toast';
 import SEO from '../../components/SEO';
 import { slugify } from '../../utils/slugify';
 import { autoDesignProduct, autoDesignArticle } from '../../utils/aiDesignHelper';
+import { autoSuggestProductIdsForArticle, resolveArticleProducts } from '../../utils/articleProductsHelper';
 import {
   generateProductWithGemini,
   rewriteDescriptionWithGemini,
@@ -423,6 +424,7 @@ export default function AdminDashboard() {
   const [newsModalOpen, setNewsModalOpen] = useState(false);
   const [editingNews, setEditingNews] = useState(null);
   const [newsTagInput, setNewsTagInput] = useState('');
+  const [newsProductSearch, setNewsProductSearch] = useState('');
   const [newsFormData, setNewsFormData] = useState({
     title: '',
     titleZh: '',
@@ -441,7 +443,9 @@ export default function AdminDashboard() {
     content: '',
     contentZh: '',
     contentEn: '',
+    recipeBox: null,
     tags: ['CASA Tea', 'F&B 2026'],
+    relatedProductIds: [],
     featuredHome: false,
     featuredNews: false
   });
@@ -1052,6 +1056,9 @@ export default function AdminDashboard() {
         contentEn: item.contentEn || item.content_en || '',
         recipeBox: item.recipeBox || null,
         tags: item.tags || [],
+        relatedProductIds: Array.isArray(item.relatedProductIds)
+          ? item.relatedProductIds
+          : (Array.isArray(item.relatedProducts) ? item.relatedProducts : []),
         featuredHome: Boolean(item.featuredHome),
         featuredNews: Boolean(item.featuredNews ?? item.featured)
       });
@@ -1077,12 +1084,54 @@ export default function AdminDashboard() {
         contentEn: '',
         recipeBox: null,
         tags: ['CASA Tea', 'F&B 2026'],
+        relatedProductIds: [],
         featuredHome: false,
         featuredNews: false
       });
     }
     setNewsTagInput('');
+    setNewsProductSearch('');
     setNewsModalOpen(true);
+  };
+
+  // Gắn sản phẩm vào bài viết
+  const handleAddNewsRelatedProduct = (productId) => {
+    if (!productId) return;
+    const current = Array.isArray(newsFormData.relatedProductIds) ? [...newsFormData.relatedProductIds] : [];
+    if (current.includes(productId)) {
+      showToast('Sản phẩm này đã được gắn vào bài viết!', 'info');
+      return;
+    }
+    setNewsFormData({
+      ...newsFormData,
+      relatedProductIds: [...current, productId]
+    });
+    setNewsProductSearch('');
+  };
+
+  // Gỡ sản phẩm khỏi bài viết
+  const handleRemoveNewsRelatedProduct = (productId) => {
+    const current = Array.isArray(newsFormData.relatedProductIds) ? newsFormData.relatedProductIds : [];
+    setNewsFormData({
+      ...newsFormData,
+      relatedProductIds: current.filter((id) => id !== productId)
+    });
+  };
+
+  // Tự động phân tích nội dung để gắn sản phẩm phù hợp
+  const handleAutoSuggestNewsProducts = () => {
+    const suggestedIds = autoSuggestProductIdsForArticle(newsFormData, products);
+    if (!suggestedIds || suggestedIds.length === 0) {
+      showToast('Chưa tìm thấy sản phẩm khớp với nội dung bài viết. Hãy thêm từ khóa như bột kem béo, syrup, trà ô long... vào nội dung!', 'info');
+      return;
+    }
+    const current = Array.isArray(newsFormData.relatedProductIds) ? newsFormData.relatedProductIds : [];
+    const merged = Array.from(new Set([...current, ...suggestedIds]));
+    setNewsFormData({
+      ...newsFormData,
+      relatedProductIds: merged
+    });
+    showToast(`⚡ Đã tự động gắn ${suggestedIds.length} sản phẩm phù hợp nhất vào bài viết!`, 'success');
   };
 
   // Thêm Tag SEO cho bài viết
@@ -4378,6 +4427,169 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     )}
+
+                    {/* GẮN SẢN PHẨM VÀO BÀI VIẾT (ATTACHED PRODUCTS TO ARTICLE) */}
+                    <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-emerald-200/60">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <Package className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-emerald-950 text-xs sm:text-sm">
+                              Gắn Sản Phẩm Vào Bài Viết (Tăng tỷ lệ chốt đơn & tư vấn sỉ)
+                            </h4>
+                            <p className="text-[11px] text-emerald-700">
+                              Khi độc giả đọc bài viết / công thức này, các sản phẩm được chọn sẽ hiển thị trực tiếp để người xem tham khảo và liên hệ ngay.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Button gợi ý tự động bằng AI / Phân tích nội dung */}
+                        <button
+                          type="button"
+                          onClick={handleAutoSuggestNewsProducts}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold shadow-sm transition-colors shrink-0"
+                          title="Tự động phân tích tên, danh mục và nội dung bài viết để gắn sản phẩm khớp nhất"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                          <span>⚡ Gợi ý tự động</span>
+                        </button>
+                      </div>
+
+                      {/* Thanh tìm kiếm & chọn sản phẩm */}
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <input
+                            type="text"
+                            placeholder="Tìm sản phẩm để gắn (nhập tên: Bột kem béo, Syrup, Trà ô long...)"
+                            value={newsProductSearch}
+                            onChange={(e) => setNewsProductSearch(e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 rounded-xl border border-emerald-200 bg-white text-gray-900 placeholder-gray-400 text-xs outline-none focus:ring-2 focus:ring-emerald-500/30"
+                          />
+                        </div>
+
+                        {/* Danh sách kết quả tìm kiếm */}
+                        {newsProductSearch.trim() && (
+                          <div className="max-h-48 overflow-y-auto rounded-xl border border-emerald-200 bg-white shadow-md divide-y divide-gray-100">
+                            {products
+                              .filter((p) => {
+                                const q = newsProductSearch.toLowerCase();
+                                return (
+                                  (p.name && p.name.toLowerCase().includes(q)) ||
+                                  (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
+                                  (p.category && p.category.toLowerCase().includes(q)) ||
+                                  (p.sku && p.sku.toLowerCase().includes(q))
+                                );
+                              })
+                              .map((p) => {
+                                const isAlreadyAdded = (newsFormData.relatedProductIds || []).includes(p.id);
+                                return (
+                                  <div
+                                    key={p.id}
+                                    className="flex items-center justify-between p-2.5 hover:bg-emerald-50/50 transition-colors text-xs"
+                                  >
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <img
+                                        src={p.image || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=100&q=80'}
+                                        alt={p.name}
+                                        className="w-9 h-9 rounded-lg object-cover border border-gray-200 shrink-0"
+                                      />
+                                      <div className="truncate">
+                                        <p className="font-bold text-gray-800 truncate">{p.name}</p>
+                                        <p className="text-[10px] text-gray-500">{p.categoryName || p.category} {p.sku ? `• ${p.sku}` : ''}</p>
+                                      </div>
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddNewsRelatedProduct(p.id)}
+                                      disabled={isAlreadyAdded}
+                                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                                        isAlreadyAdded
+                                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                          : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                                      }`}
+                                    >
+                                      {isAlreadyAdded ? (
+                                        <>
+                                          <Check className="w-3 h-3" /> Đã gắn
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Plus className="w-3 h-3" /> Gắn vào bài
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Danh sách các sản phẩm đã gắn */}
+                      <div>
+                        <div className="flex items-center justify-between text-xs font-bold text-gray-700 mb-2">
+                          <span>Sản phẩm đã chọn ({(newsFormData.relatedProductIds || []).length}):</span>
+                          {(newsFormData.relatedProductIds || []).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setNewsFormData({ ...newsFormData, relatedProductIds: [] })}
+                              className="text-[11px] text-red-600 hover:underline font-semibold"
+                            >
+                              Xóa tất cả
+                            </button>
+                          )}
+                        </div>
+
+                        {(newsFormData.relatedProductIds || []).length === 0 ? (
+                          <div className="p-4 rounded-xl border border-dashed border-emerald-300 bg-white/70 text-center">
+                            <p className="text-xs text-gray-600 font-medium">
+                              Chưa chọn sản phẩm thủ công nào.
+                            </p>
+                            <p className="text-[11px] text-emerald-700 mt-1">
+                              💡 <em>Mẹo:</em> Bạn có thể gõ tìm kiếm để chọn sản phẩm, hoặc bấm <strong>⚡ Gợi ý tự động</strong>. Nếu để trống, hệ thống sẽ tự động quét nội dung bài viết để hiển thị sản phẩm liên quan (ví dụ: bài viết nói về bột kem béo sẽ tự động đề xuất sản phẩm bột béo CASA).
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {newsFormData.relatedProductIds.map((pId) => {
+                              const prod = products.find((p) => p.id === pId);
+                              if (!prod) return null;
+                              return (
+                                <div
+                                  key={prod.id}
+                                  className="flex items-center justify-between p-2 rounded-xl bg-white border border-emerald-200 shadow-xs"
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <img
+                                      src={prod.image || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=100&q=80'}
+                                      alt={prod.name}
+                                      className="w-8 h-8 rounded-lg object-cover border border-gray-200 shrink-0"
+                                    />
+                                    <div className="truncate">
+                                      <p className="font-bold text-xs text-gray-800 truncate">{prod.name}</p>
+                                      <p className="text-[10px] text-emerald-700">{prod.categoryName || prod.category}</p>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveNewsRelatedProduct(prod.id)}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1 shrink-0"
+                                    title="Gỡ sản phẩm khỏi bài viết"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </>
                 ) : (
                   /* LIVE PREVIEW TAB */
@@ -4464,6 +4676,51 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     )}
+
+                    {/* Attached Products Preview */}
+                    {(() => {
+                      const attached = resolveArticleProducts(newsFormData, products);
+                      if (!attached || attached.length === 0) return null;
+                      return (
+                        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Package className="w-4 h-4 text-emerald-700" />
+                              <h4 className="font-bold text-xs sm:text-sm text-emerald-950">
+                                Sản Phẩm & Nguyên Liệu Gắn Trong Bài ({attached.length})
+                              </h4>
+                            </div>
+                            <span className="text-[10px] text-emerald-700 font-semibold uppercase tracking-wider">
+                              Xem trước giao diện
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {attached.map((p) => (
+                              <div
+                                key={p.id}
+                                className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-emerald-200/80 shadow-xs"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <img
+                                    src={p.image || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=100&q=80'}
+                                    alt={p.name}
+                                    className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
+                                  />
+                                  <div className="truncate">
+                                    <p className="font-bold text-xs text-gray-900 truncate">{p.name}</p>
+                                    <p className="text-[10px] text-emerald-700">{p.categoryName || p.category}</p>
+                                  </div>
+                                </div>
+                                <span className="text-[10px] font-bold text-blue-600 shrink-0 ml-2">
+                                  Xem chi tiết ➔
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Tags Preview */}
                     {newsFormData.tags && newsFormData.tags.length > 0 && (
