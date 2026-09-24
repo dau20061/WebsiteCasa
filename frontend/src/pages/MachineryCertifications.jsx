@@ -40,6 +40,8 @@ export default function MachineryCertifications() {
   const [selectedFilter, setSelectedFilter] = useState('all');
 
   const [machineryList, setMachineryList] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_machinery');
+    return saved ? JSON.parse(saved) : [];
     try {
       const saved = localStorage.getItem('casa_admin_machinery');
       if (saved) {
@@ -52,6 +54,7 @@ export default function MachineryCertifications() {
 
   useEffect(() => {
     getRtdbMachinery().then((res) => {
+      if (res && res.length > 0) setMachineryList(res);
       if (Array.isArray(res)) {
         const cleaned = res.filter((m) => !String(m.id).startsWith('machinery-0'));
         setMachineryList(cleaned);
@@ -160,6 +163,15 @@ export default function MachineryCertifications() {
           </div>
 
           {/* Machinery Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredMachinery.map((item) => (
+              <MachineryCard
+                key={item.id}
+                item={item}
+                onSelect={(m) => openLightbox(m)}
+              />
+            ))}
+          </div>
           {filteredMachinery.length === 0 ? (
             <div className="text-center py-16 px-4 bg-tea-soft/30 dark:bg-[#132018]/60 rounded-3xl border border-dashed border-tea-border dark:border-white/10 max-w-2xl mx-auto">
               <Cpu className="w-12 h-12 text-tea-leaf/40 dark:text-tea-mint/40 mx-auto mb-3" />

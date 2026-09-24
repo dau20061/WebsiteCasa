@@ -2,14 +2,23 @@
 <html lang="vi" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/frontend/src/img/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Standard Favicons for Google Search, Browsers, and PWA -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#267d88" />
+
     <title>Nguyên Liệu Pha Chế CASA | Trà Sỉ & Giải Pháp Đồ Uống F&B Toàn Quốc</title>
     <meta name="description" content="CASA – Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP, FDA." />
     <meta name="keywords" content="nguyên liệu pha chế casa, nguyên liệu pha chế, trà nguyên liệu, trà sỉ trà sữa, syrup bí đao, siro pha chế, trà đen, trà ô long, bột béo, giải pháp F&B, CASA TEA" />
     <meta name="author" content="CÔNG TY CỔ PHẦN NGUYÊN LIỆU PHA CHẾ CASA VIỆT NAM" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <link rel="canonical" href="https://nguyenlieuphachecasa.com/" />
     <link rel="canonical" href="https://www.nguyenlieuphachecasa.com/" />
 
     <!-- Open Graph (Facebook, Zalo, LinkedIn) -->
@@ -18,8 +27,6 @@
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:title" content="Nguyên Liệu Pha Chế CASA | Trà Sỉ & Giải Pháp Đồ Uống F&B Toàn Quốc" />
     <meta property="og:description" content="CASA – Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, trà nguyên liệu, siro pha chế, bột béo cao cấp cho chuỗi trà sữa, quán cafe và ngành F&B toàn quốc. Đạt chuẩn ISO 22000, HACCP, FDA." />
-    <meta property="og:url" content="https://nguyenlieuphachecasa.com/" />
-    <meta property="og:image" content="https://nguyenlieuphachecasa.com/logo.png" />
     <meta property="og:url" content="https://www.nguyenlieuphachecasa.com/" />
     <meta property="og:image" content="https://www.nguyenlieuphachecasa.com/logo.png" />
     <meta property="og:image:alt" content="Nguyên Liệu Pha Chế CASA" />
@@ -28,7 +35,6 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Nguyên Liệu Pha Chế CASA | Trà Sỉ B2B & F&B" />
     <meta name="twitter:description" content="Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, siro, bột béo cho chuỗi trà sữa và F&B toàn quốc." />
-    <meta name="twitter:image" content="https://nguyenlieuphachecasa.com/logo.png" />
     <meta name="twitter:image" content="https://www.nguyenlieuphachecasa.com/logo.png" />
 
     <!-- Global Schema.org JSON-LD: Organization, WebSite & WholesaleStore -->
@@ -38,16 +44,13 @@
       "@graph": [
         {
           "@type": "Organization",
-          "@id": "https://nguyenlieuphachecasa.com/#organization",
           "@id": "https://www.nguyenlieuphachecasa.com/#organization",
           "name": "CASA TEA & BEVERAGE SOLUTIONS",
           "legalName": "CÔNG TY CỔ PHẦN NGUYÊN LIỆU PHA CHẾ CASA VIỆT NAM",
           "alternateName": ["Nguyên Liệu Pha Chế CASA", "CASA TEA", "CASA BEVERAGE"],
-          "url": "https://nguyenlieuphachecasa.com/",
           "url": "https://www.nguyenlieuphachecasa.com/",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://nguyenlieuphachecasa.com/logo.png"
             "url": "https://www.nguyenlieuphachecasa.com/logo.png"
           },
           "description": "Nhà sản xuất và phân phối sỉ nguyên liệu pha chế, trà nguyên liệu, bột pha chế và siro chuyên nghiệp cho ngành F&B toàn quốc.",
@@ -70,21 +73,17 @@
         },
         {
           "@type": "WebSite",
-          "@id": "https://nguyenlieuphachecasa.com/#website",
-          "url": "https://nguyenlieuphachecasa.com/",
           "@id": "https://www.nguyenlieuphachecasa.com/#website",
           "url": "https://www.nguyenlieuphachecasa.com/",
           "name": "Nguyên Liệu Pha Chế CASA",
           "alternateName": "CASA TEA",
           "publisher": {
-            "@id": "https://nguyenlieuphachecasa.com/#organization"
             "@id": "https://www.nguyenlieuphachecasa.com/#organization"
           },
           "potentialAction": {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://nguyenlieuphachecasa.com/products?q={search_term_string}"
               "urlTemplate": "https://www.nguyenlieuphachecasa.com/products?q={search_term_string}"
             },
             "query-input": "required name=search_term_string"
@@ -118,4 +117,3 @@
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-
