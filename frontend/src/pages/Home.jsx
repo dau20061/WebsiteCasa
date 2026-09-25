@@ -24,7 +24,6 @@ import ProductCard from '../components/ProductCard';
 import NewsCard from '../components/NewsCard';
 import CertificationCard from '../components/CertificationCard';
 import SEO from '../components/SEO';
-import FallingTeaLeaves from '../components/FallingTeaLeaves';
 import HeroCarousel from '../components/HeroCarousel';
 import { getRtdbProducts, getRtdbNews } from '../services/rtdbService';
 import { CERTIFICATIONS } from '../constants/certifications';
@@ -85,8 +84,6 @@ export default function Home() {
         description={isEnglish ? "CASA TEA – Leading B2B manufacturer and wholesale supplier of raw tea, pyramid tea bags, and beverage mixes for milk tea chains and F&B brands." : (isChinese ? "CASA TEA – 專業茶葉原料與植脂末製造商，為手搖飲連鎖與餐飲通路提供批發與研發方案。" : "CASA TEA – Nhà sản xuất và cung ứng sỉ nguyên liệu pha chế, cốt trà nguyên lá, trà túi lọc pyramid, siro và bột béo cao cấp cho chuỗi trà sữa, cafe và ngành F&B toàn quốc.")}
       />
 
-      {/* Hiệu Ứng Lá Trà Rơi Nghệ Thuật CASA TEA */}
-      <FallingTeaLeaves />
 
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[92vh] flex items-center pt-24 pb-20 lg:pt-32 lg:pb-28 bg-gradient-to-b from-[#EBF8EE]/80 via-[#DCF3E4]/30 to-[#FAF9F5] dark:from-[#0D1D13] dark:via-[#09140D] dark:to-[#070D09]">
