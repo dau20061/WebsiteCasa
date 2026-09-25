@@ -17,6 +17,8 @@ const Contact = lazy(() => import('../pages/Contact'));
 const FAQ = lazy(() => import('../pages/FAQ'));
 
 // Admin & Security Routes (isolated in separate chunks)
+// Admin & Security Routes (isolated in separate chunks with Firebase SDK)
+const AdminLayout = lazy(() => import('../layouts/AdminLayout'));
 const AdminLogin = lazy(() => import('../pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const Forbidden403 = lazy(() => import('../pages/admin/Forbidden403'));
@@ -34,6 +36,7 @@ export default function AppRoutes() {
     <Suspense fallback={<PageFallback />}>
       <Routes>
         {/* Public Layout */}
+        {/* Public Layout (Ultralight - Zero Firebase overhead) */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
@@ -57,6 +60,19 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Admin Authentication & Portal (Lazy-loaded Firebase chunk) */}
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/403" element={<Forbidden403 />} />
+        </Route>
 
         {/* Catch-all redirect to Home */}
         <Route path="*" element={<Navigate to="/" replace />} />

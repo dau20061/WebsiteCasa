@@ -32,66 +32,6 @@ import { PRODUCTION_STEPS } from '../constants/categories';
 import { STATS, CORE_VALUES, PARTNERS_FEEDBACK, COMPANY_INFO } from '../constants/company';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
-import heroBannerImg from '../img/imgmain.jpg';
-import heroCapsuleImg from '../img/capsule.jpg';
-import heroMatchaImg from '../img/matcha.jpg';
-import heroToppingImg from '../img/topping.jpg';
-
-const HERO_SLIDES = [
-  {
-    id: 'tea-bags',
-    image: heroBannerImg,
-    badgeVi: 'CASA TEA & TEA BAGS • PREMIUM QUALITY',
-    badgeZh: 'CASA TEA & TEA BAGS • 頂級原茶系列',
-    badgeEn: 'CASA TEA & PYRAMID TEA BAGS • PREMIUM QUALITY',
-    titleVi: 'Cốt Trà Nguyên Lá & Túi Lọc Pyramid Tam Giác',
-      titleZh: '原葉茶湯與三角立體茶包工藝',
-    titleEn: 'Loose-Leaf Tea & Triangle Pyramid Tea Bag Craft',
-    tagVi: '100% Nguyên Liệu Tự Nhiên',
-    tagZh: '100% 精選茶葉原料',
-    tagEn: '100% Natural Selected Tea',
-  },
-  {
-    id: 'matcha',
-    image: heroMatchaImg,
-    badgeVi: 'PREMIUM MATCHA & POWDER • NGUYÊN LIỆU BỘT CHUYÊN DỤNG',
-    badgeZh: '頂級抹茶與專業調飲粉料系列',
-    badgeEn: 'PREMIUM MATCHA & POWDER • PROFESSIONAL BEVERAGE BASES',
-    titleVi: 'Bột Trà Xanh Matcha & Bột Pha Chế Chuẩn Vị',
-    titleZh: '日式極致抹茶與專業飲品專用粉',
-    titleEn: 'Matcha Green Tea Powder & Barista Beverage Mixes',
-    tagVi: 'Matcha Tuyển Chọn',
-    tagZh: '頂級抹茶原料',
-    tagEn: 'Premium Japanese Matcha',
-  },
-  {
-    id: 'topping',
-    image: heroToppingImg,
-    badgeVi: 'SIGNATURE TOPPING • BỘ SƯU TẬP TOPPING CAO CẤP',
-    badgeZh: '獨家風味配料與晶球寒天系列',
-    badgeEn: 'SIGNATURE TOPPING • PREMIUM TEXTURE COLLECTION',
-    titleVi: 'Bộ Sưu Tập Topping & Thạch Dẻo Đa Tầng Cảm Xúc',
-    titleZh: '嚴選手搖飲特色配料與豐富口感',
-    titleEn: 'Multi-Layer Topping & Agar Jelly Collection',
-    tagVi: 'Topping Chuẩn Chuỗi',
-    tagZh: '連鎖專用配料',
-    tagEn: 'Chain-Grade Topping',
-  },
-  {
-    id: 'capsule',
-    image: heroCapsuleImg,
-    badgeVi: 'INNOVATIVE CAPSULE TEA • CÔNG NGHỆ CHIẾT XUẤT MỚI',
-    badgeZh: '創新膠囊萃茶與現代提取科技',
-    badgeEn: 'INNOVATIVE CAPSULE TEA • ADVANCED EXTRACTION TECH',
-    titleVi: 'Viên Nén Trà Capsule – Chiết Xuất Nhanh Chuẩn Vị',
-    titleZh: '新型茶膠囊系列 – 極速精準萃取',
-    titleEn: 'Capsule Tea System – Rapid Precision Extraction',
-    tagVi: 'Công Nghệ Tiên Tiến',
-    tagZh: '尖端萃取科技',
-    tagEn: 'Advanced Extraction Tech',
-  },
-];
-
 export default function Home() {
   const { openSampleModal } = useAppUI();
   const { t, isChinese, isEnglish } = useLanguage();

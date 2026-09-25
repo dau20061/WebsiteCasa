@@ -2,15 +2,15 @@ import React, { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import heroBannerImg from '../img/imgmain.jpg';
-import heroCapsuleImg from '../img/capsule.jpg';
-import heroMatchaImg from '../img/matcha.jpg';
-import heroToppingImg from '../img/topping.jpg';
+import heroCapsuleImg from '../img/capsule.webp';
+import heroMatchaImg from '../img/matcha.webp';
+import heroToppingImg from '../img/topping.webp';
 
 const HERO_SLIDES = [
   {
     id: 'tea-bags',
-    image: heroBannerImg,
+    image: '/imgmain-desktop.webp',
+    imageMobile: '/imgmain-hero.webp',
     badgeVi: 'CASA TEA & TEA BAGS • PREMIUM QUALITY',
     badgeZh: 'CASA TEA & TEA BAGS • 頂級原茶系列',
     badgeEn: 'CASA TEA & PYRAMID TEA BAGS • PREMIUM QUALITY',
@@ -148,6 +148,21 @@ function HeroCarousel() {
                   decoding="async"
                   className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
                 />
+                <picture>
+                  {slide.imageMobile && (
+                    <source media="(max-width: 640px)" srcSet={slide.imageMobile} type="image/webp" />
+                  )}
+                  <img
+                    src={slide.image}
+                    alt={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={idx === 0 ? 'high' : 'auto'}
+                    decoding="async"
+                    width="1440"
+                    height="927"
+                    className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
+                  />
+                </picture>
               </div>
             );
           })}

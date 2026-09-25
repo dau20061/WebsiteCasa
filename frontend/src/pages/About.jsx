@@ -33,7 +33,7 @@ import SEO from '../components/SEO';
 import { TEA_REGIONS, CORE_VALUES, COMPANY_INFO } from '../constants/company';
 import { useAppUI } from '../layouts/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
-import contactInfographicImg from '../img/contact.jpg';
+import contactInfographicImg from '../img/contact.webp';
 import isoCertImg from '../img/ISO.avif';
 import gmpCertImg from '../img/gmp.avif';
 import haccpCertImg from '../img/Haccp.avif';

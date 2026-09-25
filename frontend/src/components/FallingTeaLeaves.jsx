@@ -204,8 +204,11 @@ function FallingTeaLeaves({
   }, [isDark]);
 
   // Main Canvas animation loop with scroll-pause & sprite blitting
+  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+
+  // Main Canvas animation loop with scroll-pause & sprite blitting (Desktop only)
   useEffect(() => {
-    if (!isEnabled) {
+    if (!isEnabled || isMobile) {
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current);
         animFrameIdRef.current = null;
@@ -369,6 +372,8 @@ function FallingTeaLeaves({
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [isEnabled, isDark, customCount]);
+
+  if (isMobile) return null;
 
   return (
     <>
