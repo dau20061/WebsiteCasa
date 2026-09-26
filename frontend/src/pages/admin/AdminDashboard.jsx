@@ -1304,6 +1304,15 @@ export default function AdminDashboard() {
       }
     }
 
+    const cleanArticleSlug = slugify(finalData.title) || editingNews?.slug || '';
+    const targetArticleSlug = cleanArticleSlug || editingNews?.slug || editingNews?.id || `news_${Date.now()}`;
+
+    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
+    if (finalData.image && finalData.image.startsWith('data:image/')) {
+      finalData.imageData = finalData.image;
+      finalData.image = `https://www.nguyenlieuphachecasa.com/article-image/${targetArticleSlug}.webp`;
+    }
+
     const nowIso = new Date().toISOString();
     const isHero = Boolean(finalData.featuredNews);
     const isHome = Boolean(finalData.featuredHome);

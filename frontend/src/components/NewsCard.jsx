@@ -39,11 +39,7 @@ export default function NewsCard({ article }) {
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            if (article?.imageData && e.currentTarget.src !== article.imageData) {
-              e.currentTarget.src = article.imageData;
-            } else if (image && e.currentTarget.src !== image && image.startsWith('data:')) {
-              e.currentTarget.src = image;
-            }
+            e.currentTarget.src = '/logo.png';
           }}
           className="w-full h-full object-cover object-center transform group-hover:scale-106 transition-transform duration-500 ease-out"
         />

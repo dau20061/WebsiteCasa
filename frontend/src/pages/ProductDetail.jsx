@@ -438,11 +438,7 @@ export default function ProductDetail() {
                 loading="eager"
                 fetchPriority="high"
                 onError={(e) => {
-                  if (product?.imageData && e.currentTarget.src !== product.imageData) {
-                    e.currentTarget.src = product.imageData;
-                  } else if (image && e.currentTarget.src !== image && image.startsWith('data:')) {
-                    e.currentTarget.src = image;
-                  }
+                  e.currentTarget.src = '/logo.png';
                 }}
                 className="w-full h-full object-cover object-center"
               />

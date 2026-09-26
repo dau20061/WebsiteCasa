@@ -241,11 +241,7 @@ export default function NewsDetail() {
               loading="eager"
               fetchPriority="high"
               onError={(e) => {
-                if (article?.imageData && e.currentTarget.src !== article.imageData) {
-                  e.currentTarget.src = article.imageData;
-                } else if (article?.image && e.currentTarget.src !== article.image && article.image.startsWith('data:')) {
-                  e.currentTarget.src = article.image;
-                }
+                e.currentTarget.src = '/logo.png';
               }}
               className="w-full h-full object-cover"
             />

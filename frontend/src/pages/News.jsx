@@ -173,11 +173,7 @@ export default function News() {
                     src={getArticleImageUrl(featuredArticle)}
                     alt={isEnglish ? (featuredArticle.titleEn || featuredArticle.title) : ((isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title)}
                     onError={(e) => {
-                      if (featuredArticle?.imageData && e.currentTarget.src !== featuredArticle.imageData) {
-                        e.currentTarget.src = featuredArticle.imageData;
-                      } else if (featuredArticle?.image && e.currentTarget.src !== featuredArticle.image && featuredArticle.image.startsWith('data:')) {
-                        e.currentTarget.src = featuredArticle.image;
-                      }
+                      e.currentTarget.src = '/logo.png';
                     }}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />

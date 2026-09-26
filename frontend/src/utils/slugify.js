@@ -52,7 +52,7 @@ export function getProductImageUrl(product) {
   if (slug) {
     return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp`;
   }
-  return img || 'https://www.nguyenlieuphachecasa.com/logo.png';
+  return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }
 
 export function getArticleImageUrl(article) {
@@ -67,6 +67,7 @@ export function getArticleImageUrl(article) {
   if (slug) {
     return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp`;
   }
-  return img || 'https://www.nguyenlieuphachecasa.com/logo.png';
+  return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }
+
 

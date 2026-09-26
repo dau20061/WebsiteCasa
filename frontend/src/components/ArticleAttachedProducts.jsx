@@ -100,11 +100,7 @@ export default function ArticleAttachedProducts({
                     title={`${displayName} – CASA TEA`}
                     loading="lazy"
                     onError={(e) => {
-                      if (product?.imageData && e.currentTarget.src !== product.imageData) {
-                        e.currentTarget.src = product.imageData;
-                      } else if (product?.image && e.currentTarget.src !== product.image && product.image.startsWith('data:')) {
-                        e.currentTarget.src = product.image;
-                      }
+                      e.currentTarget.src = '/logo.png';
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
