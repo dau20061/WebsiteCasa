@@ -32,7 +32,9 @@ import {
   ChefHat,
   BookOpen,
   Wand2,
-  Star
+  Star,
+  Loader2,
+  UploadCloud
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -67,6 +69,7 @@ import {
 
 import { PRODUCT_CATEGORIES, FAQ_CATEGORIES } from '../../constants/categories';
 import ImageUploadInput from '../../components/ImageUploadInput';
+import { uploadProductImage, deleteStorageImage } from '../../services/storageService';
 import {
   getRtdbProducts,
   saveRtdbProduct,
@@ -101,6 +104,8 @@ export default function AdminDashboard() {
   const [isDesigningProduct, setIsDesigningProduct] = useState(false);
   const [isTranslatingProduct, setIsTranslatingProduct] = useState(false);
   const [isTranslatingProductEn, setIsTranslatingProductEn] = useState(false);
+  const [isMigratingImages, setIsMigratingImages] = useState(false);
+  const [migrateProgress, setMigrateProgress] = useState('');
   const [isRewritingDesc, setIsRewritingDesc] = useState(false);
   const [productAiHints, setProductAiHints] = useState('');
   const [productModalTab, setProductModalTab] = useState('edit'); // 'edit' | 'preview'
@@ -984,6 +989,7 @@ export default function AdminDashboard() {
     const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
 
     if (editingProduct) {
+      const oldImage = editingProduct.image;
       // SỬA (UPDATE)
       const updatedProd = {
         ...editingProduct,
@@ -996,6 +1002,12 @@ export default function AdminDashboard() {
       );
       // Ghi trực tiếp lên Firebase Realtime Database
       await saveRtdbProduct(updatedProd);
+
+      // Nếu thay ảnh mới và ảnh cũ nằm trên Firebase Storage thì dọn dẹp ảnh cũ
+      if (oldImage && finalData.image && oldImage !== finalData.image && oldImage.includes('firebasestorage.googleapis.com')) {
+        deleteStorageImage(oldImage);
+      }
+
       showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
     } else {
       // THÊM MỚI (CREATE)
@@ -1021,9 +1033,13 @@ export default function AdminDashboard() {
       return;
     }
     if (window.confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${productName}"?`)) {
+      const targetProd = products.find((p) => p.id === productId);
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       // Xóa trực tiếp trên Firebase Realtime Database
       await deleteRtdbProduct(productId);
+      if (targetProd?.image && targetProd.image.includes('firebasestorage.googleapis.com')) {
+        deleteStorageImage(targetProd.image);
+      }
       showToast(`Đã xóa sản phẩm "${productName}" trên Realtime Database.`, 'info');
     }
   };
@@ -1043,6 +1059,59 @@ export default function AdminDashboard() {
     );
     if (targetProd) {
       await saveRtdbProduct(targetProd);
+    }
+  };
+
+  const handleMigrateAllBase64Images = async () => {
+    const targets = products.filter((p) => (p.image || '').startsWith('data:image/'));
+    if (targets.length === 0) {
+      showToast('Không có sản phẩm nào sử dụng ảnh Base64!', 'info');
+      return;
+    }
+
+    if (!window.confirm(`Hệ thống tìm thấy ${targets.length} sản phẩm đang dùng ảnh Base64. Bạn có muốn bắt đầu chuyển đổi toàn bộ sang Firebase Storage (HTTPS) để khắc phục cảnh báo Google Search Console?`)) {
+      return;
+    }
+
+    setIsMigratingImages(true);
+    let success = 0;
+    let failed = 0;
+
+    for (let i = 0; i < targets.length; i++) {
+      const p = targets[i];
+      setMigrateProgress(`${i + 1}/${targets.length}`);
+      try {
+        const res = await fetch(p.image);
+        const blob = await res.blob();
+
+        const uploadRes = await uploadProductImage(blob, {
+          folder: 'products',
+          productId: p.id || `product_${Date.now()}`,
+          customFileName: 'main',
+          optimize: false
+        });
+
+        if (uploadRes?.downloadUrl) {
+          const updatedProd = { ...p, image: uploadRes.downloadUrl };
+          await saveRtdbProduct(updatedProd);
+          setProducts((prev) => prev.map((item) => (item.id === p.id ? updatedProd : item)));
+          success++;
+        } else {
+          failed++;
+        }
+      } catch (err) {
+        console.error(`Lỗi chuyển đổi sản phẩm "${p.name}":`, err);
+        failed++;
+      }
+    }
+
+    setIsMigratingImages(false);
+    setMigrateProgress('');
+    if (success > 0) {
+      showToast(`🎉 Chuyển đổi thành công ${success}/${targets.length} ảnh sang Firebase Storage!`, 'success');
+    }
+    if (failed > 0) {
+      showToast(`⚠️ Có ${failed} sản phẩm chưa thể chuyển đổi (Vui lòng kiểm tra quyền Storage hoặc kết nối mạng).`, 'error');
     }
   };
 
@@ -2094,6 +2163,32 @@ export default function AdminDashboard() {
                 <span>+ Thêm Sản Phẩm Mới</span>
               </button>
             </div>
+
+            {/* THÔNG BÁO MIGRATION NẾU CÓ ẢNH BASE64 */}
+            {products.some((p) => (p.image || '').startsWith('data:image/')) && (
+              <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-amber-950 text-sm">
+                      Phát hiện {products.filter((p) => (p.image || '').startsWith('data:image/')).length} sản phẩm đang sử dụng ảnh Base64
+                    </h4>
+                    <p className="text-amber-800 text-xs mt-0.5">
+                      Google Search Console báo lỗi <i>&quot;URL trong trường &apos;image&apos; không hợp lệ&quot;</i> do ảnh là chuỗi Base64. Bấm nút bên dưới để chuyển đổi toàn bộ sang <b>Firebase Storage (HTTPS URL)</b> chuẩn SEO.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleMigrateAllBase64Images}
+                  disabled={isMigratingImages}
+                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold shrink-0 flex items-center gap-2 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {isMigratingImages ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
+                  <span>{isMigratingImages ? `Đang tải lên Storage (${migrateProgress})...` : 'Chuyển Đổi Sang Firebase Storage'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Filter & Search Toolbar */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
@@ -3590,6 +3685,7 @@ export default function AdminDashboard() {
                         value={productFormData.image}
                         onChange={(url) => setProductFormData({ ...productFormData, image: url })}
                         folder="products"
+                        productId={editingProduct?.id || 'new_product'}
                       />
                     </div>
                     <div>

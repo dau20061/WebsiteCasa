@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   UploadCloud,
   Image as ImageIcon,
@@ -10,8 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { uploadImageFile } from '../firebase/storage';
-import { compressImage } from '../utils/imageCompressor';
+import { uploadProductImage } from '../services/storageService';
 
 // Danh sách ảnh mẫu nguyên liệu F&B cao cấp được chuẩn bị sẵn cho CASA TEA
 const CASA_SAMPLE_IMAGES = [
@@ -81,16 +80,18 @@ export default function ImageUploadInput({
   label = "Hình Ảnh",
   value = "",
   onChange,
-  folder = "products"
+  folder = "products",
+  productId = "common"
 }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [tempPreview, setTempPreview] = useState(null);
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'url' | 'samples'
   const [errorMessage, setErrorMessage] = useState(null);
   const [sizeInfo, setSizeInfo] = useState('');
   const [urlInput, setUrlInput] = useState('');
 
-  // Xử lý chọn ảnh từ máy tính
+  // Xử lý chọn ảnh từ máy tính -> Nén WebP -> Tải trực tiếp lên Firebase Storage
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -115,41 +116,48 @@ export default function ImageUploadInput({
     setErrorMessage(null);
     setUploading(true);
 
+    // Tạo preview cục bộ tức thời trong khi upload
+    const localUrl = URL.createObjectURL(file);
+    setTempPreview(localUrl);
+
     try {
-      // 1. NÉN TỨC THÌ BẰNG HTML5 CANVAS (< 50ms) -> Thành ảnh WebP 40-80KB siêu nhẹ
-      const compressed = await compressImage(file, {
-        maxWidth: 1000,
-        maxHeight: 1000,
-        quality: 0.82
+      // Tải lên Firebase Storage (tự động tối ưu WebP qua Canvas)
+      const result = await uploadProductImage(file, {
+        folder,
+        productId,
+        optimize: true
       });
 
-      // Áp dụng ngay ảnh nén để hiển thị tức thì, KHÔNG để người dùng phải chờ đợi!
-      onChange(compressed.dataUrl);
-      const originalMb = (compressed.originalSizeKb / 1024).toFixed(1);
-      setSizeInfo(`Đã nén tối ưu: ${compressed.sizeKb} KB (từ ${originalMb} MB)`);
-      setUploading(false);
-
-      // 2. Thử tải ngầm lên Firebase Storage nếu bucket sẵn sàng (có timeout 2.5s không bao giờ treo)
-      try {
-        const result = await uploadImageFile(folder, file);
-        if (result?.downloadUrl) {
-          onChange(result.downloadUrl);
-          setSizeInfo('Lưu trữ trên Cloud CDN');
-        }
-      } catch (storageErr) {
-        // Firebase Storage chưa cấu hình bucket hoặc timeout -> Giữ nguyên WebP nén siêu nhẹ
-        console.warn('[ImageUploadInput] Firebase Storage offline, dùng ảnh WebP tối ưu:', storageErr.message);
+      if (result?.downloadUrl) {
+        onChange(result.downloadUrl);
+        setSizeInfo(`Đã lưu Cloud Storage (${result.sizeKb} KB WebP)`);
+      } else {
+        throw new Error('Không nhận được URL từ Firebase Storage.');
       }
     } catch (err) {
-      console.error('[ImageUploadInput] Lỗi xử lý ảnh:', err);
-      setErrorMessage(err.message || 'Không thể đọc và xử lý file ảnh.');
+      console.error('[ImageUploadInput] Lỗi tải lên Storage:', err);
+      setErrorMessage(err.message || 'Không thể tải ảnh lên Firebase Storage.');
+    } finally {
       setUploading(false);
+      setTempPreview(null);
+      URL.revokeObjectURL(localUrl);
     }
   };
 
   const handleApplyUrl = (inputUrl) => {
     const cleanUrl = (inputUrl || '').trim();
     if (!cleanUrl) return;
+
+    if (cleanUrl.startsWith('data:image/')) {
+      setErrorMessage('Không được sử dụng chuỗi Base64. Google Schema yêu cầu URL HTTPS công khai!');
+      return;
+    }
+
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      setErrorMessage('URL hình ảnh phải bắt đầu bằng https:// hoặc http://');
+      return;
+    }
+
     onChange(cleanUrl);
     setSizeInfo('Liên kết URL trực tiếp');
     setErrorMessage(null);
@@ -157,7 +165,7 @@ export default function ImageUploadInput({
 
   const handleSelectSample = (sampleUrl) => {
     onChange(sampleUrl);
-    setSizeInfo('Ảnh mẫu CASA TEA');
+    setSizeInfo('Ảnh mẫu CASA TEA (Unsplash CDN)');
     setErrorMessage(null);
   };
 
@@ -166,17 +174,19 @@ export default function ImageUploadInput({
     setSizeInfo('');
     setUrlInput('');
     setErrorMessage(null);
+    setTempPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const getImageSourceLabel = () => {
+    if (uploading || tempPreview) return 'Đang tối ưu & tải lên Firebase Storage...';
     if (!value) return '';
-    if (value.startsWith('data:image/')) return 'Ảnh từ máy tính (Đã tối ưu WebP)';
-    if (value.includes('unsplash.com')) return 'Ảnh nguyên liệu cao cấp';
-    if (value.includes('firebasestorage')) return 'Ảnh lưu trữ Firebase Storage';
-    return 'Ảnh từ liên kết ngoài';
+    if (value.startsWith('data:image/')) return '⚠️ Ảnh Base64 cũ (Hãy tải lại để lấy URL HTTPS chuẩn Google)';
+    if (value.includes('firebasestorage.googleapis.com')) return '✅ Firebase Storage CDN (Chuẩn Google Schema)';
+    if (value.includes('unsplash.com')) return 'Ảnh nguyên liệu mẫu CASA TEA';
+    return 'Ảnh từ liên kết ngoài HTTPS';
   };
 
   return (
@@ -249,13 +259,13 @@ export default function ImageUploadInput({
       {/* ========================================================================= */}
       {/* TRƯỜNG HỢP 1: ĐÃ CÓ ẢNH (HIỂN THỊ PREVIEW ĐẸP VÀ RÕ RÀNG)                  */}
       {/* ========================================================================= */}
-      {value ? (
+      {value || tempPreview ? (
         <div className="p-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/40 space-y-2.5">
           <div className="flex items-center gap-3">
             {/* Khung ảnh thumbnail */}
             <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm shrink-0 group">
               <img
-                src={value}
+                src={tempPreview || value}
                 alt="Product Preview"
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -266,7 +276,7 @@ export default function ImageUploadInput({
               {uploading && (
                 <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-[9px] font-bold gap-1">
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Đang nén...</span>
+                  <span>Đang tải lên...</span>
                 </div>
               )}
             </div>

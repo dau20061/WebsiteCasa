@@ -9,15 +9,20 @@ const DEFAULT_IMAGE = DEFAULT_OG_IMAGE;
 export function resolveSafeImageUrl(rawImage) {
   if (!rawImage || typeof rawImage !== 'string') return DEFAULT_IMAGE;
   const trimmed = rawImage.trim();
+  // Google cấm tuyệt đối Base64 data:, blob: và IP nội bộ
+  if (
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:') ||
+    trimmed.includes('localhost') ||
+    trimmed.includes('127.0.0.1')
+  ) {
+    return DEFAULT_IMAGE;
+  }
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
   if (trimmed.startsWith('/')) {
     return `${SITE_URL}${trimmed}`;
-  }
-  // Nếu là data:image/... thì không được truyền vào OpenGraph hay Schema (Google cấm tuyệt đối)
-  if (trimmed.startsWith('data:')) {
-    return DEFAULT_IMAGE;
   }
   return `${SITE_URL}/${trimmed}`;
 }
@@ -33,7 +38,10 @@ function sanitizeJsonLd(obj) {
       if (typeof value === 'string') {
         sanitized[key] = resolveSafeImageUrl(value);
       } else if (Array.isArray(value)) {
-        sanitized[key] = value.map((img) => resolveSafeImageUrl(img));
+        const filtered = value
+          .map((img) => resolveSafeImageUrl(img))
+          .filter((img) => img && !img.startsWith('data:') && !img.startsWith('blob:'));
+        sanitized[key] = filtered.length > 0 ? filtered : [DEFAULT_IMAGE];
       } else {
         sanitized[key] = sanitizeJsonLd(value);
       }

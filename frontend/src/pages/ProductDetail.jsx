@@ -279,19 +279,35 @@ export default function ProductDetail() {
   const productSlug = getProductSlug(product);
 
   // Chuẩn hóa URL hình ảnh hợp lệ cho Google Merchant/Schema & OpenGraph
-  // Google Schema cấm tuyệt đối base64 (data:image/...). Bắt buộc phải là HTTP/HTTPS URL
-  const getSeoImageUrl = () => {
-    if (product.image) {
-      if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
-        return product.image;
+  // Google Schema cấm tuyệt đối base64 (data:image/...). Bắt buộc phải là HTTP/HTTPS URL công khai
+  const getValidHttpsImages = () => {
+    const list = [];
+    const pushIfValid = (url) => {
+      if (url && typeof url === 'string') {
+        const trimmed = url.trim();
+        if (
+          (trimmed.startsWith('https://') || trimmed.startsWith('http://')) &&
+          !trimmed.includes('localhost') &&
+          !trimmed.includes('127.0.0.1')
+        ) {
+          if (!list.includes(trimmed)) list.push(trimmed);
+        }
       }
-      if (product.image.startsWith('data:image/')) {
-        return `${SITE_URL}/product-image/${productSlug}.webp`;
-      }
+    };
+
+    pushIfValid(product?.image);
+    if (Array.isArray(product?.images)) {
+      product.images.forEach(pushIfValid);
     }
-    return `${SITE_URL}/logo.png`;
+
+    if (list.length === 0) {
+      list.push(`${SITE_URL}/logo.png`);
+    }
+    return list;
   };
-  const seoImageUrl = getSeoImageUrl();
+
+  const validProductImages = getValidHttpsImages();
+  const primaryProductImage = validProductImages[0] || `${SITE_URL}/logo.png`;
 
   return (
     <div className="pt-20 pb-20 bg-[#FAF9F5] dark:bg-[#0B130E] min-h-screen transition-colors">
@@ -302,13 +318,13 @@ export default function ProductDetail() {
         keywords={[displayName, categoryName, 'nguyên liệu pha chế', 'trà nguyên liệu', 'mua sỉ F&B', sku, origin]}
         canonical={`/products/${productSlug}`}
         ogType="product"
-        ogImage={seoImageUrl}
+        ogImage={primaryProductImage}
         ogImageAlt={`${displayName} - Nguyên Liệu Pha Chế CASA TEA`}
         jsonLd={[
           {
             '@type': 'Product',
             name: displayName,
-            image: [seoImageUrl],
+            image: validProductImages,
             description: fullDesc,
             sku: sku,
             mpn: sku,

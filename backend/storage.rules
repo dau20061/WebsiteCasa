@@ -41,7 +41,9 @@ service firebase.storage {
     function isValidImage() {
       return request.resource.contentType.matches('image/jpeg') ||
              request.resource.contentType.matches('image/png') ||
-             request.resource.contentType.matches('image/webp');
+             request.resource.contentType.matches('image/webp') ||
+             request.resource.contentType.matches('image/gif') ||
+             request.resource.contentType.matches('image/svg\\+xml');
     }
 
     // Giới hạn kích thước file ảnh tối đa 5MB
@@ -53,9 +55,10 @@ service firebase.storage {
     // CONTENT ASSETS: /products, /news, /machinery, /certifications
     // =========================================================================
 
-    match /products/{fileName} {
+    match /products/{allPaths=**} {
       allow read: if true;
-      allow write: if isEditor() && isValidImage() && isValidSize();
+      allow write: if (signedIn() || isEditor()) && isValidImage() && isValidSize();
+      allow delete: if signedIn() || isEditor();
     }
 
     match /news/{fileName} {
