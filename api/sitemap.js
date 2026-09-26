@@ -46,21 +46,31 @@ export default async function handler(req, res) {
 
     const productUrls = (products || []).map((p) => {
       const slug = p.slug || (p.name ? slugify(p.name) : p.id);
+      const imgUrl = (p.image && (p.image.startsWith('http://') || p.image.startsWith('https://')))
+        ? p.image
+        : `${SITE_URL}/product-image/${slug}.webp`;
       return {
         loc: `${SITE_URL}/products/${slug}`,
         priority: '0.9',
         changefreq: 'weekly',
-        lastmod: p.updatedAt ? p.updatedAt.split('T')[0] : today
+        lastmod: p.updatedAt ? p.updatedAt.split('T')[0] : today,
+        imageUrl: imgUrl,
+        imageTitle: p.name || 'Nguyên Liệu Pha Chế CASA'
       };
     });
 
     const newsUrls = (news || []).map((n) => {
       const slug = n.slug || (n.title ? slugify(n.title) : n.id);
+      const imgUrl = (n.image && (n.image.startsWith('http://') || n.image.startsWith('https://')))
+        ? n.image
+        : `${SITE_URL}/article-image/${slug}.webp`;
       return {
         loc: `${SITE_URL}/news/${slug}`,
         priority: '0.8',
         changefreq: 'monthly',
-        lastmod: n.updatedAt ? n.updatedAt.split('T')[0] : (n.date || today)
+        lastmod: n.updatedAt ? n.updatedAt.split('T')[0] : (n.date || today),
+        imageUrl: imgUrl,
+        imageTitle: n.title || 'Tin tức CASA TEA'
       };
     });
 
@@ -68,6 +78,7 @@ export default async function handler(req, res) {
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
@@ -77,7 +88,11 @@ ${allUrls
     <loc>${u.loc}</loc>
     <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
+    <priority>${u.priority}</priority>${u.imageUrl ? `
+    <image:image>
+      <image:loc>${u.imageUrl}</image:loc>
+      <image:title><![CDATA[${u.imageTitle}]]></image:title>
+    </image:image>` : ''}
   </url>`
   )
   .join('\n')}

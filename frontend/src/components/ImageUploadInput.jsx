@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { uploadProductImage } from '../services/storageService';
+import { uploadProductImage, optimizeImageToDataUrl } from '../services/storageService';
 
 // Danh sách ảnh mẫu nguyên liệu F&B cao cấp được chuẩn bị sẵn cho CASA TEA
 const CASA_SAMPLE_IMAGES = [
@@ -121,22 +121,35 @@ export default function ImageUploadInput({
     setTempPreview(localUrl);
 
     try {
-      // Tải lên Firebase Storage (tự động tối ưu WebP qua Canvas)
-      const result = await uploadProductImage(file, {
-        folder,
-        productId,
-        optimize: true
-      });
+      // 1. Luôn nén WebP trước (kích thước siêu nhẹ ~30-50KB)
+      const optimized = await optimizeImageToDataUrl(file);
 
-      if (result?.downloadUrl) {
-        onChange(result.downloadUrl);
-        setSizeInfo(`Đã lưu Cloud Storage (${result.sizeKb} KB WebP)`);
-      } else {
-        throw new Error('Không nhận được URL từ Firebase Storage.');
+      // 2. Thử tải lên Firebase Cloud Storage nếu khả dụng
+      let storageUploaded = false;
+      try {
+        const result = await uploadProductImage(file, {
+          folder,
+          productId,
+          optimize: true
+        });
+        if (result?.downloadUrl) {
+          onChange(result.downloadUrl);
+          setSizeInfo(`Đã lưu Cloud Storage (${result.sizeKb} KB WebP)`);
+          storageUploaded = true;
+        }
+      } catch (storageErr) {
+        // Storage chưa bật gói trả phí Blaze -> Tự động dùng WebP nén trực tiếp hoàn toàn miễn phí
+        console.info('[ImageUploadInput] Chuyển sang lưu trữ WebP nén tối ưu miễn phí:', storageErr.message);
+      }
+
+      // 3. Fallback mượt mà: Lưu WebP nén vào Database (100% Miễn phí, Googlebot vẫn nhận URL ảnh chuẩn qua /product-image/[slug].webp)
+      if (!storageUploaded) {
+        onChange(optimized.dataUrl);
+        setSizeInfo(`Đã nén WebP tối ưu (${optimized.sizeKb} KB - Miễn phí)`);
       }
     } catch (err) {
-      console.error('[ImageUploadInput] Lỗi tải lên Storage:', err);
-      setErrorMessage(err.message || 'Không thể tải ảnh lên Firebase Storage.');
+      console.error('[ImageUploadInput] Lỗi xử lý ảnh:', err);
+      setErrorMessage(err.message || 'Không thể xử lý hình ảnh.');
     } finally {
       setUploading(false);
       setTempPreview(null);

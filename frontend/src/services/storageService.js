@@ -120,6 +120,106 @@ export async function optimizeImageToBlob(file, options = {}) {
 }
 
 /**
+ * Nén và chuyển đổi ảnh sang WebP Data URL (kích thước siêu gọn ~30-60KB) để lưu trữ trực tiếp an toàn
+ * Giải pháp lưu trữ 100% MIỄN PHÍ không yêu cầu thẻ tín dụng hay trả phí Firebase Storage Blaze
+ * @param {File|Blob} file 
+ * @param {Object} options 
+ * @returns {Promise<{dataUrl: string, width: number, height: number, sizeKb: number, format: string}>}
+ */
+export async function optimizeImageToDataUrl(file, options = {}) {
+  const {
+    maxWidth = 1200,
+    maxHeight = 1200,
+    quality = 0.82
+  } = options;
+
+  if (!file) {
+    throw new Error('Vui lòng chọn tệp tin hình ảnh.');
+  }
+
+  // Nếu là file SVG thì đọc trực tiếp Data URL
+  if (file.type === 'image/svg+xml') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({
+        dataUrl: e.target.result,
+        format: 'svg',
+        sizeKb: Math.round(file.size / 1024)
+      });
+      reader.onerror = () => reject(new Error('Không thể đọc tệp SVG.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không thể đọc tệp hình ảnh.'));
+
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Tệp hình ảnh không hợp lệ hoặc bị hỏng.'));
+
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / maxWidth > height / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return resolve({
+            dataUrl: event.target.result,
+            format: file.type || 'image/jpeg',
+            sizeKb: Math.round(file.size / 1024)
+          });
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        try {
+          const dataUrl = canvas.toDataURL('image/webp', quality);
+          const approxSizeKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+          resolve({
+            dataUrl,
+            width,
+            height,
+            format: 'webp',
+            sizeKb: approxSizeKb
+          });
+        } catch {
+          const fallbackDataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve({
+            dataUrl: fallbackDataUrl,
+            width,
+            height,
+            format: 'jpeg',
+            sizeKb: Math.round((fallbackDataUrl.length * 3) / 4 / 1024)
+          });
+        }
+      };
+
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
  * Upload ảnh sản phẩm lên Firebase Storage và trả về HTTPS Download URL
  * @param {File|Blob} fileOrBlob 
  * @param {Object} params - { folder, productId, customFileName, optimize }

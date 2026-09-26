@@ -295,9 +295,20 @@ export default function ProductDetail() {
       }
     };
 
-    pushIfValid(product?.image);
+    if (product?.image) {
+      if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
+        pushIfValid(product.image);
+      } else if (product.image.startsWith('data:image/')) {
+        pushIfValid(`${SITE_URL}/product-image/${productSlug}.webp`);
+      }
+    }
+
     if (Array.isArray(product?.images)) {
-      product.images.forEach(pushIfValid);
+      product.images.forEach((img) => {
+        if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+          pushIfValid(img);
+        }
+      });
     }
 
     if (list.length === 0) {
