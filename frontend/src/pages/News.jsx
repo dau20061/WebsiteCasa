@@ -10,6 +10,7 @@ import { NEWS_CATEGORIES } from '../constants/categories';
 import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
+import { getArticleImageUrl } from '../utils/slugify';
 
 export default function News() {
   const { t, isChinese, isEnglish } = useLanguage();
@@ -169,8 +170,15 @@ export default function News() {
               <div className="lg:col-span-5">
                 <div className="rounded-3xl overflow-hidden aspect-[4/3] bg-tea-mist dark:bg-[#0B130E] shadow-tea-sm">
                   <img
-                    src={featuredArticle.image}
+                    src={getArticleImageUrl(featuredArticle)}
                     alt={isEnglish ? (featuredArticle.titleEn || featuredArticle.title) : ((isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title)}
+                    onError={(e) => {
+                      if (featuredArticle?.imageData && e.currentTarget.src !== featuredArticle.imageData) {
+                        e.currentTarget.src = featuredArticle.imageData;
+                      } else if (featuredArticle?.image && e.currentTarget.src !== featuredArticle.image && featuredArticle.image.startsWith('data:')) {
+                        e.currentTarget.src = featuredArticle.image;
+                      }
+                    }}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>

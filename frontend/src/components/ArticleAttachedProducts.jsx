@@ -12,7 +12,7 @@ import {
   PhoneCall
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { getProductSlug } from '../utils/slugify';
+import { getProductSlug, getProductImageUrl } from '../utils/slugify';
 
 export default function ArticleAttachedProducts({
   products = [],
@@ -95,10 +95,17 @@ export default function ArticleAttachedProducts({
               <div>
                 <Link to={productUrl} className="block relative aspect-[4/3] overflow-hidden bg-tea-mist dark:bg-[#0B130E] group">
                   <img
-                    src={product.image || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80'}
+                    src={getProductImageUrl(product)}
                     alt={`${displayName} – CASA TEA`}
                     title={`${displayName} – CASA TEA`}
                     loading="lazy"
+                    onError={(e) => {
+                      if (product?.imageData && e.currentTarget.src !== product.imageData) {
+                        e.currentTarget.src = product.imageData;
+                      } else if (product?.image && e.currentTarget.src !== product.image && product.image.startsWith('data:')) {
+                        e.currentTarget.src = product.image;
+                      }
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1">

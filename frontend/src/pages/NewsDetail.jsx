@@ -235,11 +235,18 @@ export default function NewsDetail() {
           {/* Featured Image */}
           <div className="rounded-3xl overflow-hidden aspect-[16/9] mb-10 bg-tea-mist dark:bg-[#0B130E] shadow-tea-sm">
             <img
-              src={article.image}
+              src={seoImageUrl}
               alt={`${displayTitle} – CASA TEA`}
               title={`${displayTitle} – CASA TEA`}
               loading="eager"
               fetchPriority="high"
+              onError={(e) => {
+                if (article?.imageData && e.currentTarget.src !== article.imageData) {
+                  e.currentTarget.src = article.imageData;
+                } else if (article?.image && e.currentTarget.src !== article.image && article.image.startsWith('data:')) {
+                  e.currentTarget.src = article.image;
+                }
+              }}
               className="w-full h-full object-cover"
             />
           </div>

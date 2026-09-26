@@ -432,11 +432,18 @@ export default function ProductDetail() {
           <div className="lg:col-span-6 space-y-4">
             <div className="relative rounded-3xl overflow-hidden aspect-square bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
               <img
-                src={image}
+                src={primaryProductImage}
                 alt={`${displayName} – ${categoryName} CASA TEA`}
                 title={`${displayName} – CASA TEA`}
                 loading="eager"
                 fetchPriority="high"
+                onError={(e) => {
+                  if (product?.imageData && e.currentTarget.src !== product.imageData) {
+                    e.currentTarget.src = product.imageData;
+                  } else if (image && e.currentTarget.src !== image && image.startsWith('data:')) {
+                    e.currentTarget.src = image;
+                  }
+                }}
                 className="w-full h-full object-cover object-center"
               />
               <div className="absolute top-4 left-4">

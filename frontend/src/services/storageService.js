@@ -120,8 +120,8 @@ export async function optimizeImageToBlob(file, options = {}) {
 }
 
 /**
- * Nén và chuyển đổi ảnh sang WebP Data URL (kích thước siêu gọn ~30-60KB) để lưu trữ trực tiếp an toàn
- * Giải pháp lưu trữ 100% MIỄN PHÍ không yêu cầu thẻ tín dụng hay trả phí Firebase Storage Blaze
+ * Nén và chuyển đổi ảnh sang WebP Data URL (kích thước siêu gọn ~30-60KB) để lưu trữ an toàn
+ * Dùng làm giải pháp lưu trữ 100% MIỄN PHÍ không yêu cầu thẻ tín dụng hay trả phí Firebase Storage
  * @param {File|Blob} file 
  * @param {Object} options 
  * @returns {Promise<{dataUrl: string, width: number, height: number, sizeKb: number, format: string}>}
@@ -137,7 +137,6 @@ export async function optimizeImageToDataUrl(file, options = {}) {
     throw new Error('Vui lòng chọn tệp tin hình ảnh.');
   }
 
-  // Nếu là file SVG thì đọc trực tiếp Data URL
   if (file.type === 'image/svg+xml') {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

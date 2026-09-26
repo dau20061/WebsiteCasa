@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getArticleImageUrl } from '../utils/slugify';
 
 export default function NewsCard({ article }) {
   const { t, isChinese, isEnglish } = useLanguage();
   const { slug, title, category, date, readTime, excerpt, image, author } = article;
+  const displayImageUrl = getArticleImageUrl(article);
 
   const displayTitle = isEnglish
     ? (article.titleEn || article.title_en || title)
@@ -31,11 +33,18 @@ export default function NewsCard({ article }) {
     >
       <Link to={`/news/${slug}`} className="relative h-52 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21] block">
         <img
-          src={image}
+          src={displayImageUrl}
           alt={`${displayTitle} – Tạp Chí F&B & Công Thức CASA TEA`}
           title={`${displayTitle} – CASA TEA`}
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            if (article?.imageData && e.currentTarget.src !== article.imageData) {
+              e.currentTarget.src = article.imageData;
+            } else if (image && e.currentTarget.src !== image && image.startsWith('data:')) {
+              e.currentTarget.src = image;
+            }
+          }}
           className="w-full h-full object-cover object-center transform group-hover:scale-106 transition-transform duration-500 ease-out"
         />
         <div className="absolute top-3.5 left-3.5">

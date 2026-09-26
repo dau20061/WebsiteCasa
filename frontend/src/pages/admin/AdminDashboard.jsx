@@ -987,6 +987,14 @@ export default function AdminDashboard() {
     }
 
     const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
+    const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
+
+    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
+    if (finalData.image && finalData.image.startsWith('data:image/')) {
+      finalData.imageData = finalData.image;
+      finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
+      finalData.images = [finalData.image];
+    }
 
     if (editingProduct) {
       const oldImage = editingProduct.image;

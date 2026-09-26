@@ -35,18 +35,18 @@ export default async function handler(req, res) {
       return nSlug === cleanSlug || nId === cleanSlug || nTitleSlug === cleanSlug;
     });
 
-    if (!article || !article.image) {
+    if (!article) {
       return res.redirect(302, `${SITE_URL}/logo.png`);
     }
 
-    // Nếu ảnh là URL công khai (http / https) -> Chuyển hướng trực tiếp
-    if (article.image.startsWith('http://') || article.image.startsWith('https://')) {
-      return res.redirect(302, article.image);
+    const rawImage = article.imageData || article.imageBase64 || article.image;
+    if (!rawImage) {
+      return res.redirect(302, `${SITE_URL}/logo.png`);
     }
 
     // Nếu ảnh lưu dạng Base64 Data URL (data:image/...) -> Giải mã buffer nhị phân và trả về ảnh chuẩn
-    if (article.image.startsWith('data:image/')) {
-      const matches = article.image.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
+    if (rawImage.startsWith('data:image/')) {
+      const matches = rawImage.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
       if (matches) {
         const mimeType = matches[1];
         const base64Data = matches[2];
@@ -57,6 +57,14 @@ export default async function handler(req, res) {
         res.setHeader('Content-Length', buffer.length);
         return res.status(200).send(buffer);
       }
+    }
+
+    // Nếu ảnh là URL công khai (http / https) -> Chuyển hướng trực tiếp (trừ khi tự trỏ vào chính endpoint)
+    if (
+      (rawImage.startsWith('http://') || rawImage.startsWith('https://')) &&
+      !rawImage.includes('/article-image/')
+    ) {
+      return res.redirect(302, rawImage);
     }
 
     return res.redirect(302, `${SITE_URL}/logo.png`);

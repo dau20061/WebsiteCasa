@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { getProductSlug } from '../utils/slugify';
+import { getProductSlug, getProductImageUrl } from '../utils/slugify';
 
 export default function ProductCard({ product, onRequestSample }) {
   const { t, isChinese, isEnglish } = useLanguage();
   const { id, name, sku, categoryName, badge, shortDesc, image, tasteProfile, tags } = product;
   const productSlug = getProductSlug(product);
   const productUrl = `/products/${productSlug}`;
+  const displayImageUrl = getProductImageUrl(product);
 
   const isValidText = (str) => {
     if (!str || typeof str !== 'string' || !str.trim()) return false;
@@ -49,11 +50,18 @@ export default function ProductCard({ product, onRequestSample }) {
       {/* Product Image Box */}
       <div className="relative h-60 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21]">
         <img
-          src={image}
+          src={displayImageUrl}
           alt={`${displayName} – ${displayCategoryName} Pha Chế B2B CASA TEA`}
           title={`${displayName} – CASA TEA`}
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            if (product.imageData && e.currentTarget.src !== product.imageData) {
+              e.currentTarget.src = product.imageData;
+            } else if (image && e.currentTarget.src !== image && image.startsWith('data:')) {
+              e.currentTarget.src = image;
+            }
+          }}
           className="w-full h-full object-cover object-center transform group-hover:scale-108 transition-transform duration-500 ease-out"
         />
         

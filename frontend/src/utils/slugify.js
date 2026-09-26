@@ -27,3 +27,46 @@ export function getProductSlug(product) {
   return product.id || '';
 }
 
+export function getArticleSlug(article) {
+  if (!article) return '';
+  if (article.slug && typeof article.slug === 'string' && article.slug.trim()) {
+    return article.slug.trim();
+  }
+  if (article.title && typeof article.title === 'string' && article.title.trim()) {
+    return slugify(article.title);
+  }
+  return article.id || '';
+}
+
+export function getProductImageUrl(product) {
+  if (!product) return 'https://www.nguyenlieuphachecasa.com/logo.png';
+  const img = product.image;
+  // Nếu đã là link HTTPS ngoài hoặc đã là link endpoint chuẩn
+  if (img && typeof img === 'string') {
+    if ((img.startsWith('http://') || img.startsWith('https://')) && !img.startsWith('data:')) {
+      return img;
+    }
+  }
+  // Nếu là Base64 data:image/... hoặc chưa có link chuẩn -> Trả về URL endpoint chuẩn HTTPS
+  const slug = getProductSlug(product);
+  if (slug) {
+    return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp`;
+  }
+  return img || 'https://www.nguyenlieuphachecasa.com/logo.png';
+}
+
+export function getArticleImageUrl(article) {
+  if (!article) return 'https://www.nguyenlieuphachecasa.com/logo.png';
+  const img = article.image;
+  if (img && typeof img === 'string') {
+    if ((img.startsWith('http://') || img.startsWith('https://')) && !img.startsWith('data:')) {
+      return img;
+    }
+  }
+  const slug = getArticleSlug(article);
+  if (slug) {
+    return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp`;
+  }
+  return img || 'https://www.nguyenlieuphachecasa.com/logo.png';
+}
+

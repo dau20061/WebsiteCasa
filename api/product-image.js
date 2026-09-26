@@ -35,18 +35,18 @@ export default async function handler(req, res) {
       return pSlug === cleanSlug || pId === cleanSlug || pNameSlug === cleanSlug;
     });
 
-    if (!product || !product.image) {
+    if (!product) {
       return res.redirect(302, `${SITE_URL}/logo.png`);
     }
 
-    // Nếu ảnh là URL công khai (http / https) -> Chuyển hướng trực tiếp
-    if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
-      return res.redirect(302, product.image);
+    const rawImage = product.imageData || product.imageBase64 || product.image;
+    if (!rawImage) {
+      return res.redirect(302, `${SITE_URL}/logo.png`);
     }
 
     // Nếu ảnh lưu dạng Base64 Data URL (data:image/...) -> Giải mã buffer nhị phân và trả về ảnh chuẩn
-    if (product.image.startsWith('data:image/')) {
-      const matches = product.image.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
+    if (rawImage.startsWith('data:image/')) {
+      const matches = rawImage.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
       if (matches) {
         const mimeType = matches[1];
         const base64Data = matches[2];
@@ -57,6 +57,14 @@ export default async function handler(req, res) {
         res.setHeader('Content-Length', buffer.length);
         return res.status(200).send(buffer);
       }
+    }
+
+    // Nếu ảnh là URL công khai (http / https) -> Chuyển hướng trực tiếp (trừ khi tự trỏ vào chính endpoint để tránh loop)
+    if (
+      (rawImage.startsWith('http://') || rawImage.startsWith('https://')) &&
+      !rawImage.includes('/product-image/')
+    ) {
+      return res.redirect(302, rawImage);
     }
 
     return res.redirect(302, `${SITE_URL}/logo.png`);
