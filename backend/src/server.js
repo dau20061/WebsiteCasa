@@ -15,6 +15,10 @@ import contactRoutes from './routes/contactRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
+import productImageHandler from '../../api/product-image.js';
+import articleImageHandler from '../../api/article-image.js';
+import sitemapHandler from '../../api/sitemap.js';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -52,6 +56,21 @@ for (const [routePath, router] of routeList) {
     app.use(routePath, router);
   }
 }
+
+// Dedicated SEO Image & Sitemap Endpoints
+app.get(['/product-image/:slug', '/api/product-image/:slug'], (req, res) => {
+  req.query.slug = req.params.slug;
+  return productImageHandler(req, res);
+});
+
+app.get(['/article-image/:slug', '/api/article-image/:slug'], (req, res) => {
+  req.query.slug = req.params.slug;
+  return articleImageHandler(req, res);
+});
+
+app.get(['/sitemap.xml', '/api/sitemap.xml'], (req, res) => {
+  return sitemapHandler(req, res);
+});
 
 // 404 handler
 // Phục vụ giao diện Frontend tĩnh nếu đã build (hỗ trợ Hostinger Node.js, VPS, PM2)
