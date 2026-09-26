@@ -58,17 +58,29 @@ for (const [routePath, router] of routeList) {
 }
 
 // Dedicated SEO Image & Sitemap Endpoints
-app.get(['/product-image/:slug', '/api/product-image/:slug'], (req, res) => {
-  req.query.slug = req.params.slug;
+app.get([
+  '/product-image/:slug',
+  '/api/product-image/:slug',
+  '/api/product-image.js'
+], (req, res) => {
+  if (req.params.slug) req.query.slug = req.params.slug;
   return productImageHandler(req, res);
 });
 
-app.get(['/article-image/:slug', '/api/article-image/:slug'], (req, res) => {
-  req.query.slug = req.params.slug;
+app.get([
+  '/article-image/:slug',
+  '/api/article-image/:slug',
+  '/api/article-image.js'
+], (req, res) => {
+  if (req.params.slug) req.query.slug = req.params.slug;
   return articleImageHandler(req, res);
 });
 
-app.get(['/sitemap.xml', '/api/sitemap.xml'], (req, res) => {
+app.get([
+  '/sitemap.xml',
+  '/api/sitemap.xml',
+  '/api/sitemap.js'
+], (req, res) => {
   return sitemapHandler(req, res);
 });
 
