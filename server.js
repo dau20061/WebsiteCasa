@@ -3,5 +3,7 @@
 // File khởi động ứng dụng chính cho Hostinger Node.js Selector, PM2, Docker
 // ============================================================================
 
-import './backend/src/server.js';
+import app from './backend/src/server.js';
+
+export default app;
 
