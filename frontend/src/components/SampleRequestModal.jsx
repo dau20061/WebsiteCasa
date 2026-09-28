@@ -18,10 +18,11 @@ export default function SampleRequestModal({ isOpen, onClose, defaultProduct = n
   });
 
   useEffect(() => {
+    if (!isOpen) return;
     getRtdbProducts().then((res) => {
       if (Array.isArray(res)) setProductList(res);
     });
-  }, []);
+  }, [isOpen]);
 
   const [formData, setFormData] = useState({
     fullName: '',

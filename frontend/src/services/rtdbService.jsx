@@ -26,10 +26,17 @@ async function fetchDirectRtdb(path, method = 'GET', data = null) {
     if (res.ok) {
       const val = await res.json();
       if (!val) return null;
+      let result = val;
       if (method === 'GET' && typeof val === 'object' && !Array.isArray(val)) {
-        return Object.keys(val).map((k) => ({ id: k, ...val[k] }));
+        result = Object.keys(val).map((k) => ({ id: k, ...val[k] }));
       }
-      return val;
+      if (path === 'products' && Array.isArray(result)) {
+        result.forEach((p) => {
+          delete p.imageData;
+          delete p.imageBase64;
+        });
+      }
+      return result;
     }
   } catch (err) {
     console.warn(`[Frontend Direct RTDB] ${method} ${path} error:`, err?.message || err);

@@ -47,6 +47,8 @@ export default function Footer() {
               <img
                 src={logoImg}
                 alt="CASA Tea & Food"
+                width="180"
+                height="64"
                 className="h-14 sm:h-16 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
               />
             </Link>
@@ -88,31 +90,37 @@ export default function Footer() {
                 >
                   ZL
                 </a>
-                <a
-                  href={COMPANY_INFO.socials.tiktok}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-tea-mint hover:text-tea-dark transition-all flex items-center justify-center font-bold text-xs"
-                >
-                  TT
-                </a>
-                <a
-                  href={COMPANY_INFO.socials.youtube}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-tea-mint hover:text-tea-dark transition-all flex items-center justify-center font-bold text-xs"
-                >
-                  YT
-                </a>
+                {COMPANY_INFO.socials.tiktok && (
+                  <a
+                    href={COMPANY_INFO.socials.tiktok}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="TikTok CASA TEA"
+                    className="w-8 h-8 rounded-lg bg-white/10 hover:bg-tea-mint hover:text-tea-dark transition-all flex items-center justify-center font-bold text-xs"
+                  >
+                    TT
+                  </a>
+                )}
+                {COMPANY_INFO.socials.youtube && (
+                  <a
+                    href={COMPANY_INFO.socials.youtube}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="YouTube CASA TEA"
+                    className="w-8 h-8 rounded-lg bg-white/10 hover:bg-tea-mint hover:text-tea-dark transition-all flex items-center justify-center font-bold text-xs"
+                  >
+                    YT
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
           {/* Col 3: Navigation */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
               {t('footer_quick_links', 'Khám Phá Website')}
-            </h4>
+            </h3>
             <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
                 <Link to="/" className="hover:text-tea-mint transition-colors">{t('nav_home', 'Trang Chủ')}</Link>
@@ -140,9 +148,9 @@ export default function Footer() {
 
           {/* Col 4: Products Categories */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
               {t('footer_product_categories', 'Dòng Sản Phẩm B2B')}
-            </h4>
+            </h3>
             <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
                 <Link to="/products?cat=tra-den" className="hover:text-tea-mint transition-colors">{isChinese ? '阿薩姆與 CTC 紅茶' : 'Trà Đen Assam & CTC'}</Link>
@@ -170,9 +178,9 @@ export default function Footer() {
 
           {/* Col 5: Contact & Newsletter */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
               {t('footer_contact_info', 'Thông Tin Liên Hệ')}
-            </h4>
+            </h3>
             <div className="space-y-3 text-xs text-gray-300">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-tea-mint shrink-0 mt-0.5" />

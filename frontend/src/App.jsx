@@ -14,9 +14,6 @@ export default function App() {
             <AppRoutes />
           </ToastProvider>
         </AuthProvider>
-        <ToastProvider>
-          <AppRoutes />
-        </ToastProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

@@ -219,17 +219,22 @@ function HeroCarousel() {
               <button
                 key={slide.id}
                 type="button"
+                aria-label={`Slide ${idx + 1}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   goToSlide(idx);
                 }}
-                className={`transition-all duration-300 rounded-full ${
-                  idx === currentSlide
-                    ? 'w-7 sm:w-9 h-2.5 bg-tea-mint shadow-[0_0_12px_rgba(105,196,150,0.8)]'
-                    : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/80'
-                }`}
+                className="p-1.5 sm:p-2 min-w-[36px] min-h-[36px] flex items-center justify-center focus:outline-none"
                 title={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
-              />
+              >
+                <span
+                  className={`block transition-all duration-300 rounded-full ${
+                    idx === currentSlide
+                      ? 'w-7 sm:w-9 h-2.5 bg-tea-mint shadow-[0_0_12px_rgba(105,196,150,0.8)]'
+                      : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/80'
+                  }`}
+                />
+              </button>
             ))}
           </div>
 

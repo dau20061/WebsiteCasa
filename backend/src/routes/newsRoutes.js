@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import { getNews, getNewsById, saveNews, deleteNews } from '../services/dbService.js';
 
 const router = Router();

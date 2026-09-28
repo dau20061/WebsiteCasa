@@ -30,7 +30,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/[...path].js"
+      "destination": "/api/[...path].js?path=$1"
     },
     {
       "source": "/sitemap.xml",

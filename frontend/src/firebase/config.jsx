@@ -25,14 +25,21 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const rtdb = getDatabase(app);
 
-// Khởi tạo Analytics an toàn (chỉ khi trình duyệt hỗ trợ)
+// Khởi tạo Analytics an toàn (trì hoãn sau khi render trang để tối ưu điểm Mobile PageSpeed)
 export let analytics = null;
-if (typeof window !== 'undefined') {
-  isSupported().then((supported) => {
-    if (supported) {
-      analytics = getAnalytics(app);
-    }
-  });
+if (typeof window !== "undefined") {
+  const initAnalytics = () => {
+    isSupported().then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    }).catch(() => {});
+  };
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(initAnalytics, { timeout: 3500 });
+  } else {
+    setTimeout(initAnalytics, 3000);
+  }
 }
 
 export default app;

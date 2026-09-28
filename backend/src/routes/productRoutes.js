@@ -6,7 +6,12 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const products = await getProducts();
-    res.json(products);
+    const lightweightProducts = products.map((p) => {
+      const { imageData, imageBase64, ...rest } = p;
+      return rest;
+    });
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+    res.json(lightweightProducts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

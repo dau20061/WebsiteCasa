@@ -56,6 +56,8 @@ export default function Navbar({ onOpenSampleModal }) {
             <img
               src={logoImg}
               alt="CASA Tea & Food"
+              width="160"
+              height="48"
               className="h-10 sm:h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm dark:brightness-125 dark:contrast-110"
             />
           </Link>

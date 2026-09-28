@@ -201,9 +201,9 @@ export default function Home() {
               <div className="w-12 h-12 rounded-xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-3.5 shadow-sm">
                 <Leaf className="w-6 h-6" />
               </div>
-              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+              <h3 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isEnglish ? '3 Core Tea Bases' : (isChinese ? '三大經典原茶基底' : '3 Dòng Cốt Trà Chuẩn Vị')}
-              </h4>
+              </h3>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isEnglish
                   ? 'Green Tea, Black Tea & Oolong Tea rich in aroma and body, creating the perfect base for signature milk teas & fruit teas.'
@@ -223,9 +223,9 @@ export default function Home() {
               <div className="w-12 h-12 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-300 mb-3.5 shadow-sm">
                 <Award className="w-6 h-6" />
               </div>
-              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+              <h3 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isEnglish ? 'Pyramid Tea Bag Craft' : (isChinese ? '三角立體茶包工藝' : 'Túi Lọc Tam Giác Pyramid')}
-              </h4>
+              </h3>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isEnglish
                   ? 'Biodegradable food-grade PLA corn fiber mesh, ensuring complete tea leaf expansion without absorbing natural aromas.'
@@ -245,9 +245,9 @@ export default function Home() {
               <div className="w-12 h-12 rounded-xl bg-tea-mint/30 dark:bg-tea-mint/20 flex items-center justify-center text-tea-emerald dark:text-tea-mint mb-3.5 shadow-sm">
                 <FlaskConical className="w-6 h-6" />
               </div>
-              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+              <h3 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isEnglish ? 'High Extraction TDS > 2.8%' : (isChinese ? '高濃度萃取 TDS > 2.8%' : 'Chiết Xuất TDS > 2.8%')}
-              </h4>
+              </h3>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isEnglish
                   ? 'Rich, lingering aftertaste that never dilutes with milk or ice; consistent flavor across 1,000+ batches.'
@@ -267,9 +267,9 @@ export default function Home() {
               <div className="w-12 h-12 rounded-xl bg-blue-100/80 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-300 mb-3.5 shadow-sm">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h4 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
+              <h3 className="text-base font-bold text-tea-dark dark:text-white mb-1.5">
                 {isEnglish ? 'International Certifications' : (isChinese ? 'ISO 22000 & HACCP' : 'Chứng Nhận Quốc Tế')}
-              </h4>
+              </h3>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
                 {isEnglish
                   ? 'Strict adherence to ISO 22000 and HACCP food safety standards, multi-panel zero pesticide residues tested by SGS.'
@@ -448,7 +448,7 @@ export default function Home() {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <div className="text-[11px] font-mono font-bold opacity-75">{isEnglish ? `STEP ${step.step}` : (isChinese ? `步驟 ${step.step}` : `BƯỚC ${step.step}`)}</div>
+                <div className={`text-[11px] font-mono font-bold ${activeStep === idx ? "text-white" : "text-tea-mint"}`}>'{isEnglish ? `STEP ${step.step}` : (isChinese ? `步驟 ${step.step}` : `BƯỚC ${step.step}`)}</div>
                 <div className="text-xs sm:text-sm font-bold truncate mt-0.5">
                   {(isEnglish && step.titleEn ? step.titleEn.split('&')[0] : (isChinese && step.titleZh ? step.titleZh.split('&')[0] : step.title.split('&')[0]))}
                 </div>
@@ -550,9 +550,9 @@ export default function Home() {
                 <Award className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="text-base font-bold text-tea-dark dark:text-white">
+                <h3 className="text-base font-bold text-tea-dark dark:text-white">
                   {isEnglish ? 'Need self-declaration dossiers & lot-specific COA test reports?' : (isChinese ? '需要每批次自我宣告文件與 COA 檢驗報告？' : 'Cần hồ sơ tự công bố & phiếu kiểm nghiệm COA từng lô?')}
-                </h4>
+                </h3>
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-0.5 font-normal">
                   {isEnglish
                     ? 'CASA provides official stamped hard copies and digital PDFs to assist clients with smooth regulatory clearance and commercial operations.'
@@ -627,13 +627,13 @@ export default function Home() {
 
           {/* Marquee Partner Brands Simulation */}
           <div className="mb-16 py-6 border-y border-tea-border/60 dark:border-white/10 overflow-hidden">
-            <div className="flex items-center justify-around gap-8 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all">
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">T-TEA MILKTEA</span>
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">S-BEVERAGE GROUP</span>
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">THE CHAT CAFE</span>
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">BOBA KINGDOM</span>
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">AN COFFEE & TEA</span>
-              <span className="text-lg font-black tracking-wider text-gray-700 dark:text-gray-300">FRESH CUP LAB</span>
+            <div className="flex items-center justify-around gap-8 flex-wrap opacity-90 transition-all">
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">T-TEA MILKTEA</span>
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">S-BEVERAGE GROUP</span>
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">THE CHAT CAFE</span>
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">BOBA KINGDOM</span>
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">AN COFFEE & TEA</span>
+              <span className="text-lg font-black tracking-wider text-gray-800 dark:text-gray-200">FRESH CUP LAB</span>
             </div>
           </div>
 
