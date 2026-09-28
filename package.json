@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "description": "CASA TEA & BEVERAGE SOLUTIONS - Monorepo Structure with Separated Frontend and Backend",
-  "main": "server.js",
   "scripts": {
     "postinstall": "npm --prefix frontend install",
     "start": "node server.js",

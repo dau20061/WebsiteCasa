@@ -51,16 +51,6 @@ export default function AppRoutes() {
         </Route>
 
         {/* Admin Authentication & Portal */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        {/* Admin Authentication & Portal (Lazy-loaded Firebase chunk) */}
         <Route element={<AdminLayout />}>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
