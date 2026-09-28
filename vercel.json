@@ -1,4 +1,5 @@
 {
+  "framework": "vite",
   "installCommand": "npm install && npm install --prefix frontend",
   "buildCommand": "npm run frontend:build",
   "outputDirectory": "frontend/dist",
@@ -18,7 +19,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(?:ico|png|jpg|jpeg|webp|svg|woff2|avif))",
+      "source": "/((?!product-image/|article-image/).*\\.(?:ico|png|jpg|jpeg|webp|svg|woff2|avif))",
       "headers": [
         {
           "key": "Cache-Control",
@@ -41,7 +42,7 @@
       "destination": "/api/article-image.js?slug=$1"
     },
     {
-      "source": "/((?!api/|robots\\.txt|product-image/|article-image/).*)",
+      "source": "/((?!assets/|api/|robots\\.txt|sitemap\\.xml|site\\.webmanifest|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
