@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { uploadProductImage, optimizeImageToDataUrl } from '../services/storageService';
+import { optimizeImageToDataUrl } from '../services/storageService';
 
 // Danh sách ảnh mẫu nguyên liệu F&B cao cấp được chuẩn bị sẵn cho CASA TEA
 const CASA_SAMPLE_IMAGES = [
@@ -121,32 +121,10 @@ export default function ImageUploadInput({
     setTempPreview(localUrl);
 
     try {
-      // 1. Luôn nén WebP trước (kích thước siêu nhẹ ~30-50KB)
-      const optimized = await optimizeImageToDataUrl(file);
-
-      // 2. Thử tải lên Firebase Cloud Storage nếu khả dụng
-      let storageUploaded = false;
-      try {
-        const result = await uploadProductImage(file, {
-          folder,
-          productId,
-          optimize: true
-        });
-        if (result?.downloadUrl) {
-          onChange(result.downloadUrl);
-          setSizeInfo(`Đã lưu Cloud Storage (${result.sizeKb} KB WebP)`);
-          storageUploaded = true;
-        }
-      } catch (storageErr) {
-        // Storage chưa bật gói trả phí Blaze -> Tự động dùng WebP nén trực tiếp hoàn toàn miễn phí
-        console.info('[ImageUploadInput] Chuyển sang lưu trữ WebP nén tối ưu miễn phí:', storageErr.message);
-      }
-
-      // 3. Fallback mượt mà: Lưu WebP nén vào Database (100% Miễn phí, Googlebot vẫn nhận URL ảnh chuẩn qua /product-image/[slug].webp)
-      if (!storageUploaded) {
-        onChange(optimized.dataUrl);
-        setSizeInfo(`Đã nén WebP tối ưu (${optimized.sizeKb} KB - Miễn phí)`);
-      }
+      // Tự động nén WebP siêu nhẹ (~30-50KB) ngay trên trình duyệt (100% Miễn phí, 0ms mạng, không lỗi CORS)
+      const optimized = await optimizeImageToDataUrl(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+      onChange(optimized.dataUrl);
+      setSizeInfo(`Đã nén WebP tối ưu (${optimized.sizeKb} KB - Miễn phí)`);
     } catch (err) {
       console.error('[ImageUploadInput] Lỗi xử lý ảnh:', err);
       setErrorMessage(err.message || 'Không thể xử lý hình ảnh.');
@@ -194,9 +172,10 @@ export default function ImageUploadInput({
   };
 
   const getImageSourceLabel = () => {
-    if (uploading || tempPreview) return 'Đang tối ưu & tải lên Firebase Storage...';
+    if (uploading || tempPreview) return 'Đang nén & tối ưu hóa ảnh WebP...';
     if (!value) return '';
-    if (value.startsWith('data:image/')) return '⚠️ Ảnh Base64 cũ (Hãy tải lại để lấy URL HTTPS chuẩn Google)';
+    if (value.startsWith('data:image/')) return 'Ảnh WebP nén siêu nhẹ (Sẵn sàng lưu)';
+    if (value.includes('product-image/') || value.includes('article-image/')) return '✅ Ảnh CDN CASA (Chuẩn SEO & Google Schema)';
     if (value.includes('firebasestorage.googleapis.com')) return '✅ Firebase Storage CDN (Chuẩn Google Schema)';
     if (value.includes('unsplash.com')) return 'Ảnh nguyên liệu mẫu CASA TEA';
     return 'Ảnh từ liên kết ngoài HTTPS';
