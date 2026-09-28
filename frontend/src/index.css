@@ -335,7 +335,7 @@
   will-change: transform;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
   .animate-wave-flow-1,
   .animate-wave-flow-2,
   .animate-wave-flow-3 {

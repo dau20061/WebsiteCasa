@@ -96,25 +96,15 @@ export default function Home() {
           {/* Top Intro Section: Centered Headings & CTAs */}
           <div className="text-center max-w-4xl mx-auto space-y-6 sm:space-y-7">
             {/* Pill Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full bg-white/85 dark:bg-slate-900/85 border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm backdrop-blur-md"
-            >
+            <div className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full bg-white/85 dark:bg-slate-900/85 border border-tea-leaf/30 dark:border-tea-mint/30 shadow-tea-sm backdrop-blur-md">
               <span className="flex h-2.5 w-2.5 rounded-full bg-tea-leaf animate-ping" />
               <span className="text-xs sm:text-sm font-bold text-tea-primary dark:text-tea-mint tracking-wider uppercase">
                 {isEnglish ? 'CASA Premier B2B Tea & Pyramid Bag Supplier' : (isChinese ? 'CASA 專業商用茶葉原料與茶包供應商' : t('hero_pill', 'Giải Pháp Trà Nguyên Liệu & Túi Lọc B2B Hàng Đầu'))}
               </span>
-            </motion.div>
+            </div>
 
             {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-[1.14]"
-            >
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-tea-dark dark:text-white tracking-tight leading-[1.14]">
               {isEnglish ? (
                 <>
                   The Essence of CASA Tea –{' '}
@@ -138,29 +128,19 @@ export default function Home() {
                   Đỉnh Cao
                 </>
               )}
-            </motion.h1>
+            </h1>
 
             {/* Subheading */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto font-normal"
-            >
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto font-normal">
               {isEnglish
                 ? 'Specialized in premium commercial loose-leaf tea, pyramid tea bags, and custom blending solutions. Certified ISO 22000 & HACCP, empowering over 2,000+ F&B chains nationwide.'
                 : isChinese
                 ? '專注研發高品質商用原葉茶、三角立體茶包與專業拼配方案。國際標準 ISO 22000、HACCP 認證，助力手搖飲與餐飲連鎖打造爆款特色飲品。'
                 : t('hero_desc', 'Cung cấp trà nguyên liệu tuyển chọn, trà túi lọc tam giác pyramid cao cấp và giải pháp R&D pha chế chuyên sâu. Tiêu chuẩn ISO 22000, HACCP – Đồng hành cùng hơn 2.000+ chuỗi F&B toàn quốc.')}
-            </motion.p>
+            </p>
 
             {/* CTA Group */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 pt-2"
-            >
+            <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 pt-2">
               <Link
                 to="/products"
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-tea-primary to-tea-green hover:from-tea-emerald hover:to-tea-primary text-white text-sm sm:text-base font-bold shadow-tea-md hover:shadow-tea-lg transition-all hover:-translate-y-0.5 group"
@@ -183,7 +163,7 @@ export default function Home() {
               >
                 {isEnglish ? 'B2B Consultation' : (isChinese ? '即刻聯絡諮詢' : 'Liên hệ tư vấn B2B')}
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* Panoramic Flagship Banner Showcase (Isolated Auto-sliding Carousel) */}
@@ -192,12 +172,7 @@ export default function Home() {
           {/* Docked 4-Column Luxury Feature Bar (Below the Banner, Clean & Symmetrical) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-10 max-w-6xl xl:max-w-7xl mx-auto">
             {/* Card 1: 3 Dòng Cốt Trà */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
-            >
+            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-3.5 shadow-sm">
                 <Leaf className="w-6 h-6" />
               </div>
@@ -211,15 +186,10 @@ export default function Home() {
                   ? '綠茶 (Green) • 紅茶 (Black) • 烏龍茶 (Oolong) 香氣濃郁飽滿，完美支撐各式手搖特調。'
                   : 'Trà Xanh (Green) • Trà Đen (Black) • Trà Ô Long (Oolong) đậm đà, chuẩn gu người tiêu dùng hiện đại.'}
               </p>
-            </motion.div>
+            </div>
 
             {/* Card 2: Túi Lọc Pyramid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
-            >
+            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-300 mb-3.5 shadow-sm">
                 <Award className="w-6 h-6" />
               </div>
@@ -233,15 +203,10 @@ export default function Home() {
                   ? '食品級玉米纖維 PLA 環保網布，不吸附茶香，讓原葉在立體空間中完全舒展釋放。'
                   : 'Màng lưới bắp sinh học tự phân hủy, không gian bung tỏa tối đa cho búp trà nguyên bản.'}
               </p>
-            </motion.div>
+            </div>
 
             {/* Card 3: Chiết xuất TDS > 2.8% */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
-            >
+            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-tea-mint/30 dark:bg-tea-mint/20 flex items-center justify-center text-tea-emerald dark:text-tea-mint mb-3.5 shadow-sm">
                 <FlaskConical className="w-6 h-6" />
               </div>
@@ -255,15 +220,10 @@ export default function Home() {
                   ? '茶湯醇厚回甘，加奶加冰不易淡味，1,000 批次風味始終穩定如一。'
                   : 'Cốt trà sánh đậm đặc biệt, không nhạt vị khi kết hợp đá hoặc sữa, 1.000 lô đồng nhất quanh năm.'}
               </p>
-            </motion.div>
+            </div>
 
             {/* Card 4: Chứng nhận ISO & HACCP */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md"
-            >
+            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/20 dark:border-white/10 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-blue-100/80 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-300 mb-3.5 shadow-sm">
                 <ShieldCheck className="w-6 h-6" />
               </div>
@@ -277,7 +237,7 @@ export default function Home() {
                   ? '嚴格遵循國際食安管理體系，SGS 多項無農殘檢驗，提供合規合法的批發證明文件。'
                   : 'Đạt chuẩn ISO 22000, HACCP, kiểm nghiệm khắt khe không dư lượng BVTV, an toàn tuyệt đối.'}
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>

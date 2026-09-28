@@ -114,11 +114,7 @@ function HeroCarousel() {
   }, [isAutoPlay, currentSlide]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.35, ease: 'easeOut' }}
-      className="relative w-full max-w-6xl xl:max-w-7xl mx-auto mt-10 sm:mt-14"
+    <div className="relative w-full max-w-6xl xl:max-w-7xl mx-auto mt-10 sm:mt-14"
       onMouseEnter={() => setIsAutoPlay(false)}
       onMouseLeave={() => setIsAutoPlay(true)}
     >
@@ -250,7 +246,7 @@ function HeroCarousel() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
