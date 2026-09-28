@@ -41,16 +41,22 @@ export function getArticleSlug(article) {
 export function getProductImageUrl(product) {
   if (!product) return 'https://www.nguyenlieuphachecasa.com/logo.png';
   const img = product.image;
+  const vTime = product.updatedAt ? new Date(product.updatedAt).getTime() : '';
+  const vQuery = vTime ? `?v=${vTime}` : '';
+
   // Nếu đã là link HTTPS ngoài hoặc đã là link endpoint chuẩn
   if (img && typeof img === 'string') {
     if ((img.startsWith('http://') || img.startsWith('https://')) && !img.startsWith('data:')) {
+      if (img.includes('/product-image/') && !img.includes('?v=') && vTime) {
+        return `${img}?v=${vTime}`;
+      }
       return img;
     }
   }
   // Nếu là Base64 data:image/... hoặc chưa có link chuẩn -> Trả về URL endpoint chuẩn HTTPS
   const slug = getProductSlug(product);
   if (slug) {
-    return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp`;
+    return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp${vQuery}`;
   }
   return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }
@@ -58,14 +64,20 @@ export function getProductImageUrl(product) {
 export function getArticleImageUrl(article) {
   if (!article) return 'https://www.nguyenlieuphachecasa.com/logo.png';
   const img = article.image;
+  const vTime = article.updatedAt ? new Date(article.updatedAt).getTime() : '';
+  const vQuery = vTime ? `?v=${vTime}` : '';
+
   if (img && typeof img === 'string') {
     if ((img.startsWith('http://') || img.startsWith('https://')) && !img.startsWith('data:')) {
+      if (img.includes('/article-image/') && !img.includes('?v=') && vTime) {
+        return `${img}?v=${vTime}`;
+      }
       return img;
     }
   }
   const slug = getArticleSlug(article);
   if (slug) {
-    return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp`;
+    return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp${vQuery}`;
   }
   return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }

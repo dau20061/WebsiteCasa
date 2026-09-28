@@ -365,7 +365,7 @@ export default function AdminDashboard() {
     getRtdbCategories().then((res) => {
       if (res && res.length > 0) setCategories(res);
     });
-    getRtdbProducts().then((res) => {
+    getRtdbProducts(true).then((res) => {
       if (Array.isArray(res)) setProducts(res);
     });
     getRtdbNews().then((res) => {
@@ -988,12 +988,20 @@ export default function AdminDashboard() {
 
     const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
     const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
+    const vTime = Date.now();
 
-    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
+    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn kèm timestamp version
     if (finalData.image && finalData.image.startsWith('data:image/')) {
       finalData.imageData = finalData.image;
-      finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
+      finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp?v=${vTime}`;
       finalData.images = [finalData.image];
+    } else if (finalData.image && !finalData.image.includes('/product-image/')) {
+      // Người dùng chọn ảnh mẫu (Unsplash) hoặc nhập link ngoài -> Xóa imageData cũ để hiển thị ảnh mới
+      finalData.imageData = null;
+      finalData.imageBase64 = null;
+      finalData.images = [finalData.image];
+    } else if (editingProduct && !finalData.imageData && editingProduct.imageData) {
+      finalData.imageData = editingProduct.imageData;
     }
 
     if (editingProduct) {
@@ -1017,6 +1025,10 @@ export default function AdminDashboard() {
       }
 
       showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
+      // Tải lại danh sách mới nhất từ RTDB để đồng bộ State
+      getRtdbProducts(true).then((fresh) => {
+        if (Array.isArray(fresh) && fresh.length > 0) setProducts(fresh);
+      });
     } else {
       // THÊM MỚI (CREATE)
       const newId = `product_${Date.now()}`;
@@ -1030,6 +1042,10 @@ export default function AdminDashboard() {
       // Ghi trực tiếp lên Firebase Realtime Database
       await saveRtdbProduct(newProd);
       showToast(`Đã thêm mới [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
+      // Tải lại danh sách mới nhất từ RTDB để đồng bộ State
+      getRtdbProducts(true).then((fresh) => {
+        if (Array.isArray(fresh) && fresh.length > 0) setProducts(fresh);
+      });
     }
 
     setProductModalOpen(false);

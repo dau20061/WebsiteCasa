@@ -148,9 +148,10 @@ export async function deleteRtdbCategory(categoryId) {
 // ============================================================================
 // PRODUCTS
 // ============================================================================
-export async function getRtdbProducts() {
+export async function getRtdbProducts(forceFresh = false) {
   try {
-    const data = await productApi.getAll();
+    const query = forceFresh ? `?t=${Date.now()}` : '';
+    const data = await productApi.getAll(query);
     if (data && Array.isArray(data) && data.length > 0) {
       try {
         localStorage.setItem('casa_admin_products', JSON.stringify(data));
@@ -175,7 +176,7 @@ export async function getRtdbProducts() {
 }
 
 export async function saveRtdbProduct(product) {
-  const isNew = !product.id || String(product.id).startsWith('product_');
+  const isNew = !product.id;
   const targetId = product.id || `product_${Date.now()}`;
   const itemToSave = { ...product, id: targetId, updatedAt: new Date().toISOString() };
 

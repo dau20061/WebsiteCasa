@@ -53,7 +53,11 @@ export default async function handler(req, res) {
         const buffer = Buffer.from(base64Data, 'base64');
 
         res.setHeader('Content-Type', mimeType);
-        res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable');
+        if (req.query.v || req.query.t) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+        }
         res.setHeader('Content-Length', buffer.length);
         return res.status(200).send(buffer);
       }
