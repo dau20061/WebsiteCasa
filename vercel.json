@@ -29,6 +29,18 @@
   ],
   "rewrites": [
     {
+      "source": "/api/products",
+      "destination": "/api/products.js"
+    },
+    {
+      "source": "/api/news",
+      "destination": "/api/news.js"
+    },
+    {
+      "source": "/api/categories",
+      "destination": "/api/categories.js"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/[...path].js?path=$1"
     },
