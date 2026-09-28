@@ -17,6 +17,16 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
+function escapeXml(unsafe) {
+  if (!unsafe) return '';
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 export default async function handler(req, res) {
   try {
     const [products, news] = await Promise.all([
@@ -85,13 +95,13 @@ export default async function handler(req, res) {
 ${allUrls
   .map(
     (u) => `  <url>
-    <loc>${u.loc}</loc>
-    <lastmod>${u.lastmod}</lastmod>
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>${u.imageUrl ? `
+    <loc>${escapeXml(u.loc)}</loc>
+    <lastmod>${escapeXml(u.lastmod)}</lastmod>
+    <changefreq>${escapeXml(u.changefreq)}</changefreq>
+    <priority>${escapeXml(u.priority)}</priority>${u.imageUrl ? `
     <image:image>
-      <image:loc>${u.imageUrl}</image:loc>
-      <image:title><![CDATA[${u.imageTitle}]]></image:title>
+      <image:loc>${escapeXml(u.imageUrl)}</image:loc>
+      <image:title>${escapeXml(u.imageTitle)}</image:title>
     </image:image>` : ''}
   </url>`
   )
