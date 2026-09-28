@@ -141,13 +141,6 @@ function HeroCarousel() {
                   isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                <img
-                  src={slide.image}
-                  alt={isEnglish ? slide.titleEn : (isChinese ? slide.titleZh : slide.titleVi)}
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-[1.015] transition-transform duration-700 ease-out"
-                />
                 <picture>
                   {slide.imageMobile && (
                     <source media="(max-width: 640px)" srcSet={slide.imageMobile} type="image/webp" />
