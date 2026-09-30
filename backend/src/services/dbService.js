@@ -134,23 +134,7 @@ export async function getProductById(id) {
 
 export async function saveProduct(product) {
   const cleanId = product.id || `product_${Date.now()}`;
-  const existing = await getProductById(cleanId);
-  const record = {
-    ...(existing || {}),
-    ...product,
-    id: cleanId,
-    updatedAt: new Date().toISOString()
-  };
-
-  // Bảo toàn hoặc cập nhật imageData
-  if (product.imageData === null) {
-    delete record.imageData;
-    delete record.imageBase64;
-  } else if (product.imageData) {
-    record.imageData = product.imageData;
-  } else if (existing?.imageData) {
-    record.imageData = existing.imageData;
-  }
+  const record = { ...product, id: cleanId, updatedAt: new Date().toISOString() };
   
   try {
     await set(ref(rtdb, `products/${cleanId}`), record);

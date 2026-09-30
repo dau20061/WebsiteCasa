@@ -36,7 +36,7 @@ async function request(endpoint, options = {}) {
 // PRODUCTS API
 // ----------------------------------------------------------------------------
 export const productApi = {
-  getAll: (query = '') => request(`/products${query}`),
+  getAll: () => request('/products'),
   getById: (id) => request(`/products/${id}`),
   create: (data) => request('/products', { method: 'POST', body: data }),
   update: (id, data) => request(`/products/${id}`, { method: 'PUT', body: data }),
@@ -47,7 +47,7 @@ export const productApi = {
 // PRODUCT CATEGORIES API
 // ----------------------------------------------------------------------------
 export const categoryApi = {
-  getAll: (query = '') => request(`/categories${query}`),
+  getAll: () => request('/categories'),
   getById: (id) => request(`/categories/${id}`),
   create: (data) => request('/categories', { method: 'POST', body: data }),
   update: (id, data) => request(`/categories/${id}`, { method: 'PUT', body: data }),
@@ -58,7 +58,7 @@ export const categoryApi = {
 // NEWS & ARTICLES API
 // ----------------------------------------------------------------------------
 export const newsApi = {
-  getAll: (query = '') => request(`/news${query}`),
+  getAll: () => request('/news'),
   getById: (id) => request(`/news/${id}`),
   create: (data) => request('/news', { method: 'POST', body: data }),
   update: (id, data) => request(`/news/${id}`, { method: 'PUT', body: data }),

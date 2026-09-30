@@ -248,8 +248,10 @@ export default function ImageUploadInput({
         className="hidden"
       />
 
-      {/* TRƯỜNG HỢP 1: ĐÃ CÓ ẢNH (HIỂN THỊ PREVIEW) */}
-      {(value || tempPreview) && (
+      {/* ========================================================================= */}
+      {/* TRƯỜNG HỢP 1: ĐÃ CÓ ẢNH (HIỂN THỊ PREVIEW ĐẸP VÀ RÕ RÀNG)                  */}
+      {/* ========================================================================= */}
+      {value || tempPreview ? (
         <div className="p-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/40 space-y-2.5">
           <div className="flex items-center gap-3">
             {/* Khung ảnh thumbnail */}
@@ -284,7 +286,7 @@ export default function ImageUploadInput({
                 </p>
               )}
 
-              <div className="flex items-center gap-2 pt-1 flex-wrap">
+              <div className="flex items-center gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -292,7 +294,7 @@ export default function ImageUploadInput({
                   className="px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:border-tea-emerald text-gray-700 text-[11px] font-bold shadow-xs hover:bg-gray-50 transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <UploadCloud className="w-3 h-3 text-tea-emerald" />
-                  <span>Chọn ảnh từ máy tính</span>
+                  <span>Chọn ảnh khác</span>
                 </button>
                 <button
                   type="button"
@@ -307,113 +309,111 @@ export default function ImageUploadInput({
             </div>
           </div>
         </div>
-      )}
-
-      {/* TRƯỜNG HỢP CHỌN PHƯƠNG THỨC HOẶC ĐỔI ẢNH THEO TAB */}
-      <div>
-        {/* TAB 1: TẢI TỪ MÁY TÍNH (Chỉ hiện vùng kéo thả lớn nếu chưa có ảnh) */}
-        {activeTab === 'upload' && !value && !tempPreview && (
-          <div
-            onClick={() => !uploading && fileInputRef.current?.click()}
-            className="border-2 border-dashed border-gray-300 hover:border-tea-emerald rounded-2xl p-5 text-center cursor-pointer transition-all bg-white hover:bg-tea-cream/20 group"
-          >
-            {uploading ? (
-              <div className="flex flex-col items-center justify-center gap-2 py-3 text-gray-500">
-                <Loader2 className="w-7 h-7 text-tea-emerald animate-spin" />
-                <span className="text-xs font-bold text-tea-dark">Đang tối ưu hóa hình ảnh...</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-2 text-gray-500 group-hover:text-tea-emerald">
-                <div className="w-11 h-11 rounded-2xl bg-tea-cream flex items-center justify-center group-hover:bg-tea-soft/50 transition-colors shadow-xs">
-                  <UploadCloud className="w-5 h-5 text-tea-emerald" />
+      ) : (
+        /* ========================================================================= */
+        /* TRƯỜNG HỢP 2: CHƯA CÓ ẢNH -> HIỂN THỊ KHU VỰC THEO TAB LỰA CHỌN           */
+        /* ========================================================================= */
+        <div>
+          {/* TAB 1: TẢI TỪ MÁY TÍNH */}
+          {activeTab === 'upload' && (
+            <div
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              className="border-2 border-dashed border-gray-300 hover:border-tea-emerald rounded-2xl p-5 text-center cursor-pointer transition-all bg-white hover:bg-tea-cream/20 group"
+            >
+              {uploading ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-3 text-gray-500">
+                  <Loader2 className="w-7 h-7 text-tea-emerald animate-spin" />
+                  <span className="text-xs font-bold text-tea-dark">Đang tối ưu hóa hình ảnh...</span>
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-bold text-gray-800 group-hover:text-tea-dark">
-                    Bấm vào đây để chọn ảnh từ máy tính
-                  </p>
-                  <p className="text-[10px] text-gray-400">
-                    Tự động nén WebP siêu nét, lưu trữ mượt mà (Hỗ trợ JPG, PNG, WebP)
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 2: NHẬP LINK URL (Hiển thị form nhập khi chọn tab Link URL) */}
-        {activeTab === 'url' && (
-          <div className="p-3.5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-2.5 mt-2">
-            <div className="flex gap-2">
-              <input
-                type="url"
-                placeholder="Dán link ảnh tại đây (https://images.unsplash.com/...)"
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleApplyUrl(urlInput);
-                  }
-                }}
-                className="flex-1 px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-xs focus:ring-2 focus:ring-tea-emerald/30 outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => handleApplyUrl(urlInput)}
-                className="px-3.5 py-2 rounded-xl bg-tea-emerald hover:bg-tea-dark text-white font-bold text-xs transition-colors shrink-0 flex items-center gap-1 shadow-xs cursor-pointer"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Áp dụng link</span>
-              </button>
-            </div>
-            <p className="text-[10px] text-gray-500">
-              Hỗ trợ dán link ảnh từ Unsplash, Imgur, Cloudinary hoặc bất kỳ website nào.
-            </p>
-          </div>
-        )}
-
-        {/* TAB 3: KHO ẢNH MẪU CASA TEA (Hiển thị kho mẫu khi chọn tab Ảnh mẫu) */}
-        {activeTab === 'samples' && (
-          <div className="p-3 rounded-2xl border border-amber-200/80 bg-amber-50/40 space-y-2.5 mt-2">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-amber-950 text-[11px] flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>Bấm chọn ảnh nguyên liệu chuẩn vị CASA:</span>
-              </span>
-              <span className="text-[10px] text-amber-700">1 click cập nhật ngay</span>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">
-              {CASA_SAMPLE_IMAGES.map((sample, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSelectSample(sample.url)}
-                  className={`group relative rounded-xl overflow-hidden border transition-all text-left flex flex-col cursor-pointer ${
-                    value === sample.url
-                      ? 'border-emerald-500 ring-2 ring-emerald-500 shadow-md'
-                      : 'border-amber-200 bg-white hover:border-amber-500 hover:shadow-md'
-                  }`}
-                >
-                  <div className="h-14 w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={sample.url}
-                      alt={sample.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      loading="lazy"
-                    />
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-2 text-gray-500 group-hover:text-tea-emerald">
+                  <div className="w-11 h-11 rounded-2xl bg-tea-cream flex items-center justify-center group-hover:bg-tea-soft/50 transition-colors shadow-xs">
+                    <UploadCloud className="w-5 h-5 text-tea-emerald" />
                   </div>
-                  <div className="p-1 text-center bg-white">
-                    <p className="text-[9px] font-bold text-gray-800 truncate group-hover:text-amber-700">
-                      {sample.title}
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-gray-800 group-hover:text-tea-dark">
+                      Bấm vào đây để chọn ảnh từ máy tính
+                    </p>
+                    <p className="text-[10px] text-gray-400">
+                      Tự động nén WebP siêu nét, lưu trữ mượt mà (Hỗ trợ JPG, PNG, WebP)
                     </p>
                   </div>
-                </button>
-              ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {/* TAB 2: NHẬP LINK URL */}
+          {activeTab === 'url' && (
+            <div className="p-3.5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-2.5">
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  placeholder="Dán link ảnh tại đây (https://images.unsplash.com/...)"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleApplyUrl(urlInput);
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-xs focus:ring-2 focus:ring-tea-emerald/30 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleApplyUrl(urlInput)}
+                  className="px-3.5 py-2 rounded-xl bg-tea-emerald hover:bg-tea-dark text-white font-bold text-xs transition-colors shrink-0 flex items-center gap-1 shadow-xs cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Áp dụng</span>
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-500">
+                Hỗ trợ dán link ảnh từ Unsplash, Imgur, Cloudinary hoặc bất kỳ website nào.
+              </p>
+            </div>
+          )}
+
+          {/* TAB 3: KHO ẢNH MẪU CASA TEA */}
+          {activeTab === 'samples' && (
+            <div className="p-3 rounded-2xl border border-amber-200/80 bg-amber-50/40 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-amber-950 text-[11px] flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Chọn nhanh từ 15 ảnh nguyên liệu F&B cao cấp:</span>
+                </span>
+                <span className="text-[10px] text-amber-700">1 click chọn ngay</span>
+              </div>
+
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">
+                {CASA_SAMPLE_IMAGES.map((sample, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectSample(sample.url)}
+                    className="group relative rounded-xl overflow-hidden border border-amber-200 bg-white hover:border-amber-500 hover:shadow-md transition-all text-left flex flex-col cursor-pointer"
+                  >
+                    <div className="h-14 w-full overflow-hidden bg-gray-100">
+                      <img
+                        src={sample.url}
+                        alt={sample.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-1 text-center bg-white">
+                      <p className="text-[9px] font-bold text-gray-800 truncate group-hover:text-amber-700">
+                        {sample.title}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

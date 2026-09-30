@@ -7,17 +7,10 @@ export default async function handler(req, res) {
       const products = await getProducts();
       const lightweightProducts = (products || []).map((p) => {
         const { imageData, imageBase64, ...rest } = p;
-        if (rest.image && rest.image.includes('/product-image/') && !rest.image.includes('?v=')) {
-          const vTime = new Date(rest.updatedAt || rest.createdAt || Date.now()).getTime();
-          rest.image = `${rest.image.split('?')[0]}?v=${vTime}`;
-          if (Array.isArray(rest.images) && rest.images.length > 0) {
-            rest.images = [rest.image];
-          }
-        }
         return rest;
       });
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=30, stale-while-revalidate=60');
+      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
       return res.status(200).json(lightweightProducts);
     } catch (err) {
       console.error('[API Products Error]:', err);
