@@ -42,6 +42,38 @@
       "destination": "/api/article-image.js?slug=$1"
     },
     {
+      "source": "/api/products/(.+)",
+      "destination": "/api/[...path].js?path=products/$1"
+    },
+    {
+      "source": "/api/news/(.+)",
+      "destination": "/api/[...path].js?path=news/$1"
+    },
+    {
+      "source": "/api/categories/(.+)",
+      "destination": "/api/[...path].js?path=categories/$1"
+    },
+    {
+      "source": "/api/faq/(.+)",
+      "destination": "/api/[...path].js?path=faq/$1"
+    },
+    {
+      "source": "/api/faqs/(.+)",
+      "destination": "/api/[...path].js?path=faqs/$1"
+    },
+    {
+      "source": "/api/contacts/(.+)",
+      "destination": "/api/[...path].js?path=contacts/$1"
+    },
+    {
+      "source": "/api/users/(.+)",
+      "destination": "/api/[...path].js?path=users/$1"
+    },
+    {
+      "source": "/api/ai/(.+)",
+      "destination": "/api/[...path].js?path=ai/$1"
+    },
+    {
       "source": "/((?!assets/|api/|robots\\.txt|sitemap\\.xml|site\\.webmanifest|.*\\..*).*)",
       "destination": "/index.html"
     }

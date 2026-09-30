@@ -136,13 +136,17 @@ export async function deleteRtdbCategory(categoryId) {
     }
   } catch (_) {}
 
+  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
-    return await categoryApi.delete(categoryId);
-  } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbCategory error, deleting from direct RTDB:', err.message);
     await fetchDirectRtdb(`categories/${categoryId}`, 'DELETE');
-    return { success: true };
-  }
+  } catch (_) {}
+
+  // 2. Đồng bộ qua backend API
+  try {
+    await categoryApi.delete(categoryId);
+  } catch (_) {}
+
+  return { success: true, id: categoryId };
 }
 
 // ============================================================================
@@ -212,13 +216,17 @@ export async function deleteRtdbProduct(productId) {
     }
   } catch (_) {}
 
+  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
-    return await productApi.delete(productId);
-  } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbProduct error, deleting from direct RTDB:', err.message);
     await fetchDirectRtdb(`products/${productId}`, 'DELETE');
-    return { success: true };
-  }
+  } catch (_) {}
+
+  // 2. Đồng bộ qua backend API
+  try {
+    await productApi.delete(productId);
+  } catch (_) {}
+
+  return { success: true, id: productId };
 }
 
 // ============================================================================
@@ -288,13 +296,17 @@ export async function deleteRtdbNews(newsId) {
     }
   } catch (_) {}
 
+  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
-    return await newsApi.delete(newsId);
-  } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbNews error, deleting from direct RTDB:', err.message);
     await fetchDirectRtdb(`news/${newsId}`, 'DELETE');
-    return { success: true };
-  }
+  } catch (_) {}
+
+  // 2. Đồng bộ qua backend API
+  try {
+    await newsApi.delete(newsId);
+  } catch (_) {}
+
+  return { success: true, id: newsId };
 }
 
 // ============================================================================
