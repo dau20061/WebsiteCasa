@@ -519,22 +519,49 @@ export async function translateHtmlToZhTw(html) {
   }
 
   const tokens = html.split(/(<[^>]+>)/g);
-  const translatedTokens = await Promise.all(
-    tokens.map(async (token) => {
-      if (token.startsWith('<') && token.endsWith('>')) {
-        return token;
-      }
-      if (token.trim().length === 0) {
-        return token;
-      }
-      const leadingSpace = token.match(/^\s*/)[0];
-      const trailingSpace = token.match(/\s*$/)[0];
-      const translated = await translateTextToZhTw(token.trim());
-      return leadingSpace + translated + trailingSpace;
-    })
-  );
+  const textItems = [];
+  const textIndices = [];
 
-  return translatedTokens.join('');
+  tokens.forEach((token, index) => {
+    if (!token.startsWith('<') && token.trim().length > 0) {
+      textIndices.push(index);
+      textItems.push(token.trim());
+    }
+  });
+
+  if (textItems.length === 0) return html;
+
+  const BATCH_SIZE = 20;
+  const DELIMITER = ' ||| ';
+  const translatedTexts = [];
+
+  for (let i = 0; i < textItems.length; i += BATCH_SIZE) {
+    const chunk = textItems.slice(i, i + BATCH_SIZE);
+    const joined = chunk.join(DELIMITER);
+    try {
+      const translatedJoined = await translateTextToZhTw(joined);
+      const parts = translatedJoined.split(/\s*\|\|\|\s*/);
+      if (parts.length === chunk.length) {
+        translatedTexts.push(...parts);
+      } else {
+        const individual = await Promise.all(chunk.map((t) => translateTextToZhTw(t)));
+        translatedTexts.push(...individual);
+      }
+    } catch {
+      const fallback = await Promise.all(chunk.map((t) => translateTextToZhTw(t)));
+      translatedTexts.push(...fallback);
+    }
+  }
+
+  textIndices.forEach((tokenIdx, itemIdx) => {
+    const original = tokens[tokenIdx];
+    const leadingSpace = original.match(/^\s*/)[0];
+    const trailingSpace = original.match(/\s*$/)[0];
+    const translated = translatedTexts[itemIdx] || original.trim();
+    tokens[tokenIdx] = leadingSpace + translated + trailingSpace;
+  });
+
+  return tokens.join('');
 }
 
 export async function fallbackProductTranslation(product = {}) {
@@ -949,22 +976,49 @@ export async function translateHtmlToEn(html) {
   }
 
   const tokens = html.split(/(<[^>]+>)/g);
-  const translatedTokens = await Promise.all(
-    tokens.map(async (token) => {
-      if (token.startsWith('<') && token.endsWith('>')) {
-        return token;
-      }
-      if (token.trim().length === 0) {
-        return token;
-      }
-      const leadingSpace = token.match(/^\s*/)[0];
-      const trailingSpace = token.match(/\s*$/)[0];
-      const translated = await translateTextToEn(token.trim());
-      return leadingSpace + translated + trailingSpace;
-    })
-  );
+  const textItems = [];
+  const textIndices = [];
 
-  return translatedTokens.join('');
+  tokens.forEach((token, index) => {
+    if (!token.startsWith('<') && token.trim().length > 0) {
+      textIndices.push(index);
+      textItems.push(token.trim());
+    }
+  });
+
+  if (textItems.length === 0) return html;
+
+  const BATCH_SIZE = 20;
+  const DELIMITER = ' ||| ';
+  const translatedTexts = [];
+
+  for (let i = 0; i < textItems.length; i += BATCH_SIZE) {
+    const chunk = textItems.slice(i, i + BATCH_SIZE);
+    const joined = chunk.join(DELIMITER);
+    try {
+      const translatedJoined = await translateTextToEn(joined);
+      const parts = translatedJoined.split(/\s*\|\|\|\s*/);
+      if (parts.length === chunk.length) {
+        translatedTexts.push(...parts);
+      } else {
+        const individual = await Promise.all(chunk.map((t) => translateTextToEn(t)));
+        translatedTexts.push(...individual);
+      }
+    } catch {
+      const fallback = await Promise.all(chunk.map((t) => translateTextToEn(t)));
+      translatedTexts.push(...fallback);
+    }
+  }
+
+  textIndices.forEach((tokenIdx, itemIdx) => {
+    const original = tokens[tokenIdx];
+    const leadingSpace = original.match(/^\s*/)[0];
+    const trailingSpace = original.match(/\s*$/)[0];
+    const translated = translatedTexts[itemIdx] || original.trim();
+    tokens[tokenIdx] = leadingSpace + translated + trailingSpace;
+  });
+
+  return tokens.join('');
 }
 
 export async function translateProductToEnglish(product = {}) {

@@ -162,12 +162,122 @@ export default function ArticleStudioEditor({
   const [showTranslations, setShowTranslations] = useState(false);
   const [showAttachedProducts, setShowAttachedProducts] = useState(false);
 
-  // Đồng bộ nội dung vào editor khi mở hoặc khi newsFormData.content thay đổi từ bên ngoài (ví dụ do AI tạo)
-  useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== (newsFormData.content || '')) {
-      editorRef.current.innerHTML = newsFormData.content || '';
+  // Tab ngôn ngữ đang soạn thảo trực tiếp: 'vi' (Tiếng Việt) | 'zh' (繁體中文) | 'en' (English)
+  const [activeLanguageTab, setActiveLanguageTab] = useState('vi');
+  const [previewLang, setPreviewLang] = useState('vi');
+
+  // Lấy nội dung theo ngôn ngữ đang chọn
+  const getCurrentContent = () => {
+    if (activeLanguageTab === 'zh') return newsFormData.contentZh || '';
+    if (activeLanguageTab === 'en') return newsFormData.contentEn || '';
+    return newsFormData.content || '';
+  };
+
+  const getCurrentTitle = () => {
+    if (activeLanguageTab === 'zh') return newsFormData.titleZh || '';
+    if (activeLanguageTab === 'en') return newsFormData.titleEn || '';
+    return newsFormData.title || '';
+  };
+
+  const getCurrentExcerpt = () => {
+    if (activeLanguageTab === 'zh') return newsFormData.excerptZh || '';
+    if (activeLanguageTab === 'en') return newsFormData.excerptEn || '';
+    return newsFormData.excerpt || '';
+  };
+
+  // Chuyển đổi tab ngôn ngữ trong Word canvas
+  const handleSwitchLanguageTab = (targetLang) => {
+    if (targetLang === activeLanguageTab) return;
+
+    // 1. Lưu nội dung hiện tại của editor vào đúng ngôn ngữ cũ
+    if (editorRef.current) {
+      const currentHtml = editorRef.current.innerHTML;
+      if (activeLanguageTab === 'vi') setNewsFormData((prev) => ({ ...prev, content: currentHtml }));
+      else if (activeLanguageTab === 'zh') setNewsFormData((prev) => ({ ...prev, contentZh: currentHtml }));
+      else if (activeLanguageTab === 'en') setNewsFormData((prev) => ({ ...prev, contentEn: currentHtml }));
     }
-  }, [newsFormData.content]);
+
+    // 2. Chuyển tab
+    setActiveLanguageTab(targetLang);
+
+    // 3. Tải nội dung của ngôn ngữ mới vào editor
+    setTimeout(() => {
+      if (editorRef.current) {
+        let nextHtml = '';
+        if (targetLang === 'vi') nextHtml = newsFormData.content || '';
+        else if (targetLang === 'zh') nextHtml = newsFormData.contentZh || '';
+        else if (targetLang === 'en') nextHtml = newsFormData.contentEn || '';
+        editorRef.current.innerHTML = nextHtml;
+      }
+    }, 20);
+  };
+
+  // Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt VÀ Toàn bộ Nội dung bài viết WYSIWYG)
+  const handleTranslateArticle = async (targetLang) => {
+    // 1. Lưu nội dung mới nhất từ editor
+    const currentEditorHtml = editorRef.current ? editorRef.current.innerHTML : (newsFormData.content || '');
+    const latestFormData = {
+      ...newsFormData,
+      content: activeLanguageTab === 'vi' ? currentEditorHtml : (newsFormData.content || ''),
+      contentZh: activeLanguageTab === 'zh' ? currentEditorHtml : (newsFormData.contentZh || ''),
+      contentEn: activeLanguageTab === 'en' ? currentEditorHtml : (newsFormData.contentEn || '')
+    };
+
+    if (!latestFormData.title?.trim() && !latestFormData.content?.trim()) {
+      showToast?.('Vui lòng nhập Tiêu đề hoặc Nội dung bài viết tiếng Việt trước khi dịch!', 'warning');
+      return;
+    }
+
+    if (targetLang === 'zh') {
+      const res = await onTranslateZh(latestFormData);
+      if (res) {
+        setNewsFormData((prev) => ({
+          ...prev,
+          titleZh: res.titleZh || prev.titleZh,
+          excerptZh: res.excerptZh || prev.excerptZh,
+          contentZh: res.contentZh || prev.contentZh
+        }));
+        // Tự động chuyển ngay sang tab tiếng Trung để xem và sửa toàn văn bài viết dịch
+        setActiveLanguageTab('zh');
+        setTimeout(() => {
+          if (editorRef.current) {
+            editorRef.current.innerHTML = res.contentZh || '';
+          }
+        }, 50);
+      }
+    } else if (targetLang === 'en') {
+      const res = await onTranslateEn(latestFormData);
+      if (res) {
+        setNewsFormData((prev) => ({
+          ...prev,
+          titleEn: res.titleEn || prev.titleEn,
+          excerptEn: res.excerptEn || prev.excerptEn,
+          contentEn: res.contentEn || prev.contentEn
+        }));
+        // Tự động chuyển ngay sang tab tiếng Anh để xem và sửa toàn văn bài viết dịch
+        setActiveLanguageTab('en');
+        setTimeout(() => {
+          if (editorRef.current) {
+            editorRef.current.innerHTML = res.contentEn || '';
+          }
+        }, 50);
+      }
+    }
+  };
+
+  // Đồng bộ nội dung vào editor khi tab ngôn ngữ hoặc dữ liệu từ AI thay đổi
+  useEffect(() => {
+    if (editorRef.current) {
+      let expectedHtml = '';
+      if (activeLanguageTab === 'vi') expectedHtml = newsFormData.content || '';
+      else if (activeLanguageTab === 'zh') expectedHtml = newsFormData.contentZh || '';
+      else if (activeLanguageTab === 'en') expectedHtml = newsFormData.contentEn || '';
+
+      if (editorRef.current.innerHTML !== expectedHtml) {
+        editorRef.current.innerHTML = expectedHtml;
+      }
+    }
+  }, [activeLanguageTab, newsFormData.content, newsFormData.contentZh, newsFormData.contentEn]);
 
   // Lưu selection range trước khi click toolbar hoặc mở popup
   const saveSelection = () => {
@@ -200,7 +310,13 @@ export default function ArticleStudioEditor({
   const handleEditorInput = () => {
     if (editorRef.current) {
       const html = editorRef.current.innerHTML;
-      setNewsFormData((prev) => ({ ...prev, content: html }));
+      if (activeLanguageTab === 'vi') {
+        setNewsFormData((prev) => ({ ...prev, content: html }));
+      } else if (activeLanguageTab === 'zh') {
+        setNewsFormData((prev) => ({ ...prev, contentZh: html }));
+      } else if (activeLanguageTab === 'en') {
+        setNewsFormData((prev) => ({ ...prev, contentEn: html }));
+      }
     }
   };
 
@@ -388,16 +504,30 @@ export default function ArticleStudioEditor({
 
   // Lưu bài viết (Xuất bản hoặc Lưu nháp)
   const handleSaveAction = async (status = 'PUBLISHED') => {
-    if (!newsFormData.title || !newsFormData.title.trim()) {
+    let finalContent = newsFormData.content || '';
+    let finalContentZh = newsFormData.contentZh || '';
+    let finalContentEn = newsFormData.contentEn || '';
+
+    if (editorRef.current) {
+      const currentHtml = editorRef.current.innerHTML;
+      if (activeLanguageTab === 'vi') finalContent = currentHtml;
+      else if (activeLanguageTab === 'zh') finalContentZh = currentHtml;
+      else if (activeLanguageTab === 'en') finalContentEn = currentHtml;
+    }
+
+    if (!newsFormData.title?.trim() && !newsFormData.titleZh?.trim() && !newsFormData.titleEn?.trim()) {
       showToast('Vui lòng nhập Tiêu đề bài viết!', 'error');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const generatedSlug = newsFormData.slug ? slugify(newsFormData.slug) : slugify(newsFormData.title);
+      const generatedSlug = newsFormData.slug ? slugify(newsFormData.slug) : slugify(newsFormData.title || 'bai-viet-casa');
       const articlePayload = {
         ...newsFormData,
+        content: finalContent,
+        contentZh: finalContentZh,
+        contentEn: finalContentEn,
         slug: generatedSlug,
         status: status,
         author: newsFormData.author || 'CASA R&D Team',
@@ -413,16 +543,18 @@ export default function ArticleStudioEditor({
     }
   };
 
-  // Tính toán SEO Check
-  const titleLength = (newsFormData.title || '').trim().length;
-  const excerptLength = (newsFormData.excerpt || '').trim().length;
+  // Tính toán SEO Check & Word count theo ngôn ngữ hiện hành
+  const currentTitle = getCurrentTitle();
+  const currentExcerpt = getCurrentExcerpt();
+  const currentContent = getCurrentContent();
+  const titleLength = currentTitle.trim().length;
+  const excerptLength = currentExcerpt.trim().length;
   const hasThumbnail = Boolean(newsFormData.image);
   const hasCategory = Boolean(newsFormData.category);
   const tagsCount = (newsFormData.tags || []).length;
-  const contentHtml = newsFormData.content || '';
-  const hasHeadings = /<h[1-4]/i.test(contentHtml);
-  const hasInlineImages = /<img/i.test(contentHtml);
-  const wordCount = contentHtml.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+  const hasHeadings = /<h[1-4]/i.test(currentContent);
+  const hasInlineImages = /<img/i.test(currentContent);
+  const wordCount = currentContent.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
 
   const seoScore = [
     titleLength >= 40 && titleLength <= 70,
@@ -469,7 +601,31 @@ export default function ArticleStudioEditor({
 
         {/* Right: Các nút Hành động */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-          {/* Menu AI Auto-Design & Dịch */}
+          {/* Nút dịch toàn bộ bài viết sang Tiếng Trung Phồn Thể 繁中 */}
+          <button
+            type="button"
+            disabled={isTranslatingNews}
+            onClick={() => handleTranslateArticle('zh')}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 text-purple-200 hover:text-white border border-purple-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-sm"
+            title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt và Toàn văn nội dung) sang Tiếng Trung Phồn Thể 繁中"
+          >
+            <span className="text-sm">🇹🇼</span>
+            <span className="hidden sm:inline">{isTranslatingNews ? 'Đang dịch...' : 'Dịch toàn bài 繁中'}</span>
+          </button>
+
+          {/* Nút dịch toàn bộ bài viết sang Tiếng Anh English */}
+          <button
+            type="button"
+            disabled={isTranslatingNewsEn}
+            onClick={() => handleTranslateArticle('en')}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-950/40 hover:bg-blue-900/50 text-blue-200 hover:text-white border border-blue-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-sm"
+            title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt và Toàn văn nội dung) sang Tiếng Anh English"
+          >
+            <span className="text-sm">🇬🇧</span>
+            <span className="hidden sm:inline">{isTranslatingNewsEn ? 'Đang dịch...' : 'Dịch toàn bài English'}</span>
+          </button>
+
+          {/* Menu AI Auto-Design & Mẫu bài viết */}
           <div className="relative">
             <button
               type="button"
@@ -526,31 +682,31 @@ export default function ArticleStudioEditor({
                 <div className="border-t border-white/10 my-1" />
 
                 <div className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  Dịch thuật quốc tế
+                  Dịch thuật trọn gói bài viết
                 </div>
                 <button
                   type="button"
                   disabled={isTranslatingNews}
                   onClick={() => {
                     setAiMenuOpen(false);
-                    onTranslateZh();
+                    handleTranslateArticle('zh');
                   }}
                   className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-purple-300 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <span>🇹🇼</span>
-                  <span>{isTranslatingNews ? 'Đang dịch sang 繁中...' : 'Dịch sang Chữ Phồn Thể (繁中)'}</span>
+                  <span>{isTranslatingNews ? 'Đang dịch toàn bài...' : 'Dịch toàn bộ bài viết sang 繁中'}</span>
                 </button>
                 <button
                   type="button"
                   disabled={isTranslatingNewsEn}
                   onClick={() => {
                     setAiMenuOpen(false);
-                    onTranslateEn();
+                    handleTranslateArticle('en');
                   }}
                   className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-blue-300 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <span>🇬🇧</span>
-                  <span>{isTranslatingNewsEn ? 'Đang dịch sang EN...' : 'Dịch sang Tiếng Anh (English)'}</span>
+                  <span>{isTranslatingNewsEn ? 'Đang dịch toàn bài...' : 'Dịch toàn bộ bài viết sang English'}</span>
                 </button>
               </div>
             )}
@@ -559,7 +715,16 @@ export default function ArticleStudioEditor({
           {/* Xem trước */}
           <button
             type="button"
-            onClick={() => setIsPreviewModalOpen(true)}
+            onClick={() => {
+              if (editorRef.current) {
+                const currentHtml = editorRef.current.innerHTML;
+                if (activeLanguageTab === 'vi') setNewsFormData((prev) => ({ ...prev, content: currentHtml }));
+                else if (activeLanguageTab === 'zh') setNewsFormData((prev) => ({ ...prev, contentZh: currentHtml }));
+                else if (activeLanguageTab === 'en') setNewsFormData((prev) => ({ ...prev, contentEn: currentHtml }));
+              }
+              setPreviewLang(activeLanguageTab);
+              setIsPreviewModalOpen(true);
+            }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#17231B] hover:bg-[#203126] text-gray-200 hover:text-white border border-[#273B2E] transition-all text-xs font-semibold cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5 text-gray-400" />
@@ -598,27 +763,167 @@ export default function ArticleStudioEditor({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* ============================================================== */}
-            {/* CỘT TRÁI (COL-8): TIÊU ĐỀ + TRÌNH SOẠN THẢO GIỐNG WORD + TÓM TẮT */}
+            {/* CỘT TRÁI (COL-8): THANH CHUYỂN NGÔN NGỮ + TIÊU ĐỀ + WORD WYSIWYG */}
             {/* ============================================================== */}
             <div className="lg:col-span-8 space-y-6">
               
+              {/* THANH CHUYỂN ĐỔI TAB NGÔN NGỮ (VI | ZH | EN) */}
+              <div className="p-3 sm:p-4 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider pl-1 hidden sm:inline">
+                    Ngôn ngữ soạn thảo:
+                  </span>
+
+                  {/* Tab Tiếng Việt */}
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchLanguageTab('vi')}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                      activeLanguageTab === 'vi'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-2 ring-emerald-400/50'
+                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                    }`}
+                  >
+                    <span className="text-base">🇻🇳</span>
+                    <span>Tiếng Việt (Gốc)</span>
+                  </button>
+
+                  {/* Tab Tiếng Trung */}
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchLanguageTab('zh')}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                      activeLanguageTab === 'zh'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-950/50 ring-2 ring-purple-400/50'
+                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                    }`}
+                  >
+                    <span className="text-base">🇹🇼</span>
+                    <span>繁體中文</span>
+                    {newsFormData.contentZh || newsFormData.titleZh ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-semibold">
+                        ✓ Có bản dịch
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/40 font-semibold">
+                        Chưa dịch
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Tab Tiếng Anh */}
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchLanguageTab('en')}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                      activeLanguageTab === 'en'
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/50 ring-2 ring-blue-400/50'
+                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                    }`}
+                  >
+                    <span className="text-base">🇬🇧</span>
+                    <span>English</span>
+                    {newsFormData.contentEn || newsFormData.titleEn ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-semibold">
+                        ✓ Có bản dịch
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/40 font-semibold">
+                        Chưa dịch
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                {/* Nút dịch nhanh toàn bài */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={isTranslatingNews}
+                    onClick={() => handleTranslateArticle('zh')}
+                    className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shadow-sm"
+                    title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt & Nội dung) sang Tiếng Trung Phồn Thể"
+                  >
+                    <Sparkles className={`w-3.5 h-3.5 text-purple-300 ${isTranslatingNews ? 'animate-spin' : ''}`} />
+                    <span>{isTranslatingNews ? 'Đang dịch...' : 'Dịch toàn bài 繁中'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isTranslatingNewsEn}
+                    onClick={() => handleTranslateArticle('en')}
+                    className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shadow-sm"
+                    title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt & Nội dung) sang Tiếng Anh"
+                  >
+                    <Sparkles className={`w-3.5 h-3.5 text-blue-300 ${isTranslatingNewsEn ? 'animate-spin' : ''}`} />
+                    <span>{isTranslatingNewsEn ? 'Đang dịch...' : 'Dịch toàn bài EN'}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* 1. Tiêu đề bài viết */}
               <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm space-y-2">
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  Tiêu đề bài viết *
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    {activeLanguageTab === 'vi' && 'Tiêu đề bài viết (Tiếng Việt - Bản gốc) *'}
+                    {activeLanguageTab === 'zh' && 'Tiêu đề bài viết Tiếng Trung Phồn Thể (繁體中文 標題) *'}
+                    {activeLanguageTab === 'en' && 'Article Title in English (Tiêu đề Tiếng Anh) *'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {activeLanguageTab === 'zh' && (
+                      <span className="text-[11px] font-bold text-purple-300 flex items-center gap-1">
+                        <span>🇹🇼</span> Đang soạn Tiếng Trung
+                      </span>
+                    )}
+                    {activeLanguageTab === 'en' && (
+                      <span className="text-[11px] font-bold text-blue-300 flex items-center gap-1">
+                        <span>🇬🇧</span> Đang soạn English
+                      </span>
+                    )}
+                    {activeLanguageTab === 'vi' && (
+                      <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                        <span>🇻🇳</span> Đang soạn Tiếng Việt
+                      </span>
+                    )}
+                  </div>
+                </div>
+
                 <input
                   type="text"
                   required
-                  placeholder="Tiêu đề bài viết..."
-                  value={newsFormData.title || ''}
+                  placeholder={
+                    activeLanguageTab === 'vi'
+                      ? 'Tiêu đề bài viết tiếng Việt...'
+                      : activeLanguageTab === 'zh'
+                      ? '輸入繁體中文文章標題... (hoặc bấm nút Dịch toàn bài 繁中)'
+                      : 'Enter article title in English... (or click Translate full article)'
+                  }
+                  value={
+                    activeLanguageTab === 'vi'
+                      ? newsFormData.title || ''
+                      : activeLanguageTab === 'zh'
+                      ? newsFormData.titleZh || ''
+                      : newsFormData.titleEn || ''
+                  }
                   onChange={(e) => {
-                    const newTitle = e.target.value;
-                    setNewsFormData({
-                      ...newsFormData,
-                      title: newTitle,
-                      slug: newsFormData.slug || slugify(newTitle)
-                    });
+                    const val = e.target.value;
+                    if (activeLanguageTab === 'vi') {
+                      setNewsFormData({
+                        ...newsFormData,
+                        title: val,
+                        slug: newsFormData.slug || slugify(val)
+                      });
+                    } else if (activeLanguageTab === 'zh') {
+                      setNewsFormData({
+                        ...newsFormData,
+                        titleZh: val
+                      });
+                    } else if (activeLanguageTab === 'en') {
+                      setNewsFormData({
+                        ...newsFormData,
+                        titleEn: val
+                      });
+                    }
                   }}
                   className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                 />
@@ -907,6 +1212,46 @@ export default function ArticleStudioEditor({
                 </div>
 
                 {/* Vùng soạn thảo chính */}
+                {/* Banner thông báo nếu bản dịch Tiếng Trung hoặc Tiếng Anh đang trống */}
+                {activeLanguageTab === 'zh' && !(newsFormData.contentZh || '').trim() && (
+                  <div className="mx-6 mt-4 p-4 rounded-xl bg-purple-950/40 border border-purple-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="text-xs text-purple-200">
+                      <span className="font-bold flex items-center gap-1.5 text-purple-300">
+                        <span>🇹🇼</span> Bản dịch tiếng Trung (繁體中文) chưa có nội dung
+                      </span>
+                      <span>Bạn có thể gõ trực tiếp bên dưới hoặc bấm nút bên phải để AI tự động dịch toàn bộ từ bản gốc tiếng Việt.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTranslateArticle('zh')}
+                      disabled={isTranslatingNews}
+                      className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
+                    >
+                      {isTranslatingNews ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      <span>{isTranslatingNews ? 'Đang dịch...' : '✨ AI Dịch Toàn Bộ Sang 繁中'}</span>
+                    </button>
+                  </div>
+                )}
+                {activeLanguageTab === 'en' && !(newsFormData.contentEn || '').trim() && (
+                  <div className="mx-6 mt-4 p-4 rounded-xl bg-blue-950/40 border border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="text-xs text-blue-200">
+                      <span className="font-bold flex items-center gap-1.5 text-blue-300">
+                        <span>🇬🇧</span> Bản dịch tiếng Anh (English) chưa có nội dung
+                      </span>
+                      <span>Bạn có thể gõ trực tiếp bên dưới hoặc bấm nút bên phải để AI tự động dịch toàn bộ từ bản gốc tiếng Việt.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTranslateArticle('en')}
+                      disabled={isTranslatingNewsEn}
+                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
+                    >
+                      {isTranslatingNewsEn ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      <span>{isTranslatingNewsEn ? 'Đang dịch...' : '✨ AI Dịch Toàn Bộ Sang EN'}</span>
+                    </button>
+                  </div>
+                )}
+
                 {editorMode === 'wysiwyg' ? (
                   <div
                     ref={editorRef}
@@ -915,16 +1260,36 @@ export default function ArticleStudioEditor({
                     onBlur={saveSelection}
                     onKeyUp={saveSelection}
                     onMouseUp={saveSelection}
-                    data-placeholder="Bắt đầu viết nội dung bài viết... (Bạn có thể gõ trực tiếp, bôi đen để định dạng và bấm 'Thêm ảnh' để chèn hình minh họa vào từng đoạn)"
+                    data-placeholder={
+                      activeLanguageTab === 'zh'
+                        ? '輸入繁體中文內容... (可直接輸入、反白選取文字進行排版或插入圖片)'
+                        : activeLanguageTab === 'en'
+                        ? 'Type English content here... (Format text, insert images for each section)'
+                        : "Bắt đầu viết nội dung bài viết... (Bạn có thể gõ trực tiếp, bôi đen để định dạng và bấm 'Thêm ảnh' để chèn hình minh họa vào từng đoạn)"
+                    }
                     className="article-content wysiwyg-canvas p-6 sm:p-8 min-h-[500px] max-h-[750px] overflow-y-auto bg-[#0B120E] text-gray-100 text-base leading-relaxed outline-none focus:ring-0 space-y-4"
                     style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                   />
                 ) : (
                   <textarea
                     rows={20}
-                    value={newsFormData.content || ''}
-                    onChange={(e) => setNewsFormData({ ...newsFormData, content: e.target.value })}
-                    placeholder="Mã HTML bài viết..."
+                    value={
+                      activeLanguageTab === 'zh'
+                        ? (newsFormData.contentZh || '')
+                        : activeLanguageTab === 'en'
+                        ? (newsFormData.contentEn || '')
+                        : (newsFormData.content || '')
+                    }
+                    onChange={(e) => {
+                      if (activeLanguageTab === 'zh') {
+                        setNewsFormData({ ...newsFormData, contentZh: e.target.value });
+                      } else if (activeLanguageTab === 'en') {
+                        setNewsFormData({ ...newsFormData, contentEn: e.target.value });
+                      } else {
+                        setNewsFormData({ ...newsFormData, content: e.target.value });
+                      }
+                    }}
+                    placeholder={`Mã HTML bài viết (${activeLanguageTab === 'zh' ? '繁體中文' : activeLanguageTab === 'en' ? 'English' : 'Tiếng Việt'})...`}
                     className="w-full p-6 bg-[#0B120E] text-emerald-300 font-mono text-xs leading-relaxed outline-none resize-y min-h-[500px]"
                   />
                 )}
@@ -932,6 +1297,7 @@ export default function ArticleStudioEditor({
                 {/* Thanh thông tin dưới đáy editor */}
                 <div className="px-4 py-2 bg-[#0E1611] border-t border-[#223326] flex items-center justify-between text-[11px] text-gray-400">
                   <div className="flex items-center gap-4">
+                    <span>Ngôn ngữ đang soạn: <strong className={activeLanguageTab === 'zh' ? 'text-purple-300' : activeLanguageTab === 'en' ? 'text-blue-300' : 'text-emerald-400'}>{activeLanguageTab === 'zh' ? '🇹🇼 繁體中文' : activeLanguageTab === 'en' ? '🇬🇧 English' : '🇻🇳 Tiếng Việt'}</strong></span>
                     <span>Số từ: <strong className="text-white">{wordCount}</strong></span>
                     <span>Thời gian đọc ước tính: <strong className="text-white">{Math.max(1, Math.ceil(wordCount / 200))} phút</strong></span>
                   </div>
@@ -945,7 +1311,7 @@ export default function ArticleStudioEditor({
               <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    Tóm tắt (Excerpt)
+                    Tóm tắt (Excerpt) {activeLanguageTab === 'zh' ? '— 繁體中文' : activeLanguageTab === 'en' ? '— English' : '— Tiếng Việt'}
                   </label>
                   <span className={`text-[11px] font-medium ${
                     excerptLength >= 90 && excerptLength <= 180 ? 'text-emerald-400' : 'text-gray-500'
@@ -955,9 +1321,23 @@ export default function ArticleStudioEditor({
                 </div>
                 <textarea
                   rows={3}
-                  placeholder="Một đoạn tóm tắt ngắn..."
-                  value={newsFormData.excerpt || ''}
-                  onChange={(e) => setNewsFormData({ ...newsFormData, excerpt: e.target.value })}
+                  placeholder={
+                    activeLanguageTab === 'zh'
+                      ? '輸入繁體中文文章摘要...'
+                      : activeLanguageTab === 'en'
+                      ? 'Article summary in English...'
+                      : 'Một đoạn tóm tắt ngắn...'
+                  }
+                  value={getCurrentExcerpt()}
+                  onChange={(e) => {
+                    if (activeLanguageTab === 'zh') {
+                      setNewsFormData({ ...newsFormData, excerptZh: e.target.value });
+                    } else if (activeLanguageTab === 'en') {
+                      setNewsFormData({ ...newsFormData, excerptEn: e.target.value });
+                    } else {
+                      setNewsFormData({ ...newsFormData, excerpt: e.target.value });
+                    }
+                  }}
                   className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-gray-200 placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
                 />
               </div>
@@ -1160,67 +1540,151 @@ export default function ArticleStudioEditor({
                   </button>
 
                   {showTranslations && (
-                    <div className="p-4 sm:p-5 border-t border-[#223326] bg-[#0C140F] space-y-4">
+                    <div className="p-4 sm:p-5 border-t border-[#223326] bg-[#0C140F] space-y-5">
                       {/* Tiếng Trung */}
-                      <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-800/30 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-                            <span>🇹🇼</span> Bản Dịch Tiếng Trung Phồn Thể (繁體中文)
-                          </span>
-                          <button
-                            type="button"
-                            onClick={onTranslateZh}
-                            disabled={isTranslatingNews}
-                            className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-[11px] font-bold cursor-pointer"
-                          >
-                            {isTranslatingNews ? 'Đang dịch...' : '✨ AI Dịch 繁中'}
-                          </button>
+                      <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-800/40 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">🇹🇼</span>
+                            <span className="text-xs font-bold text-purple-300">
+                              Bản Dịch Tiếng Trung Phồn Thể (繁體中文)
+                            </span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                              (newsFormData.contentZh || '').trim()
+                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                : 'bg-gray-800 text-gray-400'
+                            }`}>
+                              {(newsFormData.contentZh || '').trim() ? '✓ Đã dịch' : 'Chưa có bản dịch'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSwitchLanguageTab('zh')}
+                              className="px-2.5 py-1 rounded-lg bg-[#19271E] hover:bg-[#223529] text-gray-300 hover:text-white border border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors"
+                            >
+                              Mở soạn trong Word Canvas →
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleTranslateArticle('zh')}
+                              disabled={isTranslatingNews}
+                              className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold cursor-pointer flex items-center gap-1.5 shadow-md disabled:opacity-50"
+                            >
+                              {isTranslatingNews ? <Sparkles className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                              <span>{isTranslatingNews ? 'Đang dịch...' : '✨ AI Dịch Toàn Bài 繁中'}</span>
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          placeholder="Tiêu đề tiếng Trung (繁體中文)..."
-                          value={newsFormData.titleZh || ''}
-                          onChange={(e) => setNewsFormData({ ...newsFormData, titleZh: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none"
-                        />
-                        <textarea
-                          rows={2}
-                          placeholder="Tóm tắt bài viết tiếng Trung (繁體中文)..."
-                          value={newsFormData.excerptZh || ''}
-                          onChange={(e) => setNewsFormData({ ...newsFormData, excerptZh: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none"
-                        />
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1">Tiêu đề (繁體中文):</label>
+                          <input
+                            type="text"
+                            placeholder="Tiêu đề tiếng Trung (繁體中文)..."
+                            value={newsFormData.titleZh || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, titleZh: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none focus:border-purple-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1">Tóm tắt ngắn (繁體中文):</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Tóm tắt bài viết tiếng Trung (繁體中文)..."
+                            value={newsFormData.excerptZh || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, excerptZh: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none focus:border-purple-500 resize-none"
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-gray-400">Nội dung bài viết (繁體中文):</label>
+                            <span className="text-[10px] text-purple-400">{(newsFormData.contentZh || '').length} ký tự HTML</span>
+                          </div>
+                          <textarea
+                            rows={5}
+                            placeholder="Toàn bộ nội dung bài viết bằng tiếng Trung phồn thể..."
+                            value={newsFormData.contentZh || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, contentZh: e.target.value })}
+                            className="w-full p-3 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 font-mono text-[11px] leading-relaxed outline-none focus:border-purple-500"
+                          />
+                        </div>
                       </div>
 
                       {/* Tiếng Anh */}
-                      <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-800/30 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-                            <span>🇬🇧</span> Bản Dịch Tiếng Anh (English)
-                          </span>
-                          <button
-                            type="button"
-                            onClick={onTranslateEn}
-                            disabled={isTranslatingNewsEn}
-                            className="px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/40 text-[11px] font-bold cursor-pointer"
-                          >
-                            {isTranslatingNewsEn ? 'Đang dịch...' : '✨ AI Dịch EN'}
-                          </button>
+                      <div className="p-4 rounded-xl bg-blue-950/20 border border-blue-800/40 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">🇬🇧</span>
+                            <span className="text-xs font-bold text-blue-300">
+                              Bản Dịch Tiếng Anh (English)
+                            </span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                              (newsFormData.contentEn || '').trim()
+                                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                : 'bg-gray-800 text-gray-400'
+                            }`}>
+                              {(newsFormData.contentEn || '').trim() ? '✓ Đã dịch' : 'Chưa có bản dịch'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSwitchLanguageTab('en')}
+                              className="px-2.5 py-1 rounded-lg bg-[#19271E] hover:bg-[#223529] text-gray-300 hover:text-white border border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors"
+                            >
+                              Mở soạn trong Word Canvas →
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleTranslateArticle('en')}
+                              disabled={isTranslatingNewsEn}
+                              className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold cursor-pointer flex items-center gap-1.5 shadow-md disabled:opacity-50"
+                            >
+                              {isTranslatingNewsEn ? <Sparkles className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                              <span>{isTranslatingNewsEn ? 'Đang dịch...' : '✨ AI Dịch Toàn Bài EN'}</span>
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          placeholder="Article title in English..."
-                          value={newsFormData.titleEn || ''}
-                          onChange={(e) => setNewsFormData({ ...newsFormData, titleEn: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none"
-                        />
-                        <textarea
-                          rows={2}
-                          placeholder="Article summary in English..."
-                          value={newsFormData.excerptEn || ''}
-                          onChange={(e) => setNewsFormData({ ...newsFormData, excerptEn: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none"
-                        />
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1">Title (English):</label>
+                          <input
+                            type="text"
+                            placeholder="Article title in English..."
+                            value={newsFormData.titleEn || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, titleEn: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1">Excerpt (English):</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Article summary in English..."
+                            value={newsFormData.excerptEn || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, excerptEn: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none focus:border-blue-500 resize-none"
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-gray-400">Content / Body (English):</label>
+                            <span className="text-[10px] text-blue-400">{(newsFormData.contentEn || '').length} characters HTML</span>
+                          </div>
+                          <textarea
+                            rows={5}
+                            placeholder="Full article content in English..."
+                            value={newsFormData.contentEn || ''}
+                            onChange={(e) => setNewsFormData({ ...newsFormData, contentEn: e.target.value })}
+                            className="w-full p-3 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 font-mono text-[11px] leading-relaxed outline-none focus:border-blue-500"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1871,42 +2335,103 @@ export default function ArticleStudioEditor({
                 </button>
               </div>
 
-              {/* Header bài viết */}
-              <div className="space-y-4">
-                <span className="inline-block px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-800/40">
-                  {newsFormData.categoryName || newsFormData.category || 'Tin tức'}
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-                  {newsFormData.title || 'Tiêu Đề Bài Viết Xem Trước'}
-                </h1>
-                <div className="flex items-center gap-4 text-xs text-gray-400">
-                  <span>Tác giả: <strong className="text-gray-200">{newsFormData.author || 'CASA R&D Team'}</strong></span>
-                  <span>•</span>
-                  <span>{newsFormData.date || 'Hôm nay'}</span>
-                  <span>•</span>
-                  <span>{newsFormData.readTime || '4 phút đọc'}</span>
+              {/* Language Switcher in Preview Modal */}
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111A14] p-3 rounded-2xl border border-white/5">
+                <span className="text-xs font-semibold text-gray-400">Xem trước theo ngôn ngữ:</span>
+                <div className="flex items-center gap-1.5 bg-[#080E0A] p-1 rounded-xl border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLang('vi')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      previewLang === 'vi' ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    🇻🇳 Tiếng Việt
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLang('zh')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      previewLang === 'zh' ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    🇹🇼 繁體中文
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLang('en')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      previewLang === 'en' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    🇬🇧 English
+                  </button>
                 </div>
               </div>
 
-              {/* Ảnh bìa */}
-              {newsFormData.image && (
-                <div className="rounded-3xl overflow-hidden aspect-[16/9] shadow-lg border border-white/10">
-                  <img src={newsFormData.image} alt={newsFormData.title} className="w-full h-full object-cover" />
-                </div>
-              )}
+              {/* Header bài viết & Nội dung theo ngôn ngữ được chọn */}
+              {(() => {
+                const previewTitle =
+                  previewLang === 'zh'
+                    ? (newsFormData.titleZh || newsFormData.title || 'Tiêu Đề (Chưa có bản dịch Tiếng Trung)')
+                    : previewLang === 'en'
+                    ? (newsFormData.titleEn || newsFormData.title || 'Title (No English translation yet)')
+                    : (newsFormData.title || 'Tiêu Đề Bài Viết Xem Trước');
 
-              {/* Tóm tắt */}
-              {newsFormData.excerpt && (
-                <p className="text-base sm:text-lg font-medium text-gray-300 italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed">
-                  {newsFormData.excerpt}
-                </p>
-              )}
+                const previewExcerpt =
+                  previewLang === 'zh'
+                    ? (newsFormData.excerptZh || newsFormData.excerpt || '')
+                    : previewLang === 'en'
+                    ? (newsFormData.excerptEn || newsFormData.excerpt || '')
+                    : (newsFormData.excerpt || '');
 
-              {/* Nội dung bài viết */}
-              <div
-                className="article-content prose prose-invert max-w-none text-gray-200 leading-relaxed space-y-4 text-base"
-                dangerouslySetInnerHTML={{ __html: newsFormData.content || '<p>Chưa có nội dung bài viết...</p>' }}
-              />
+                const previewContent =
+                  previewLang === 'zh'
+                    ? (newsFormData.contentZh || '<p class="text-amber-400 italic">Chưa có nội dung bài viết bằng Tiếng Trung (繁體中文)... Bạn hãy dùng nút AI Dịch 繁中 để dịch toàn bộ bài.</p>')
+                    : previewLang === 'en'
+                    ? (newsFormData.contentEn || '<p class="text-amber-400 italic">No English content available yet... Please use AI Dịch EN to translate the whole article.</p>')
+                    : (newsFormData.content || '<p>Chưa có nội dung bài viết...</p>');
+
+                return (
+                  <>
+                    <div className="space-y-4">
+                      <span className="inline-block px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-800/40">
+                        {newsFormData.categoryName || newsFormData.category || 'Tin tức'}
+                      </span>
+                      <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                        {previewTitle}
+                      </h1>
+                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                        <span>Tác giả: <strong className="text-gray-200">{newsFormData.author || 'CASA R&D Team'}</strong></span>
+                        <span>•</span>
+                        <span>{newsFormData.date || 'Hôm nay'}</span>
+                        <span>•</span>
+                        <span>{newsFormData.readTime || '4 phút đọc'}</span>
+                      </div>
+                    </div>
+
+                    {/* Ảnh bìa */}
+                    {newsFormData.image && (
+                      <div className="rounded-3xl overflow-hidden aspect-[16/9] shadow-lg border border-white/10">
+                        <img src={newsFormData.image} alt={previewTitle} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {/* Tóm tắt */}
+                    {previewExcerpt && (
+                      <p className="text-base sm:text-lg font-medium text-gray-300 italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed">
+                        {previewExcerpt}
+                      </p>
+                    )}
+
+                    {/* Nội dung bài viết */}
+                    <div
+                      className="article-content prose prose-invert max-w-none text-gray-200 leading-relaxed space-y-4 text-base"
+                      dangerouslySetInnerHTML={{ __html: previewContent }}
+                    />
+                  </>
+                );
+              })()}
 
               {/* Hộp công thức nếu có */}
               {newsFormData.recipeBox && (

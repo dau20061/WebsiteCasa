@@ -870,49 +870,57 @@ export default function AdminDashboard() {
     }
   };
 
-  // 4. Dịch bài viết sang Trung Phồn Thể (繁體中文) bằng Gemini AI
-  const handleTranslateNewsZh = async () => {
-    if (!newsFormData.title.trim()) {
-      showToast('Vui lòng nhập Tiêu đề bài viết trước khi dịch!', 'warning');
-      return;
+  // 4. Dịch toàn bộ bài viết sang Trung Phồn Thể (繁體中文) bằng Gemini AI
+  const handleTranslateNewsZh = async (customPayload) => {
+    const dataToTranslate = customPayload || newsFormData;
+    if (!dataToTranslate.title?.trim() && !dataToTranslate.content?.trim()) {
+      showToast('Vui lòng nhập Tiêu đề hoặc Nội dung bài viết trước khi dịch!', 'warning');
+      return null;
     }
     setIsTranslatingNews(true);
     try {
-      showToast('Gemini AI đang dịch bài viết sang Trung Phồn Thể (繁體中文)...', 'info');
-      const zhResult = await translateArticleToTraditionalChinese(newsFormData);
+      showToast('Gemini AI đang dịch toàn bộ bài viết (Tiêu đề, Tóm tắt & Nội dung) sang Trung Phồn Thể (繁體中文)...', 'info');
+      const zhResult = await translateArticleToTraditionalChinese(dataToTranslate);
       setNewsFormData((prev) => ({
         ...prev,
+        ...(customPayload || {}),
         titleZh: zhResult.titleZh || prev.titleZh,
         excerptZh: zhResult.excerptZh || prev.excerptZh,
         contentZh: zhResult.contentZh || prev.contentZh
       }));
       showToast(`✨ Đã dịch hoàn tất bài viết sang Trung Phồn Thể: "${zhResult.titleZh}"!`, 'success');
+      return zhResult;
     } catch (err) {
       showToast('Lỗi khi dịch bài viết: ' + err.message, 'error');
+      return null;
     } finally {
       setIsTranslatingNews(false);
     }
   };
 
-  // Dịch bài viết sang Tiếng Anh (English) bằng Gemini AI
-  const handleTranslateNewsEn = async () => {
-    if (!newsFormData.title.trim()) {
-      showToast('Vui lòng nhập Tiêu đề bài viết trước khi dịch!', 'warning');
-      return;
+  // Dịch toàn bộ bài viết sang Tiếng Anh (English) bằng Gemini AI
+  const handleTranslateNewsEn = async (customPayload) => {
+    const dataToTranslate = customPayload || newsFormData;
+    if (!dataToTranslate.title?.trim() && !dataToTranslate.content?.trim()) {
+      showToast('Vui lòng nhập Tiêu đề hoặc Nội dung bài viết trước khi dịch!', 'warning');
+      return null;
     }
     setIsTranslatingNewsEn(true);
     try {
-      showToast('Gemini AI đang dịch bài viết sang Tiếng Anh (English)...', 'info');
-      const enResult = await translateArticleToEnglish(newsFormData);
+      showToast('Gemini AI đang dịch toàn bộ bài viết (Tiêu đề, Tóm tắt & Nội dung) sang Tiếng Anh (English)...', 'info');
+      const enResult = await translateArticleToEnglish(dataToTranslate);
       setNewsFormData((prev) => ({
         ...prev,
+        ...(customPayload || {}),
         titleEn: enResult.titleEn || prev.titleEn,
         excerptEn: enResult.excerptEn || prev.excerptEn,
         contentEn: enResult.contentEn || prev.contentEn
       }));
       showToast(`✨ Đã dịch hoàn tất bài viết sang Tiếng Anh: "${enResult.titleEn}"!`, 'success');
+      return enResult;
     } catch (err) {
       showToast('Lỗi khi dịch bài viết sang Tiếng Anh: ' + err.message, 'error');
+      return null;
     } finally {
       setIsTranslatingNewsEn(false);
     }
