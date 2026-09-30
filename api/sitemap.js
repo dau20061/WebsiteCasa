@@ -49,7 +49,6 @@ export default async function handler(req, res) {
       { loc: `${SITE_URL}/products?cat=topping`, priority: '0.8', changefreq: 'weekly', lastmod: today },
       { loc: `${SITE_URL}/news`, priority: '0.8', changefreq: 'daily', lastmod: today },
       { loc: `${SITE_URL}/about`, priority: '0.8', changefreq: 'monthly', lastmod: today },
-      { loc: `${SITE_URL}/machinery-certifications`, priority: '0.8', changefreq: 'monthly', lastmod: today },
       { loc: `${SITE_URL}/contact`, priority: '0.7', changefreq: 'monthly', lastmod: today },
       { loc: `${SITE_URL}/faq`, priority: '0.7', changefreq: 'monthly', lastmod: today }
     ];

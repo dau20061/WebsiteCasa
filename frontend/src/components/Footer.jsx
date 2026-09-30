@@ -129,9 +129,6 @@ export default function Footer() {
                 <Link to="/about" className="hover:text-tea-mint transition-colors">{t('nav_about', 'Về Chúng Tôi')}</Link>
               </li>
               <li>
-                <Link to="/machinery-certifications" className="hover:text-tea-mint transition-colors">{t('nav_machinery', 'Máy Móc & Chứng Nhận')}</Link>
-              </li>
-              <li>
                 <Link to="/products" className="hover:text-tea-mint transition-colors">{t('nav_products', 'Danh Mục Sản Phẩm')}</Link>
               </li>
               <li>
