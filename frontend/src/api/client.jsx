@@ -8,8 +8,11 @@ const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
   const config = {
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
       ...options.headers,
     },
     ...options,

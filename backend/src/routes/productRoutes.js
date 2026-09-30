@@ -10,7 +10,9 @@ router.get('/', async (req, res) => {
       const { imageData, imageBase64, ...rest } = p;
       return rest;
     });
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.json(lightweightProducts);
   } catch (err) {
     res.status(500).json({ error: err.message });

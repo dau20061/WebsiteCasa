@@ -11,13 +11,20 @@ import { PRODUCT_CATEGORIES } from '../constants/categories';
 
 const DIRECT_RTDB_BASE = 'https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-// Trợ thủ fetch trực tiếp Firebase Realtime Database REST API
+// Trợ thủ fetch trực tiếp Firebase Realtime Database REST API (Không bao giờ bị CDN/trình duyệt cache)
 async function fetchDirectRtdb(path, method = 'GET', data = null) {
   try {
-    const url = `${DIRECT_RTDB_BASE}/${path}.json`;
+    const url = method === 'GET'
+      ? `${DIRECT_RTDB_BASE}/${path}.json?_t=${Date.now()}`
+      : `${DIRECT_RTDB_BASE}/${path}.json`;
     const options = {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      },
     };
     if (data !== null) {
       options.body = JSON.stringify(data);
@@ -25,7 +32,9 @@ async function fetchDirectRtdb(path, method = 'GET', data = null) {
     const res = await fetch(url, options);
     if (res.ok) {
       const val = await res.json();
-      if (!val) return null;
+      if (val === null || val === undefined) {
+        return method === 'GET' ? [] : null;
+      }
       let result = val;
       if (method === 'GET' && typeof val === 'object' && !Array.isArray(val)) {
         result = Object.keys(val).map((k) => ({ id: k, ...val[k] }));
@@ -48,6 +57,20 @@ async function fetchDirectRtdb(path, method = 'GET', data = null) {
 // PRODUCT CATEGORIES (CRUD)
 // ============================================================================
 export async function getRtdbCategories() {
+  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database (Nguồn sự thật 100%)
+  try {
+    const directData = await fetchDirectRtdb('categories');
+    if (directData !== null && Array.isArray(directData) && directData.length > 0) {
+      try {
+        localStorage.setItem('casa_admin_categories', JSON.stringify(directData));
+      } catch (_) {}
+      return directData;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb categories error, trying Backend API:', err.message);
+  }
+
+  // 2. Dự phòng qua Backend API
   try {
     const data = await categoryApi.getAll();
     if (data && Array.isArray(data) && data.length > 0) {
@@ -57,17 +80,8 @@ export async function getRtdbCategories() {
       return data;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbCategories via Backend API failed, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbCategories via Backend API failed:', err.message);
   }
-
-  // Thử trực tiếp Firebase RTDB nếu backend API lỗi
-  try {
-    const directData = await fetchDirectRtdb('categories');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_categories', JSON.stringify(directData));
-      return directData;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_categories');
   if (saved) {
@@ -149,26 +163,31 @@ export async function deleteRtdbCategory(categoryId) {
 // PRODUCTS
 // ============================================================================
 export async function getRtdbProducts() {
+  // 1. Luôn ưu tiên fetch trực tiếp từ Firebase Realtime Database (Nguồn sự thật 100%, 0ms cache)
+  try {
+    const directData = await fetchDirectRtdb('products');
+    if (directData !== null && Array.isArray(directData)) {
+      try {
+        localStorage.setItem('casa_admin_products', JSON.stringify(directData));
+      } catch (_) {}
+      return directData;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb products error, trying Backend API:', err.message);
+  }
+
+  // 2. Dự phòng qua Backend API nếu fetch trực tiếp Firebase bị lỗi mạng
   try {
     const data = await productApi.getAll();
-    if (data && Array.isArray(data) && data.length > 0) {
+    if (data !== null && Array.isArray(data)) {
       try {
         localStorage.setItem('casa_admin_products', JSON.stringify(data));
       } catch (_) {}
       return data;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbProducts via Backend API failed, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbProducts via Backend API failed:', err.message);
   }
-
-  // Thử trực tiếp Firebase RTDB nếu backend API 500/offline
-  try {
-    const directData = await fetchDirectRtdb('products');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_products', JSON.stringify(directData));
-      return directData;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_products');
   return saved ? JSON.parse(saved) : [];
@@ -252,26 +271,31 @@ export async function deleteRtdbProduct(productId) {
 // NEWS & ARTICLES
 // ============================================================================
 export async function getRtdbNews() {
+  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database
+  try {
+    const directData = await fetchDirectRtdb('news');
+    if (directData !== null && Array.isArray(directData)) {
+      try {
+        localStorage.setItem('casa_admin_news', JSON.stringify(directData));
+      } catch (_) {}
+      return directData;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb news error, trying Backend API:', err.message);
+  }
+
+  // 2. Dự phòng qua Backend API
   try {
     const data = await newsApi.getAll();
-    if (data && Array.isArray(data) && data.length > 0) {
+    if (data !== null && Array.isArray(data)) {
       try {
         localStorage.setItem('casa_admin_news', JSON.stringify(data));
       } catch (_) {}
       return data;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbNews via Backend API failed, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbNews via Backend API failed:', err.message);
   }
-
-  // Thử trực tiếp Firebase RTDB nếu backend API lỗi
-  try {
-    const directData = await fetchDirectRtdb('news');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_news', JSON.stringify(directData));
-      return directData;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_news');
   return saved ? JSON.parse(saved) : [];

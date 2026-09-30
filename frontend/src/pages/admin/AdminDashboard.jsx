@@ -103,7 +103,6 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('products');
   const [isSyncingRtdb, setIsSyncingRtdb] = useState(false);
   const [isDesigningProduct, setIsDesigningProduct] = useState(false);
-  const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [isTranslatingProduct, setIsTranslatingProduct] = useState(false);
   const [isTranslatingProductEn, setIsTranslatingProductEn] = useState(false);
   const [isMigratingImages, setIsMigratingImages] = useState(false);
@@ -956,121 +955,93 @@ export default function AdminDashboard() {
   };
 
   const handleSaveProduct = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (isSavingProduct) return;
-
-    if (!productFormData.name?.trim() || !productFormData.sku?.trim()) {
+    e.preventDefault();
+    if (!productFormData.name.trim() || !productFormData.sku.trim()) {
       showToast('Vui lòng điền đầy đủ Tên sản phẩm và SKU!', 'error');
       return;
     }
 
-    if (productFormData.purchaseAction === 'shopee') {
-      const url = (productFormData.shopeeUrl || '').trim();
-      if (!url) {
-        showToast('Vui lòng nhập đường dẫn Shopee (VD: https://shopee.vn/...)', 'error');
-        return;
+    let finalData = { ...productFormData };
+
+    // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ (繁體中文) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
+    const isZhEmptyOrVietnamese = !finalData.nameZh || !finalData.nameZh.trim() || finalData.nameZh.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+    if (isZhEmptyOrVietnamese) {
+      try {
+        const zh = await translateProductToTraditionalChinese(finalData);
+        finalData.nameZh = zh.nameZh;
+        finalData.badgeZh = zh.badgeZh || '新品上市';
+        finalData.shortDescZh = zh.shortDescZh;
+        finalData.fullDescZh = zh.fullDescZh;
+        finalData.originZh = zh.originZh;
+        finalData.applicationsZh = zh.applicationsZh;
+      } catch (e) {
+        console.warn('Tự động dịch Trung ngầm:', e);
       }
     }
 
-    setIsSavingProduct(true);
-    try {
-      let finalData = { ...productFormData };
-
-      // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ NẾU CHƯA CÓ (Timeout 2.5s không làm nghẽn lưu sản phẩm)
-      const isZhEmptyOrVietnamese = !finalData.nameZh || !finalData.nameZh.trim() || finalData.nameZh.trim().toLowerCase() === finalData.name.trim().toLowerCase();
-      if (isZhEmptyOrVietnamese) {
-        try {
-          const zh = await Promise.race([
-            translateProductToTraditionalChinese(finalData),
-            new Promise((resolve) => setTimeout(() => resolve(null), 2500))
-          ]);
-          if (zh) {
-            finalData.nameZh = zh.nameZh || finalData.nameZh;
-            finalData.badgeZh = zh.badgeZh || '新品上市';
-            finalData.shortDescZh = zh.shortDescZh || finalData.shortDescZh;
-            finalData.fullDescZh = zh.fullDescZh || finalData.fullDescZh;
-            finalData.originZh = zh.originZh || finalData.originZh;
-            finalData.applicationsZh = zh.applicationsZh || finalData.applicationsZh;
-          }
-        } catch (e) {
-          console.warn('Tự động dịch Trung ngầm:', e);
-        }
+    // TỰ ĐỘNG DỊCH SANG TIẾNG ANH (ENGLISH) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
+    const isEnEmptyOrVietnamese = !finalData.nameEn || !finalData.nameEn.trim() || finalData.nameEn.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+    if (isEnEmptyOrVietnamese) {
+      try {
+        const en = await translateProductToEnglish(finalData);
+        finalData.nameEn = en.nameEn;
+        finalData.badgeEn = en.badgeEn || 'New Arrival';
+        finalData.shortDescEn = en.shortDescEn;
+        finalData.fullDescEn = en.fullDescEn;
+        finalData.originEn = en.originEn;
+        finalData.applicationsEn = en.applicationsEn;
+      } catch (e) {
+        console.warn('Tự động dịch En ngầm:', e);
       }
-
-      // TỰ ĐỘNG DỊCH SANG TIẾNG ANH NẾU CHƯA CÓ (Timeout 2.5s)
-      const isEnEmptyOrVietnamese = !finalData.nameEn || !finalData.nameEn.trim() || finalData.nameEn.trim().toLowerCase() === finalData.name.trim().toLowerCase();
-      if (isEnEmptyOrVietnamese) {
-        try {
-          const en = await Promise.race([
-            translateProductToEnglish(finalData),
-            new Promise((resolve) => setTimeout(() => resolve(null), 2500))
-          ]);
-          if (en) {
-            finalData.nameEn = en.nameEn || finalData.nameEn;
-            finalData.badgeEn = en.badgeEn || 'New Arrival';
-            finalData.shortDescEn = en.shortDescEn || finalData.shortDescEn;
-            finalData.fullDescEn = en.fullDescEn || finalData.fullDescEn;
-            finalData.originEn = en.originEn || finalData.originEn;
-            finalData.applicationsEn = en.applicationsEn || finalData.applicationsEn;
-          }
-        } catch (e) {
-          console.warn('Tự động dịch En ngầm:', e);
-        }
-      }
-
-      const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
-      const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
-
-      // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
-      if (finalData.image && finalData.image.startsWith('data:image/')) {
-        finalData.imageData = finalData.image;
-        finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
-        finalData.images = [finalData.image];
-      }
-
-      if (editingProduct) {
-        const oldImage = editingProduct.image;
-        // SỬA (UPDATE)
-        const updatedProd = {
-          ...editingProduct,
-          ...finalData,
-          slug: cleanSlug || editingProduct.slug || editingProduct.id,
-          updatedAt: new Date().toISOString()
-        };
-        setProducts((prev) =>
-          prev.map((p) => (p.id === editingProduct.id ? updatedProd : p))
-        );
-        // Ghi trực tiếp lên Firebase Realtime Database và Backend API (isExplicitNew = false)
-        await saveRtdbProduct(updatedProd, false);
-
-        // Nếu thay ảnh mới và ảnh cũ nằm trên Firebase Storage thì dọn dẹp ảnh cũ
-        if (oldImage && finalData.image && oldImage !== finalData.image && oldImage.includes('firebasestorage.googleapis.com')) {
-          deleteStorageImage(oldImage);
-        }
-
-        showToast(`Đã lưu cập nhật sản phẩm [${finalData.name}] thành công!`, 'success');
-      } else {
-        // THÊM MỚI (CREATE)
-        const newId = `product_${Date.now()}`;
-        const newProd = {
-          id: newId,
-          slug: cleanSlug || newId,
-          ...finalData,
-          createdAt: new Date().toISOString()
-        };
-        setProducts((prev) => [newProd, ...prev]);
-        // Ghi trực tiếp lên Firebase Realtime Database và Backend API (isExplicitNew = true)
-        await saveRtdbProduct(newProd, true);
-        showToast(`Đã thêm mới sản phẩm [${finalData.name}] thành công!`, 'success');
-      }
-
-      setProductModalOpen(false);
-    } catch (err) {
-      console.error('Lỗi khi lưu sản phẩm:', err);
-      showToast('Lỗi khi lưu sản phẩm: ' + (err.message || 'Vui lòng thử lại'), 'error');
-    } finally {
-      setIsSavingProduct(false);
     }
+
+    const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
+    const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
+
+    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
+    if (finalData.image && finalData.image.startsWith('data:image/')) {
+      finalData.imageData = finalData.image;
+      finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
+      finalData.images = [finalData.image];
+    }
+
+    if (editingProduct) {
+      const oldImage = editingProduct.image;
+      // SỬA (UPDATE)
+      const updatedProd = {
+        ...editingProduct,
+        ...finalData,
+        slug: cleanSlug || editingProduct.slug || editingProduct.id,
+        updatedAt: new Date().toISOString()
+      };
+      setProducts((prev) =>
+        prev.map((p) => (p.id === editingProduct.id ? updatedProd : p))
+      );
+      // Ghi trực tiếp lên Firebase Realtime Database
+      await saveRtdbProduct(updatedProd);
+
+      // Nếu thay ảnh mới và ảnh cũ nằm trên Firebase Storage thì dọn dẹp ảnh cũ
+      if (oldImage && finalData.image && oldImage !== finalData.image && oldImage.includes('firebasestorage.googleapis.com')) {
+        deleteStorageImage(oldImage);
+      }
+
+      showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
+    } else {
+      // THÊM MỚI (CREATE)
+      const newId = `product_${Date.now()}`;
+      const newProd = {
+        id: newId,
+        slug: cleanSlug || newId,
+        ...finalData,
+        createdAt: new Date().toISOString()
+      };
+      setProducts((prev) => [newProd, ...prev]);
+      // Ghi trực tiếp lên Firebase Realtime Database
+      await saveRtdbProduct(newProd);
+      showToast(`Đã thêm mới [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
+    }
+
+    setProductModalOpen(false);
   };
 
   const handleDeleteProduct = async (productId, productName) => {
@@ -3675,7 +3646,8 @@ export default function AdminDashboard() {
                           Đường Dẫn Shopee (Link Sản Phẩm) *
                         </label>
                         <input
-                          type="text"
+                          type="url"
+                          required
                           placeholder="https://shopee.vn/casa-tea-..."
                           value={productFormData.shopeeUrl || ''}
                           onChange={(e) => setProductFormData({ ...productFormData, shopeeUrl: e.target.value })}
@@ -3969,25 +3941,16 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        disabled={isSavingProduct}
                         onClick={() => setProductModalOpen(false)}
-                        className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 font-bold disabled:opacity-50"
+                        className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 font-bold"
                       >
                         Hủy bỏ
                       </button>
                       <button
                         type="submit"
-                        disabled={isSavingProduct}
-                        className="px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white font-bold shadow-tea-sm transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white font-bold shadow-tea-sm transition-colors"
                       >
-                        {isSavingProduct && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                        <span>
-                          {isSavingProduct
-                            ? 'Đang lưu...'
-                            : editingProduct
-                            ? 'Lưu Thay Đổi (Update)'
-                            : 'Thêm Sản Phẩm (Create)'}
-                        </span>
+                        {editingProduct ? 'Lưu Thay Đổi (Update)' : 'Thêm Sản Phẩm (Create)'}
                       </button>
                     </div>
                   </div>
@@ -4101,12 +4064,10 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       type="button"
-                      disabled={isSavingProduct}
                       onClick={handleSaveProduct}
-                      className="px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white font-bold text-xs shadow-tea-sm transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="px-6 py-2.5 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white font-bold text-xs shadow-tea-sm transition-colors"
                     >
-                      {isSavingProduct && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                      <span>{isSavingProduct ? 'Đang lưu...' : editingProduct ? 'Lưu Sản Phẩm (Update)' : 'Thêm Sản Phẩm Ngay (Create)'}</span>
+                      {editingProduct ? 'Lưu Sản Phẩm (Update)' : 'Thêm Sản Phẩm Ngay (Create)'}
                     </button>
                   </div>
                 </div>
