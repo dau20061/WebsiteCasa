@@ -42,6 +42,9 @@ export function setGeminiApiKey(key) {
  */
 async function callGeminiApi({ prompt, systemInstruction = '' }) {
   const apiKey = getGeminiApiKey();
+  if (!apiKey || !apiKey.trim()) {
+    throw new Error('GEMINI_API_KEY is not configured.');
+  }
   // Ưu tiên các model khả dụng trong năm 2026 (gemini-3.6-flash hoạt động ổn định nhất)
   const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-flash-latest', GEMINI_CONFIG.MODEL_NAME];
   let lastError = null;
@@ -70,9 +73,9 @@ async function callGeminiApi({ prompt, systemInstruction = '' }) {
         };
       }
 
-      // Timeout 25s cho mỗi lần gọi để AI có đủ thời gian xử lý bài viết dài và phản hồi đầy đủ
+      // Timeout 8s cho mỗi lần gọi để tránh treo serverless function
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       const response = await fetch(url, {
         method: 'POST',

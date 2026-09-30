@@ -136,17 +136,13 @@ export async function deleteRtdbCategory(categoryId) {
     }
   } catch (_) {}
 
-  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
+    return await categoryApi.delete(categoryId);
+  } catch (err) {
+    console.warn('[Frontend Service] deleteRtdbCategory error, deleting from direct RTDB:', err.message);
     await fetchDirectRtdb(`categories/${categoryId}`, 'DELETE');
-  } catch (_) {}
-
-  // 2. Đồng bộ qua backend API
-  try {
-    await categoryApi.delete(categoryId);
-  } catch (_) {}
-
-  return { success: true, id: categoryId };
+    return { success: true };
+  }
 }
 
 // ============================================================================
@@ -178,8 +174,7 @@ export async function getRtdbProducts() {
   return saved ? JSON.parse(saved) : [];
 }
 
-export async function saveRtdbProduct(product) {
-  const isNew = !product.id || String(product.id).startsWith('product_');
+export async function saveRtdbProduct(product, isExplicitNew = null) {
   const targetId = product.id || `product_${Date.now()}`;
   const itemToSave = { ...product, id: targetId, updatedAt: new Date().toISOString() };
 
@@ -196,13 +191,36 @@ export async function saveRtdbProduct(product) {
     localStorage.setItem('casa_admin_products', JSON.stringify(list));
   } catch (_) {}
 
-  // 2. Thử lưu qua backend API
+  // Xác định chuẩn xác trạng thái thêm mới hay chỉnh sửa
+  let isNew = isExplicitNew;
+  if (isNew === null) {
+    if (!product.id) {
+      isNew = true;
+    } else {
+      try {
+        const saved = localStorage.getItem('casa_admin_products');
+        const list = saved ? JSON.parse(saved) : [];
+        // Nếu ID đã có trong danh sách thì là CẬP NHẬT (isNew = false)
+        isNew = !list.some((p) => String(p.id) === String(targetId));
+      } catch (_) {
+        isNew = false;
+      }
+    }
+  }
+
+  // 2. Ghi trực tiếp lên Firebase Realtime Database (0ms trễ)
+  try {
+    await fetchDirectRtdb(`products/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save error:', directErr);
+  }
+
+  // 3. Đồng bộ với Backend API
   try {
     const result = isNew ? await productApi.create(itemToSave) : await productApi.update(targetId, itemToSave);
-    return result.id || targetId;
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbProduct via Backend API failed, saving to direct RTDB:', err.message);
-    await fetchDirectRtdb(`products/${targetId}`, 'PUT', itemToSave);
+    console.warn('[Frontend Service] saveRtdbProduct backend sync notice:', err.message);
     return targetId;
   }
 }
@@ -216,17 +234,18 @@ export async function deleteRtdbProduct(productId) {
     }
   } catch (_) {}
 
-  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
     await fetchDirectRtdb(`products/${productId}`, 'DELETE');
-  } catch (_) {}
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete error:', directErr);
+  }
 
-  // 2. Đồng bộ qua backend API
   try {
-    await productApi.delete(productId);
-  } catch (_) {}
-
-  return { success: true, id: productId };
+    return await productApi.delete(productId);
+  } catch (err) {
+    console.warn('[Frontend Service] deleteRtdbProduct error:', err.message);
+    return { success: true };
+  }
 }
 
 // ============================================================================
@@ -296,17 +315,18 @@ export async function deleteRtdbNews(newsId) {
     }
   } catch (_) {}
 
-  // 1. Luôn xóa trực tiếp từ Firebase Realtime Database
   try {
     await fetchDirectRtdb(`news/${newsId}`, 'DELETE');
-  } catch (_) {}
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete error:', directErr);
+  }
 
-  // 2. Đồng bộ qua backend API
   try {
-    await newsApi.delete(newsId);
-  } catch (_) {}
-
-  return { success: true, id: newsId };
+    return await newsApi.delete(newsId);
+  } catch (err) {
+    console.warn('[Frontend Service] deleteRtdbNews error:', err.message);
+    return { success: true };
+  }
 }
 
 // ============================================================================

@@ -341,16 +341,19 @@ export async function translateHtmlToZhTw(html) {
 }
 
 export async function translateProductToTraditionalChinese(product = {}) {
-  // 1. Thử gọi qua Backend API trước (Gemini AI)
+  // 1. Thử gọi qua Backend API trước (Gemini AI với timeout 3s)
   try {
-    const res = await aiApi.translateProductZh(product);
+    const res = await Promise.race([
+      aiApi.translateProductZh(product),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const hasChinese = (res?.nameZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
     const isHalfVietnamese = hasVietnamese(res?.nameZh) || hasVietnamese(res?.shortDescZh);
     if (res && res.nameZh && hasChinese && !isHalfVietnamese) {
       return res;
     }
   } catch (err) {
-    console.warn('[translateProductToTraditionalChinese] Backend API unreachable, switching to Deep Zh-TW engine:', err.message);
+    console.warn('[translateProductToTraditionalChinese] Backend API unreachable/timeout, switching to Deep Zh-TW engine:', err.message);
   }
 
   // 2. Dịch chi tiết toàn diện 100% từng trường thông tin
@@ -688,16 +691,19 @@ export async function translateHtmlToEn(html) {
 }
 
 export async function translateProductToEnglish(product = {}) {
-  // 1. Thử gọi backend API trước
+  // 1. Thử gọi backend API trước (với timeout 3s)
   try {
-    const res = await aiApi.translateProductEn(product);
+    const res = await Promise.race([
+      aiApi.translateProductEn(product),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const isHalfVi = hasVietnamese(res?.nameEn) || hasVietnamese(res?.shortDescEn);
     const hasInvalidEn = isInvalidEnTranslation(res?.nameEn) || isInvalidEnTranslation(res?.shortDescEn) || isInvalidEnTranslation(res?.fullDescEn);
     if (res && res.nameEn && !isHalfVi && !hasInvalidEn) {
       return res;
     }
   } catch (err) {
-    console.warn('[translateProductToEnglish] Backend API unreachable, switching to Deep EN engine:', err.message);
+    console.warn('[translateProductToEnglish] Backend API unreachable/timeout, switching to Deep EN engine:', err.message);
   }
 
   // 2. Dịch qua client fallback engine
