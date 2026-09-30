@@ -17,7 +17,6 @@ export default function Navbar({ onOpenSampleModal }) {
   const NAV_LINKS = [
     { path: '/', label: t('nav_home', 'Trang Chủ') },
     { path: '/about', label: t('nav_about', 'Giới Thiệu') },
-    { path: '/machinery-certifications', label: t('nav_machinery', 'Máy Móc & Chứng Nhận') },
     { path: '/products', label: t('nav_products', 'Sản Phẩm') },
     { path: '/news', label: t('nav_news', 'Tin Tức') },
     { path: '/contact', label: t('nav_contact', 'Liên Lạc') },
@@ -37,7 +36,7 @@ export default function Navbar({ onOpenSampleModal }) {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const hasHeroBanner = ['/', '/about', '/machinery-certifications', '/products', '/news', '/contact', '/faq'].includes(location.pathname);
+  const hasHeroBanner = ['/', '/about', '/products', '/news', '/contact', '/faq'].includes(location.pathname);
 
   return (
     <>

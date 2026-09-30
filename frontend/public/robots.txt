@@ -15,7 +15,6 @@ Allow: /article-image/
 Allow: /article-image/*
 Allow: /about
 Allow: /contact
-Allow: /machinery-certifications
 Allow: /faq
 
 # Disallow private administrative & api endpoints

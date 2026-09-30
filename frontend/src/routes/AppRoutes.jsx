@@ -6,7 +6,6 @@ import Home from '../pages/Home';
 
 // Subpages lazy-loaded to keep initial bundle size minimal (< 250 KB)
 const About = lazy(() => import('../pages/About'));
-const MachineryCertifications = lazy(() => import('../pages/MachineryCertifications'));
 const Products = lazy(() => import('../pages/Products'));
 const ProductDetail = lazy(() => import('../pages/ProductDetail'));
 const News = lazy(() => import('../pages/News'));
@@ -37,7 +36,7 @@ export default function AppRoutes() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
-          <Route path="machinery-certifications" element={<MachineryCertifications />} />
+          <Route path="machinery-certifications" element={<Navigate to="/about" replace />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="news" element={<News />} />
