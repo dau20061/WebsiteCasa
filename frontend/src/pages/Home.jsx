@@ -449,10 +449,10 @@ export default function Home() {
               <div className="pt-2 flex items-center gap-6 text-xs text-gray-400">
                 <span>{isEnglish ? 'Specifications:' : (isChinese ? '規格參數：' : 'Thông số:')} <strong className="text-white">{(isEnglish && PRODUCTION_STEPS[activeStep].statsEn) || (isChinese && PRODUCTION_STEPS[activeStep].statsZh) || PRODUCTION_STEPS[activeStep].stats}</strong></span>
                 <Link
-                  to="/about"
+                  to="/machinery-certifications"
                   className="inline-flex items-center gap-1 text-tea-mint hover:underline font-bold"
                 >
-                  <span>{isEnglish ? 'Explore CASA capabilities' : (isChinese ? '了解更多關於 CASA' : 'Tìm hiểu thêm về CASA')}</span>
+                  <span>{isEnglish ? 'View machinery details' : (isChinese ? '查看設備詳情' : 'Xem chi tiết máy móc')}</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
