@@ -397,6 +397,7 @@ export default function AdminDashboard() {
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [productFormData, setProductFormData] = useState({
     name: '',
     nameZh: '',
@@ -955,93 +956,121 @@ export default function AdminDashboard() {
   };
 
   const handleSaveProduct = async (e) => {
-    e.preventDefault();
-    if (!productFormData.name.trim() || !productFormData.sku.trim()) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (isSavingProduct) return;
+
+    if (!productFormData.name?.trim() || !productFormData.sku?.trim()) {
       showToast('Vui lòng điền đầy đủ Tên sản phẩm và SKU!', 'error');
       return;
     }
 
-    let finalData = { ...productFormData };
-
-    // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ (繁體中文) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
-    const isZhEmptyOrVietnamese = !finalData.nameZh || !finalData.nameZh.trim() || finalData.nameZh.trim().toLowerCase() === finalData.name.trim().toLowerCase();
-    if (isZhEmptyOrVietnamese) {
-      try {
-        const zh = await translateProductToTraditionalChinese(finalData);
-        finalData.nameZh = zh.nameZh;
-        finalData.badgeZh = zh.badgeZh || '新品上市';
-        finalData.shortDescZh = zh.shortDescZh;
-        finalData.fullDescZh = zh.fullDescZh;
-        finalData.originZh = zh.originZh;
-        finalData.applicationsZh = zh.applicationsZh;
-      } catch (e) {
-        console.warn('Tự động dịch Trung ngầm:', e);
+    if (productFormData.purchaseAction === 'shopee') {
+      const url = (productFormData.shopeeUrl || '').trim();
+      if (!url) {
+        showToast('Vui lòng nhập đường dẫn Shopee (VD: https://shopee.vn/...)', 'error');
+        return;
       }
     }
 
-    // TỰ ĐỘNG DỊCH SANG TIẾNG ANH (ENGLISH) NẾU CHƯA CÓ HOẶC NẾU ĐANG LÀ TIẾNG VIỆT
-    const isEnEmptyOrVietnamese = !finalData.nameEn || !finalData.nameEn.trim() || finalData.nameEn.trim().toLowerCase() === finalData.name.trim().toLowerCase();
-    if (isEnEmptyOrVietnamese) {
-      try {
-        const en = await translateProductToEnglish(finalData);
-        finalData.nameEn = en.nameEn;
-        finalData.badgeEn = en.badgeEn || 'New Arrival';
-        finalData.shortDescEn = en.shortDescEn;
-        finalData.fullDescEn = en.fullDescEn;
-        finalData.originEn = en.originEn;
-        finalData.applicationsEn = en.applicationsEn;
-      } catch (e) {
-        console.warn('Tự động dịch En ngầm:', e);
-      }
-    }
+    setIsSavingProduct(true);
+    try {
+      let finalData = { ...productFormData };
 
-    const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
-    const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
-
-    // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
-    if (finalData.image && finalData.image.startsWith('data:image/')) {
-      finalData.imageData = finalData.image;
-      finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
-      finalData.images = [finalData.image];
-    }
-
-    if (editingProduct) {
-      const oldImage = editingProduct.image;
-      // SỬA (UPDATE)
-      const updatedProd = {
-        ...editingProduct,
-        ...finalData,
-        slug: cleanSlug || editingProduct.slug || editingProduct.id,
-        updatedAt: new Date().toISOString()
-      };
-      setProducts((prev) =>
-        prev.map((p) => (p.id === editingProduct.id ? updatedProd : p))
-      );
-      // Ghi trực tiếp lên Firebase Realtime Database
-      await saveRtdbProduct(updatedProd);
-
-      // Nếu thay ảnh mới và ảnh cũ nằm trên Firebase Storage thì dọn dẹp ảnh cũ
-      if (oldImage && finalData.image && oldImage !== finalData.image && oldImage.includes('firebasestorage.googleapis.com')) {
-        deleteStorageImage(oldImage);
+      // TỰ ĐỘNG DỊCH SANG TRUNG PHỒN THỂ NẾU CHƯA CÓ (Timeout 2.5s không làm nghẽn lưu sản phẩm)
+      const isZhEmptyOrVietnamese = !finalData.nameZh || !finalData.nameZh.trim() || finalData.nameZh.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+      if (isZhEmptyOrVietnamese) {
+        try {
+          const zh = await Promise.race([
+            translateProductToTraditionalChinese(finalData),
+            new Promise((resolve) => setTimeout(() => resolve(null), 2500))
+          ]);
+          if (zh) {
+            finalData.nameZh = zh.nameZh || finalData.nameZh;
+            finalData.badgeZh = zh.badgeZh || '新品上市';
+            finalData.shortDescZh = zh.shortDescZh || finalData.shortDescZh;
+            finalData.fullDescZh = zh.fullDescZh || finalData.fullDescZh;
+            finalData.originZh = zh.originZh || finalData.originZh;
+            finalData.applicationsZh = zh.applicationsZh || finalData.applicationsZh;
+          }
+        } catch (e) {
+          console.warn('Tự động dịch Trung ngầm:', e);
+        }
       }
 
-      showToast(`Đã lưu [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
-    } else {
-      // THÊM MỚI (CREATE)
-      const newId = `product_${Date.now()}`;
-      const newProd = {
-        id: newId,
-        slug: cleanSlug || newId,
-        ...finalData,
-        createdAt: new Date().toISOString()
-      };
-      setProducts((prev) => [newProd, ...prev]);
-      // Ghi trực tiếp lên Firebase Realtime Database
-      await saveRtdbProduct(newProd);
-      showToast(`Đã thêm mới [${finalData.name}] (kèm bản dịch 繁體中文 & English) lên Realtime Database!`, 'success');
-    }
+      // TỰ ĐỘNG DỊCH SANG TIẾNG ANH NẾU CHƯA CÓ (Timeout 2.5s)
+      const isEnEmptyOrVietnamese = !finalData.nameEn || !finalData.nameEn.trim() || finalData.nameEn.trim().toLowerCase() === finalData.name.trim().toLowerCase();
+      if (isEnEmptyOrVietnamese) {
+        try {
+          const en = await Promise.race([
+            translateProductToEnglish(finalData),
+            new Promise((resolve) => setTimeout(() => resolve(null), 2500))
+          ]);
+          if (en) {
+            finalData.nameEn = en.nameEn || finalData.nameEn;
+            finalData.badgeEn = en.badgeEn || 'New Arrival';
+            finalData.shortDescEn = en.shortDescEn || finalData.shortDescEn;
+            finalData.fullDescEn = en.fullDescEn || finalData.fullDescEn;
+            finalData.originEn = en.originEn || finalData.originEn;
+            finalData.applicationsEn = en.applicationsEn || finalData.applicationsEn;
+          }
+        } catch (e) {
+          console.warn('Tự động dịch En ngầm:', e);
+        }
+      }
 
-    setProductModalOpen(false);
+      const cleanSlug = slugify(finalData.name) || editingProduct?.slug || '';
+      const targetSlug = cleanSlug || editingProduct?.slug || editingProduct?.id || `product_${Date.now()}`;
+
+      // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
+      if (finalData.image && finalData.image.startsWith('data:image/')) {
+        finalData.imageData = finalData.image;
+        finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
+        finalData.images = [finalData.image];
+      }
+
+      if (editingProduct) {
+        const oldImage = editingProduct.image;
+        // SỬA (UPDATE)
+        const updatedProd = {
+          ...editingProduct,
+          ...finalData,
+          slug: cleanSlug || editingProduct.slug || editingProduct.id,
+          updatedAt: new Date().toISOString()
+        };
+        setProducts((prev) =>
+          prev.map((p) => (p.id === editingProduct.id ? updatedProd : p))
+        );
+        // Ghi trực tiếp lên Firebase Realtime Database và Backend API (isExplicitNew = false)
+        await saveRtdbProduct(updatedProd, false);
+
+        // Nếu thay ảnh mới và ảnh cũ nằm trên Firebase Storage thì dọn dẹp ảnh cũ
+        if (oldImage && finalData.image && oldImage !== finalData.image && oldImage.includes('firebasestorage.googleapis.com')) {
+          deleteStorageImage(oldImage);
+        }
+
+        showToast(`Đã lưu cập nhật sản phẩm [${finalData.name}] thành công!`, 'success');
+      } else {
+        // THÊM MỚI (CREATE)
+        const newId = `product_${Date.now()}`;
+        const newProd = {
+          id: newId,
+          slug: cleanSlug || newId,
+          ...finalData,
+          createdAt: new Date().toISOString()
+        };
+        setProducts((prev) => [newProd, ...prev]);
+        // Ghi trực tiếp lên Firebase Realtime Database và Backend API (isExplicitNew = true)
+        await saveRtdbProduct(newProd, true);
+        showToast(`Đã thêm mới sản phẩm [${finalData.name}] thành công!`, 'success');
+      }
+
+      setProductModalOpen(false);
+    } catch (err) {
+      console.error('Lỗi khi lưu sản phẩm:', err);
+      showToast('Lỗi khi lưu sản phẩm: ' + (err.message || 'Vui lòng thử lại'), 'error');
+    } finally {
+      setIsSavingProduct(false);
+    }
   };
 
   const handleDeleteProduct = async (productId, productName) => {
@@ -1295,7 +1324,10 @@ export default function AdminDashboard() {
     // TỰ ĐỘNG DỊCH BÀI VIẾT SANG TRUNG PHỒN THỂ (繁體中文) NẾU CHƯA CÓ
     if (!finalData.titleZh || !finalData.titleZh.trim()) {
       try {
-        const zh = await translateArticleToTraditionalChinese(finalData);
+        const zh = await Promise.race([
+          translateArticleToTraditionalChinese(finalData),
+          new Promise((resolve) => setTimeout(() => resolve(null), 2500))
+        ]);
         finalData.titleZh = zh.titleZh;
         finalData.excerptZh = zh.excerptZh;
         finalData.contentZh = zh.contentZh;
@@ -1307,7 +1339,10 @@ export default function AdminDashboard() {
     // TỰ ĐỘNG DỊCH BÀI VIẾT SANG TIẾNG ANH (ENGLISH) NẾU CHƯA CÓ
     if (!finalData.titleEn || !finalData.titleEn.trim()) {
       try {
-        const en = await translateArticleToEnglish(finalData);
+        const en = await Promise.race([
+          translateArticleToEnglish(finalData),
+          new Promise((resolve) => setTimeout(() => resolve(null), 2500))
+        ]);
         finalData.titleEn = en.titleEn;
         finalData.excerptEn = en.excerptEn;
         finalData.contentEn = en.contentEn;
@@ -3645,10 +3680,7 @@ export default function AdminDashboard() {
                         <label className="block text-xs font-bold text-[#EE4D2D] mb-1">
                           Đường Dẫn Shopee (Link Sản Phẩm) *
                         </label>
-                        <input
-                          type="url"
-                          required
-                          placeholder="https://shopee.vn/casa-tea-..."
+                        <input type="text" placeholder="https://shopee.vn/casa-tea-..."
                           value={productFormData.shopeeUrl || ''}
                           onChange={(e) => setProductFormData({ ...productFormData, shopeeUrl: e.target.value })}
                           className="w-full px-3 py-2 text-xs rounded-xl border border-[#EE4D2D]/30 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#EE4D2D]/30 font-mono"

@@ -10,9 +10,9 @@ async function request(endpoint, options = {}) {
   const config = {
     cache: 'no-store',
     headers: {
-      'Content-Type': 'application/json',
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
+      'Content-Type': 'application/json',
       ...options.headers,
     },
     ...options,

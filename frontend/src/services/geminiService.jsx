@@ -343,7 +343,10 @@ export async function translateHtmlToZhTw(html) {
 export async function translateProductToTraditionalChinese(product = {}) {
   // 1. Thử gọi qua Backend API trước (Gemini AI)
   try {
-    const res = await aiApi.translateProductZh(product);
+    const res = await Promise.race([
+      aiApi.translateProductZh(product),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const hasChinese = (res?.nameZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 1;
     const isHalfVietnamese = hasVietnamese(res?.nameZh) || hasVietnamese(res?.shortDescZh);
     if (res && res.nameZh && hasChinese && !isHalfVietnamese) {
@@ -382,7 +385,10 @@ export async function translateProductToTraditionalChinese(product = {}) {
 export async function translateArticleToTraditionalChinese(article = {}) {
   // 1. Thử gọi qua Backend API trước (Gemini AI)
   try {
-    const res = await aiApi.translateNewsZh(article);
+    const res = await Promise.race([
+      aiApi.translateNewsZh(article),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const hasChinese = (res?.titleZh?.match(/[\u4e00-\u9fa5]/g) || []).length > 2;
     const isHalfVietnamese = hasVietnamese(res?.titleZh) || hasVietnamese(res?.excerptZh);
     if (res && res.titleZh && hasChinese && !isHalfVietnamese) {
@@ -690,7 +696,10 @@ export async function translateHtmlToEn(html) {
 export async function translateProductToEnglish(product = {}) {
   // 1. Thử gọi backend API trước
   try {
-    const res = await aiApi.translateProductEn(product);
+    const res = await Promise.race([
+      aiApi.translateProductEn(product),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const isHalfVi = hasVietnamese(res?.nameEn) || hasVietnamese(res?.shortDescEn);
     const hasInvalidEn = isInvalidEnTranslation(res?.nameEn) || isInvalidEnTranslation(res?.shortDescEn) || isInvalidEnTranslation(res?.fullDescEn);
     if (res && res.nameEn && !isHalfVi && !hasInvalidEn) {
@@ -734,7 +743,10 @@ export async function translateProductToEnglish(product = {}) {
 
 export async function translateArticleToEnglish(article = {}) {
   try {
-    const res = await aiApi.translateNewsEn(article);
+    const res = await Promise.race([
+      aiApi.translateNewsEn(article),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Backend AI timeout 3s')), 3000))
+    ]);
     const isHalfVi = hasVietnamese(res?.titleEn) || hasVietnamese(res?.excerptEn);
     if (res && res.titleEn && !isHalfVi) {
       return res;

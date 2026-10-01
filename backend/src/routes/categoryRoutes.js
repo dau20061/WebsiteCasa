@@ -7,6 +7,9 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const categories = await getCategories();
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });

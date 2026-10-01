@@ -1,8 +1,8 @@
 // ============================================================================
 // CASA TEA - FRONTEND DATABASE SERVICE ADAPTER
 // Tầng xử lý giao tiếp database tập trung:
-// 1. Ưu tiên Backend REST API Server (/api/...)
-// 2. Tự động dự phòng trực tiếp Firebase RTDB REST nếu Backend 500/offline
+// 1. Luôn ưu tiên Firebase Realtime Database REST API trực tiếp (0ms cache, nguồn sự thật 100%)
+// 2. Dự phòng qua Backend REST API Server (/api/...) nếu mạng trực tiếp bị lỗi
 // 3. Đồng bộ tức thì LocalStorage để UI mượt mà 0ms và không bao giờ mất dữ liệu
 // ============================================================================
 
@@ -39,10 +39,15 @@ async function fetchDirectRtdb(path, method = 'GET', data = null) {
       if (method === 'GET' && typeof val === 'object' && !Array.isArray(val)) {
         result = Object.keys(val).map((k) => ({ id: k, ...val[k] }));
       }
+      if (Array.isArray(result)) {
+        result = result.filter(Boolean);
+      }
       if (path === 'products' && Array.isArray(result)) {
         result.forEach((p) => {
-          delete p.imageData;
-          delete p.imageBase64;
+          if (p) {
+            delete p.imageData;
+            delete p.imageBase64;
+          }
         });
       }
       return result;
@@ -130,13 +135,19 @@ export async function saveRtdbCategory(category) {
     localStorage.setItem('casa_admin_categories', JSON.stringify(list));
   } catch (_) {}
 
-  // 2. Thử lưu qua backend API
+  // 2. Ghi trực tiếp lên Firebase Realtime Database ngay lập tức (0ms trễ)
+  try {
+    await fetchDirectRtdb(`categories/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save category error:', directErr);
+  }
+
+  // 3. Đồng bộ với Backend API
   try {
     const result = isNew ? await categoryApi.create(itemToSave) : await categoryApi.update(targetId, itemToSave);
-    return result.id || targetId;
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbCategory via Backend API failed, saving to direct RTDB:', err.message);
-    await fetchDirectRtdb(`categories/${targetId}`, 'PUT', itemToSave);
+    console.warn('[Frontend Service] saveRtdbCategory backend sync notice:', err.message);
     return targetId;
   }
 }
@@ -151,10 +162,15 @@ export async function deleteRtdbCategory(categoryId) {
   } catch (_) {}
 
   try {
+    await fetchDirectRtdb(`categories/${categoryId}`, 'DELETE');
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete category error:', directErr);
+  }
+
+  try {
     return await categoryApi.delete(categoryId);
   } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbCategory error, deleting from direct RTDB:', err.message);
-    await fetchDirectRtdb(`categories/${categoryId}`, 'DELETE');
+    console.warn('[Frontend Service] deleteRtdbCategory error:', err.message);
     return { success: true };
   }
 }
@@ -231,7 +247,7 @@ export async function saveRtdbProduct(product, isExplicitNew = null) {
   try {
     await fetchDirectRtdb(`products/${targetId}`, 'PUT', itemToSave);
   } catch (directErr) {
-    console.warn('[Frontend Service] fetchDirectRtdb save error:', directErr);
+    console.warn('[Frontend Service] fetchDirectRtdb save product error:', directErr);
   }
 
   // 3. Đồng bộ với Backend API
@@ -256,7 +272,7 @@ export async function deleteRtdbProduct(productId) {
   try {
     await fetchDirectRtdb(`products/${productId}`, 'DELETE');
   } catch (directErr) {
-    console.warn('[Frontend Service] fetchDirectRtdb delete error:', directErr);
+    console.warn('[Frontend Service] fetchDirectRtdb delete product error:', directErr);
   }
 
   try {
@@ -271,7 +287,7 @@ export async function deleteRtdbProduct(productId) {
 // NEWS & ARTICLES
 // ============================================================================
 export async function getRtdbNews() {
-  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database
+  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database (Nguồn sự thật 100%)
   try {
     const directData = await fetchDirectRtdb('news');
     if (directData !== null && Array.isArray(directData)) {
@@ -319,13 +335,19 @@ export async function saveRtdbNews(newsItem) {
     localStorage.setItem('casa_admin_news', JSON.stringify(list));
   } catch (_) {}
 
-  // 2. Thử lưu qua backend API
+  // 2. Ghi trực tiếp lên Firebase Realtime Database (0ms trễ)
+  try {
+    await fetchDirectRtdb(`news/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save news error:', directErr);
+  }
+
+  // 3. Đồng bộ với Backend API
   try {
     const result = isNew ? await newsApi.create(itemToSave) : await newsApi.update(targetId, itemToSave);
-    return result.id || targetId;
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbNews via Backend API failed, saving to direct RTDB:', err.message);
-    await fetchDirectRtdb(`news/${targetId}`, 'PUT', itemToSave);
+    console.warn('[Frontend Service] saveRtdbNews backend sync notice:', err.message);
     return targetId;
   }
 }
@@ -342,7 +364,7 @@ export async function deleteRtdbNews(newsId) {
   try {
     await fetchDirectRtdb(`news/${newsId}`, 'DELETE');
   } catch (directErr) {
-    console.warn('[Frontend Service] fetchDirectRtdb delete error:', directErr);
+    console.warn('[Frontend Service] fetchDirectRtdb delete news error:', directErr);
   }
 
   try {
@@ -357,6 +379,20 @@ export async function deleteRtdbNews(newsId) {
 // FAQS
 // ============================================================================
 export async function getRtdbFaqs() {
+  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database
+  try {
+    const directData = await fetchDirectRtdb('faqs');
+    if (directData !== null && Array.isArray(directData) && directData.length > 0) {
+      try {
+        localStorage.setItem('casa_admin_faqs', JSON.stringify(directData));
+      } catch (_) {}
+      return directData;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb faqs error, trying Backend API:', err.message);
+  }
+
+  // 2. Dự phòng qua Backend API
   try {
     const data = await faqApi.getAll();
     if (data && Array.isArray(data) && data.length > 0) {
@@ -366,16 +402,8 @@ export async function getRtdbFaqs() {
       return data;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbFaqs via Backend API failed, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbFaqs via Backend API failed:', err.message);
   }
-
-  try {
-    const directData = await fetchDirectRtdb('faqs');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_faqs', JSON.stringify(directData));
-      return directData;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_faqs');
   return saved ? JSON.parse(saved) : [];
@@ -398,12 +426,18 @@ export async function saveRtdbFaq(faq) {
     localStorage.setItem('casa_admin_faqs', JSON.stringify(list));
   } catch (_) {}
 
+  // Ghi trực tiếp lên Firebase Realtime Database ngay lập tức (0ms trễ)
+  try {
+    await fetchDirectRtdb(`faqs/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save faq error:', directErr);
+  }
+
   try {
     const result = isNew ? await faqApi.create(itemToSave) : await faqApi.update(targetId, itemToSave);
-    return result.id || targetId;
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbFaq error, saving to direct RTDB:', err.message);
-    await fetchDirectRtdb(`faqs/${targetId}`, 'PUT', itemToSave);
+    console.warn('[Frontend Service] saveRtdbFaq backend notice:', err.message);
     return targetId;
   }
 }
@@ -418,10 +452,15 @@ export async function deleteRtdbFaq(faqId) {
   } catch (_) {}
 
   try {
+    await fetchDirectRtdb(`faqs/${faqId}`, 'DELETE');
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete faq error:', directErr);
+  }
+
+  try {
     return await faqApi.delete(faqId);
   } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbFaq error, deleting from direct RTDB:', err.message);
-    await fetchDirectRtdb(`faqs/${faqId}`, 'DELETE');
+    console.warn('[Frontend Service] deleteRtdbFaq error:', err.message);
     return { success: true };
   }
 }
@@ -430,6 +469,21 @@ export async function deleteRtdbFaq(faqId) {
 // MACHINERY
 // ============================================================================
 export async function getRtdbMachinery() {
+  // 1. Luôn ưu tiên fetch trực tiếp Firebase Realtime Database
+  try {
+    const directData = await fetchDirectRtdb('machinery');
+    if (directData !== null && Array.isArray(directData)) {
+      const cleaned = directData.filter((m) => !String(m.id).startsWith('machinery-0'));
+      try {
+        localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
+      } catch (_) {}
+      return cleaned;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb machinery error, trying Backend API:', err.message);
+  }
+
+  // 2. Dự phòng qua Backend API
   try {
     const data = await machineryApi.getAll();
     if (data && Array.isArray(data)) {
@@ -440,19 +494,8 @@ export async function getRtdbMachinery() {
       return cleaned;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbMachinery via Backend API failed, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbMachinery via Backend API failed:', err.message);
   }
-
-  try {
-    const directData = await fetchDirectRtdb('machinery');
-    if (directData && Array.isArray(directData)) {
-      const cleaned = directData.filter((m) => !String(m.id).startsWith('machinery-0'));
-      try {
-        localStorage.setItem('casa_admin_machinery', JSON.stringify(cleaned));
-      } catch (_) {}
-      return cleaned;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_machinery');
   if (saved) {
@@ -483,12 +526,18 @@ export async function saveRtdbMachinery(item) {
     localStorage.setItem('casa_admin_machinery', JSON.stringify(list));
   } catch (_) {}
 
+  // Ghi trực tiếp lên Firebase Realtime Database ngay lập tức (0ms trễ)
+  try {
+    await fetchDirectRtdb(`machinery/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save machinery error:', directErr);
+  }
+
   try {
     const result = isNew ? await machineryApi.create(itemToSave) : await machineryApi.update(targetId, itemToSave);
-    return result.id || targetId;
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbMachinery error, saving to direct RTDB:', err.message);
-    await fetchDirectRtdb(`machinery/${targetId}`, 'PUT', itemToSave);
+    console.warn('[Frontend Service] saveRtdbMachinery backend notice:', err.message);
     return targetId;
   }
 }
@@ -503,10 +552,15 @@ export async function deleteRtdbMachinery(id) {
   } catch (_) {}
 
   try {
+    await fetchDirectRtdb(`machinery/${id}`, 'DELETE');
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete machinery error:', directErr);
+  }
+
+  try {
     return await machineryApi.delete(id);
   } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbMachinery error, deleting from direct RTDB:', err.message);
-    await fetchDirectRtdb(`machinery/${id}`, 'DELETE');
+    console.warn('[Frontend Service] deleteRtdbMachinery error:', err.message);
     return { success: true };
   }
 }
@@ -516,6 +570,14 @@ export async function deleteRtdbMachinery(id) {
 // ============================================================================
 export async function getRtdbCertifications() {
   try {
+    const directData = await fetchDirectRtdb('certifications');
+    if (directData && Array.isArray(directData) && directData.length > 0) {
+      localStorage.setItem('casa_admin_certifications', JSON.stringify(directData));
+      return directData;
+    }
+  } catch (_) {}
+
+  try {
     const data = await certificationApi.getAll();
     if (data && Array.isArray(data) && data.length > 0) {
       try {
@@ -524,16 +586,8 @@ export async function getRtdbCertifications() {
       return data;
     }
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbCertifications error, trying direct RTDB:', err.message);
+    console.warn('[Frontend Service] getRtdbCertifications error:', err.message);
   }
-
-  try {
-    const directData = await fetchDirectRtdb('certifications');
-    if (directData && Array.isArray(directData) && directData.length > 0) {
-      localStorage.setItem('casa_admin_certifications', JSON.stringify(directData));
-      return directData;
-    }
-  } catch (_) {}
 
   const saved = localStorage.getItem('casa_admin_certifications');
   return saved ? JSON.parse(saved) : [];
@@ -544,32 +598,48 @@ export async function getRtdbCertifications() {
 // ============================================================================
 export async function getRtdbContacts() {
   try {
+    const directData = await fetchDirectRtdb('contacts');
+    if (Array.isArray(directData)) return directData;
+  } catch (_) {}
+
+  try {
     return await contactApi.getAll();
   } catch (err) {
-    console.warn('[Frontend Service] getRtdbContacts error, trying direct RTDB:', err.message);
-    const directData = await fetchDirectRtdb('contacts');
-    return Array.isArray(directData) ? directData : [];
+    console.warn('[Frontend Service] getRtdbContacts error:', err.message);
+    return [];
   }
 }
 
 export async function saveRtdbContact(contact) {
+  const targetId = contact.id || `contact_${Date.now()}`;
+  const itemToSave = { ...contact, id: targetId, createdAt: contact.createdAt || new Date().toISOString() };
+
   try {
-    const result = await contactApi.submit(contact);
-    return result.id || `contact_${Date.now()}`;
+    await fetchDirectRtdb(`contacts/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save contact error:', directErr);
+  }
+
+  try {
+    const result = await contactApi.submit(itemToSave);
+    return result?.id || targetId;
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbContact error, saving to direct RTDB:', err.message);
-    const targetId = `contact_${Date.now()}`;
-    await fetchDirectRtdb(`contacts/${targetId}`, 'PUT', { ...contact, id: targetId });
+    console.warn('[Frontend Service] saveRtdbContact backend notice:', err.message);
     return targetId;
   }
 }
 
 export async function deleteRtdbContact(contactId) {
   try {
+    await fetchDirectRtdb(`contacts/${contactId}`, 'DELETE');
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete contact error:', directErr);
+  }
+
+  try {
     return await contactApi.delete(contactId);
   } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbContact error, deleting from direct RTDB:', err.message);
-    await fetchDirectRtdb(`contacts/${contactId}`, 'DELETE');
+    console.warn('[Frontend Service] deleteRtdbContact error:', err.message);
     return { success: true };
   }
 }
@@ -578,22 +648,34 @@ export async function deleteRtdbContact(contactId) {
 // USERS
 // ============================================================================
 export async function saveRtdbUser(user) {
+  const targetId = user.uid || user.id || `user_${Date.now()}`;
+  const itemToSave = { ...user, id: targetId, uid: targetId };
+
   try {
-    return await userApi.save(user);
+    await fetchDirectRtdb(`users/${targetId}`, 'PUT', itemToSave);
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb save user error:', directErr);
+  }
+
+  try {
+    return await userApi.save(itemToSave);
   } catch (err) {
-    console.warn('[Frontend Service] saveRtdbUser error, saving to direct RTDB:', err.message);
-    const targetId = user.uid || `user_${Date.now()}`;
-    await fetchDirectRtdb(`users/${targetId}`, 'PUT', user);
-    return user;
+    console.warn('[Frontend Service] saveRtdbUser error:', err.message);
+    return itemToSave;
   }
 }
 
 export async function deleteRtdbUser(uid) {
   try {
+    await fetchDirectRtdb(`users/${uid}`, 'DELETE');
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb delete user error:', directErr);
+  }
+
+  try {
     return await userApi.delete(uid);
   } catch (err) {
-    console.warn('[Frontend Service] deleteRtdbUser error, deleting from direct RTDB:', err.message);
-    await fetchDirectRtdb(`users/${uid}`, 'DELETE');
+    console.warn('[Frontend Service] deleteRtdbUser error:', err.message);
     return { success: true };
   }
 }
