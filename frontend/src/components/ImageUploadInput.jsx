@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   UploadCloud,
   Image as ImageIcon,
@@ -90,6 +90,20 @@ export default function ImageUploadInput({
   const [errorMessage, setErrorMessage] = useState(null);
   const [sizeInfo, setSizeInfo] = useState('');
   const [urlInput, setUrlInput] = useState('');
+
+  // Tự động bust cache cho preview ảnh URL (tránh trình duyệt hiển thị ảnh cũ trong disk cache)
+  const previewSrc = useMemo(() => {
+    if (tempPreview) return tempPreview;
+    if (!value || typeof value !== 'string') return '';
+    if (value.startsWith('data:') || value.startsWith('blob:')) return value;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      if (value.includes('?v=') || value.includes('&v=') || value.includes('?t=') || value.includes('&t=')) {
+        return value;
+      }
+      return `${value}${value.includes('?') ? '&' : '?'}t=${Date.now()}`;
+    }
+    return value;
+  }, [tempPreview, value]);
 
   // Xử lý chọn ảnh từ máy tính -> Nén WebP -> Tải trực tiếp lên Firebase Storage
   const handleFileSelect = async (e) => {
@@ -257,7 +271,7 @@ export default function ImageUploadInput({
             {/* Khung ảnh thumbnail */}
             <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm shrink-0 group">
               <img
-                src={tempPreview || value}
+                src={previewSrc}
                 alt="Product Preview"
                 className="w-full h-full object-cover"
                 onError={(e) => {

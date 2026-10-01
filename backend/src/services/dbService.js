@@ -12,7 +12,9 @@ const RTDB_BASE_URL = 'https://websitecasa-15d46-default-rtdb.asia-southeast1.fi
 
 // REST fallback for Realtime Database
 async function restRtdb(path, method = 'GET', data = null) {
-  const url = `${RTDB_BASE_URL}/${path}.json`;
+  const url = method === 'GET'
+    ? `${RTDB_BASE_URL}/${path}.json?_t=${Date.now()}`
+    : `${RTDB_BASE_URL}/${path}.json`;
   const options = {
     method,
     headers: { 'Content-Type': 'application/json' },

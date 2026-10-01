@@ -50,7 +50,8 @@ export function getProductImageUrl(product) {
   // Nếu là Base64 data:image/... hoặc chưa có link chuẩn -> Trả về URL endpoint chuẩn HTTPS
   const slug = getProductSlug(product);
   if (slug) {
-    return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp`;
+    const v = product.updatedAt ? `?v=${new Date(product.updatedAt).getTime() || ''}` : '';
+    return `https://www.nguyenlieuphachecasa.com/product-image/${slug}.webp${v}`;
   }
   return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }
@@ -65,7 +66,8 @@ export function getArticleImageUrl(article) {
   }
   const slug = getArticleSlug(article);
   if (slug) {
-    return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp`;
+    const v = article.updatedAt ? `?v=${new Date(article.updatedAt).getTime() || ''}` : '';
+    return `https://www.nguyenlieuphachecasa.com/article-image/${slug}.webp${v}`;
   }
   return (img && typeof img === 'string' && !img.startsWith('data:')) ? img : 'https://www.nguyenlieuphachecasa.com/logo.png';
 }

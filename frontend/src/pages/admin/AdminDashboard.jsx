@@ -1024,7 +1024,7 @@ export default function AdminDashboard() {
       // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
       if (finalData.image && finalData.image.startsWith('data:image/')) {
         finalData.imageData = finalData.image;
-        finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
+        finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp?v=${Date.now()}`;
         finalData.images = [finalData.image];
       }
 
@@ -1357,7 +1357,7 @@ export default function AdminDashboard() {
     // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
     if (finalData.image && finalData.image.startsWith('data:image/')) {
       finalData.imageData = finalData.image;
-      finalData.image = `https://www.nguyenlieuphachecasa.com/article-image/${targetArticleSlug}.webp`;
+      finalData.image = `https://www.nguyenlieuphachecasa.com/article-image/${targetArticleSlug}.webp?v=${Date.now()}`;
     }
 
     const nowIso = new Date().toISOString();
