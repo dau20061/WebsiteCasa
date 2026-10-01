@@ -128,6 +128,7 @@ export const aiApi = {
 // USERS API
 // ----------------------------------------------------------------------------
 export const userApi = {
+  getAll: () => request('/users'),
   save: (data) => request('/users', { method: 'POST', body: data }),
   delete: (uid) => request(`/users/${uid}`, { method: 'DELETE' }),
 };

@@ -647,12 +647,53 @@ export async function deleteRtdbContact(contactId) {
 // ============================================================================
 // USERS
 // ============================================================================
-export async function saveRtdbUser(user) {
-  const targetId = user.uid || user.id || `user_${Date.now()}`;
-  const itemToSave = { ...user, id: targetId, uid: targetId };
+export async function getRtdbUsers() {
+  try {
+    const [directUsers, directUser] = await Promise.all([
+      fetchDirectRtdb('users'),
+      fetchDirectRtdb('user'),
+    ]);
+    const map = {};
+    if (Array.isArray(directUsers)) {
+      directUsers.forEach((u) => {
+        if (u) {
+          const k = u.uid || u.id || u.email;
+          if (k) map[k] = { ...u, uid: u.uid || u.id || k };
+        }
+      });
+    }
+    if (Array.isArray(directUser)) {
+      directUser.forEach((u) => {
+        if (u) {
+          const k = u.uid || u.id || u.email;
+          if (k) map[k] = { ...(map[k] || {}), ...u, uid: u.uid || u.id || k };
+        }
+      });
+    }
+    const list = Object.values(map);
+    if (list.length > 0) return list;
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb users error:', err);
+  }
 
   try {
-    await fetchDirectRtdb(`users/${targetId}`, 'PUT', itemToSave);
+    const fromBackend = await userApi.getAll();
+    if (Array.isArray(fromBackend) && fromBackend.length > 0) return fromBackend;
+  } catch (_) {}
+
+  return null;
+}
+
+export async function saveRtdbUser(user) {
+  const targetId = user.uid || user.id || `user_${Date.now()}`;
+  const itemToSave = { ...user, id: targetId, uid: targetId, updatedAt: new Date().toISOString() };
+
+  try {
+    // Lưu đồng thời vào cả node 'users' và 'user' để mọi hàm xác thực đăng nhập đều nhận diện được
+    await Promise.allSettled([
+      fetchDirectRtdb(`users/${targetId}`, 'PUT', itemToSave),
+      fetchDirectRtdb(`user/${targetId}`, 'PUT', itemToSave),
+    ]);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb save user error:', directErr);
   }
@@ -667,7 +708,10 @@ export async function saveRtdbUser(user) {
 
 export async function deleteRtdbUser(uid) {
   try {
-    await fetchDirectRtdb(`users/${uid}`, 'DELETE');
+    await Promise.allSettled([
+      fetchDirectRtdb(`users/${uid}`, 'DELETE'),
+      fetchDirectRtdb(`user/${uid}`, 'DELETE'),
+    ]);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb delete user error:', directErr);
   }
