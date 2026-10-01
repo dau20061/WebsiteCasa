@@ -599,74 +599,62 @@ export default function ArticleStudioEditor({
   return (
     <div className={`fixed inset-0 z-50 overflow-hidden flex flex-col font-sans transition-colors duration-200 article-studio-root ${isDark ? "dark bg-[#0A100C] text-gray-100 theme-dark" : "bg-[#F6F8F7] text-gray-900 theme-light"}`}>
       <style>{`
-        /* Force crisp white text on all inputs, textareas, selects */
-        .article-studio-root:not(.theme-light) input,
-        .article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
-        .article-studio-root:not(.theme-light) select,
-        .admin-portal .article-studio-root:not(.theme-light) input,
-        .admin-portal .article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
-        .admin-portal .article-studio-root:not(.theme-light) select,
-        .article-studio-root:not(.theme-light) .bg-white input,
-        .article-studio-root:not(.theme-light) .bg-white textarea:not(.html-code-editor) {
+        /* Force crisp pure white text on EVERYTHING in Article Studio */
+        .article-studio-root,
+        .article-studio-root input,
+        .article-studio-root textarea,
+        .article-studio-root select,
+        .article-studio-root select option,
+        .article-studio-root .wysiwyg-canvas,
+        .article-studio-root .wysiwyg-canvas *,
+        .admin-portal .article-studio-root,
+        .admin-portal .article-studio-root input,
+        .admin-portal .article-studio-root textarea,
+        .admin-portal .article-studio-root select,
+        .admin-portal .article-studio-root select option,
+        .admin-portal .article-studio-root .wysiwyg-canvas,
+        .admin-portal .article-studio-root .wysiwyg-canvas * {
           color: #FFFFFF !important;
           -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* HTML Code Editor specifically */
-        .article-studio-root textarea.html-code-editor,
-        .article-studio-root .html-code-editor,
-        .admin-portal .article-studio-root textarea.html-code-editor,
-        .admin-portal .article-studio-root .html-code-editor {
-          color: #34D399 !important;
-          -webkit-text-fill-color: #34D399 !important;
-          background-color: #070D09 !important;
-          caret-color: #34D399 !important;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-        }
-        .article-studio-root:not(.theme-light) input::placeholder,
-        .article-studio-root:not(.theme-light) textarea::placeholder,
-        .admin-portal .article-studio-root:not(.theme-light) input::placeholder,
-        .admin-portal .article-studio-root:not(.theme-light) textarea::placeholder {
+        .article-studio-root input::placeholder,
+        .article-studio-root textarea::placeholder,
+        .admin-portal .article-studio-root input::placeholder,
+        .admin-portal .article-studio-root textarea::placeholder {
           color: rgba(255, 255, 255, 0.45) !important;
           -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
           opacity: 1 !important;
         }
-        .article-studio-root:not(.theme-light) select option,
-        .admin-portal .article-studio-root:not(.theme-light) select option {
-          background-color: #121C15 !important;
+
+        .article-studio-root select,
+        .article-studio-root select option,
+        .admin-portal .article-studio-root select,
+        .admin-portal .article-studio-root select option {
+          background-color: #0E1611 !important;
           color: #FFFFFF !important;
           -webkit-text-fill-color: #FFFFFF !important;
         }
+
         .wysiwyg-canvas[contenteditable]:empty:before {
           content: attr(data-placeholder) !important;
-          color: ${isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF'} !important;
-          -webkit-text-fill-color: ${isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF'} !important;
+          color: rgba(255, 255, 255, 0.45) !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
           pointer-events: none;
           display: block;
           font-style: italic;
         }
-        .wysiwyg-canvas,
-        .wysiwyg-canvas * {
-          color: ${isDark ? '#F8FAFC !important' : '#111827 !important'};
-          -webkit-text-fill-color: ${isDark ? '#F8FAFC !important' : '#111827 !important'};
-        }
-        .wysiwyg-canvas p, .wysiwyg-canvas div, .wysiwyg-canvas span, .wysiwyg-canvas li, .wysiwyg-canvas td, .wysiwyg-canvas th {
-          color: ${isDark ? '#F8FAFC !important' : '#1F2937 !important'};
-          -webkit-text-fill-color: ${isDark ? '#F8FAFC !important' : '#1F2937 !important'};
-        }
-        .wysiwyg-canvas h1, .wysiwyg-canvas h2, .wysiwyg-canvas h3, .wysiwyg-canvas h4, .wysiwyg-canvas h5, .wysiwyg-canvas h6, .wysiwyg-canvas strong, .wysiwyg-canvas b {
-          color: ${isDark ? '#FFFFFF !important' : '#0E2218 !important'};
-          -webkit-text-fill-color: ${isDark ? '#FFFFFF !important' : '#0E2218 !important'};
-        }
+
         .wysiwyg-canvas a {
           color: #38BDF8 !important;
           -webkit-text-fill-color: #38BDF8 !important;
           text-decoration: underline !important;
         }
+
         .wysiwyg-canvas blockquote {
-          border-left-color: ${isDark ? '#10B981' : '#059669'} !important;
-          color: ${isDark ? '#E2E8F0' : '#4B5563'} !important;
-          -webkit-text-fill-color: ${isDark ? '#E2E8F0' : '#4B5563'} !important;
+          border-left-color: #10B981 !important;
+          color: #E2E8F0 !important;
+          -webkit-text-fill-color: #E2E8F0 !important;
         }
       `}</style>
 
@@ -979,7 +967,7 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 1. Tiêu đề bài viết */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-xs space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                     {activeLanguageTab === 'vi' && 'Tiêu đề bài viết (Tiếng Việt - Bản gốc) *'}
@@ -1042,8 +1030,8 @@ export default function ArticleStudioEditor({
                       });
                     }
                   }}
-                  style={{ color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
-                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
+                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
+                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
                 />
                 
                 {/* Đường dẫn Slug URL */}
@@ -1082,7 +1070,7 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 2. Trình soạn thảo Rich Text Editor (Word-like WYSIWYG) */}
-              <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-sm overflow-hidden">
+              <div className="rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm overflow-hidden">
                 {/* Thanh công cụ Toolbar giống Word */}
                 <div className="sticky top-0 z-10 p-2 sm:p-2.5 bg-gray-50/95 dark:bg-[#141F17] border-b border-gray-200 dark:border-[#223326] flex flex-wrap items-center gap-1 text-xs select-none text-gray-700 dark:text-gray-300 backdrop-blur-sm">
                   
@@ -1090,7 +1078,7 @@ export default function ArticleStudioEditor({
                   <select
                     onChange={(e) => execCmd('formatBlock', e.target.value)}
                     style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
-                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer shadow-2xs"
+                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer shadow-2xs"
                     defaultValue="p"
                   >
                     <option value="p">Paragraph</option>
@@ -1105,7 +1093,7 @@ export default function ArticleStudioEditor({
                   <select
                     onChange={(e) => execCmd('fontName', e.target.value)}
                     style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
-                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer hidden sm:block shadow-2xs"
+                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden sm:block shadow-2xs"
                     defaultValue="Montserrat, sans-serif"
                   >
                     <option value="Montserrat, sans-serif">Mặc định</option>
@@ -1119,7 +1107,7 @@ export default function ArticleStudioEditor({
                   <select
                     onChange={(e) => execCmd('fontSize', e.target.value)}
                     style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
-                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer hidden md:block shadow-2xs"
+                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden md:block shadow-2xs"
                     defaultValue="3"
                   >
                     <option value="2">13px</option>
@@ -1407,8 +1395,8 @@ export default function ArticleStudioEditor({
                         ? 'Type English content here... (Format text, insert images for each section)'
                         : "Bắt đầu viết nội dung bài viết... (Bạn có thể gõ trực tiếp, bôi đen để định dạng và bấm 'Thêm ảnh' để chèn hình minh họa vào từng đoạn)"
                     }
-                    className="article-content wysiwyg-canvas p-6 sm:p-10 min-h-[550px] max-h-[800px] overflow-y-auto bg-white dark:bg-[#0B120E] text-gray-900 dark:text-gray-100 text-base leading-relaxed outline-none focus:ring-0 space-y-4 shadow-inner/5"
-                    style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
+                    className="article-content wysiwyg-canvas p-6 sm:p-10 min-h-[550px] max-h-[800px] overflow-y-auto bg-[#0B120E] text-white text-base leading-relaxed outline-none focus:ring-0 space-y-4 shadow-inner/5"
+                    style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0B120E' }}
                   />
                 ) : (
                   <textarea
@@ -1433,10 +1421,10 @@ export default function ArticleStudioEditor({
                     placeholder={`Mã HTML bài viết (${activeLanguageTab === 'zh' ? '繁體中文' : activeLanguageTab === 'en' ? 'English' : 'Tiếng Việt'})...`}
                     className="w-full p-6 bg-[#070D09] text-emerald-400 font-mono text-xs leading-relaxed outline-none resize-y min-h-[550px] html-code-editor border border-emerald-900/40"
                     style={{
-                      color: '#34D399',
-                      WebkitTextFillColor: '#34D399',
+                      color: '#FFFFFF',
+                      WebkitTextFillColor: '#FFFFFF',
                       backgroundColor: '#070D09',
-                      caretColor: '#34D399'
+                      caretColor: '#FFFFFF'
                     }}
                   />
                 )}
@@ -1455,7 +1443,7 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 3. Tóm tắt ngắn (Excerpt) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-xs space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Tóm tắt (Excerpt) {activeLanguageTab === 'zh' ? '— 繁體中文' : activeLanguageTab === 'en' ? '— English' : '— Tiếng Việt'}
@@ -1485,15 +1473,15 @@ export default function ArticleStudioEditor({
                       setNewsFormData({ ...newsFormData, excerpt: e.target.value });
                     }
                   }}
-                  style={{ color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
-                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none shadow-2xs"
+                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
+                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none shadow-2xs"
                 />
               </div>
 
               {/* 4. Khối Mở rộng: Hộp Công Thức SOP, Sản Phẩm Gắn Kèm, Đa Ngôn Ngữ */}
               <div className="space-y-3 pt-2">
                 {/* Accordion: Hộp công thức Barista SOP */}
-                <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] overflow-hidden shadow-xs">
+                <div className="rounded-2xl bg-[#111A13] border border-[#223326] overflow-hidden shadow-xs">
                   <button
                     type="button"
                     onClick={() => setShowRecipeBox(!showRecipeBox)}
@@ -2007,7 +1995,8 @@ export default function ArticleStudioEditor({
                             });
                           }}
                           style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-gray-200 text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
+                          style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
+                          className="w-full px-3 py-2.5 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
                         >
                           <option value="cong-thuc">Công Thức Pha Chế (Barista SOP)</option>
                           <option value="xu-huong">Xu Hướng Đồ Uống 2026</option>
@@ -2034,7 +2023,8 @@ export default function ArticleStudioEditor({
                               }
                             }}
                             style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
-                            className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-gray-200 text-xs outline-none focus:border-emerald-500 shadow-2xs"
+                            style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
+                            className="flex-1 px-3 py-2 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                           />
                           <button
                             type="button"
