@@ -46,8 +46,8 @@
   textarea.bg-white::placeholder,
   .bg-white input::placeholder,
   .bg-white textarea::placeholder,
-  .admin-portal input::placeholder,
-  .admin-portal textarea::placeholder {
+  .admin-portal:not(:has(.article-studio-root)) input::placeholder,
+  .admin-portal:not(:has(.article-studio-root)) textarea::placeholder {
     color: #9ca3af !important;
     opacity: 1 !important;
   }
@@ -702,6 +702,12 @@
 .article-studio-root textarea,
 .article-studio-root select,
 .article-studio-root select option,
+.article-studio-root input.bg-white,
+.article-studio-root textarea.bg-white,
+.article-studio-root select.bg-white,
+.article-studio-root .bg-white input,
+.article-studio-root .bg-white textarea,
+.article-studio-root .bg-white select,
 .article-studio-root .wysiwyg-canvas,
 .article-studio-root .wysiwyg-canvas *,
 .admin-portal .article-studio-root,
@@ -709,6 +715,12 @@
 .admin-portal .article-studio-root textarea,
 .admin-portal .article-studio-root select,
 .admin-portal .article-studio-root select option,
+.admin-portal .article-studio-root input.bg-white,
+.admin-portal .article-studio-root textarea.bg-white,
+.admin-portal .article-studio-root select.bg-white,
+.admin-portal .article-studio-root .bg-white input,
+.admin-portal .article-studio-root .bg-white textarea,
+.admin-portal .article-studio-root .bg-white select,
 .admin-portal .article-studio-root .wysiwyg-canvas,
 .admin-portal .article-studio-root .wysiwyg-canvas * {
   color: #FFFFFF !important;
