@@ -23,8 +23,6 @@ import {
   Filter,
   X,
   Eye,
-  EyeOff,
-  Key,
   Check,
   RefreshCw,
   Tag,
@@ -92,7 +90,6 @@ import {
   getRtdbContacts,
   saveRtdbContact,
   deleteRtdbContact,
-  getRtdbUsers,
   saveRtdbUser,
   deleteRtdbUser
 } from '../../services/rtdbService';
@@ -395,9 +392,6 @@ export default function AdminDashboard() {
     getRtdbContacts().then((res) => {
       if (res && res.length > 0) setContacts(res);
     });
-    getRtdbUsers().then((res) => {
-      if (res && res.length > 0) setUsersList(res);
-    });
   }, []);
   const [productSearch, setProductSearch] = useState('');
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
@@ -623,12 +617,9 @@ export default function AdminDashboard() {
         ];
   });
   const [userModalOpen, setUserModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
   const [userFormData, setUserFormData] = useState({
     displayName: '',
     email: '',
-    password: '',
     role: ROLES.EDITOR,
     status: 'ACTIVE'
   });
@@ -1857,84 +1848,22 @@ export default function AdminDashboard() {
   // ============================================================================
   // HANDLERS: USERS MANAGEMENT CRUD
   // ============================================================================
-  const handleOpenCreateUser = () => {
-    setEditingUser(null);
-    setUserFormData({
-      displayName: '',
-      email: '',
-      password: '',
-      role: ROLES.EDITOR,
-      status: 'ACTIVE'
-    });
-    setShowPassword(false);
-    setUserModalOpen(true);
-  };
-
-  const handleOpenEditUser = (u) => {
-    setEditingUser(u);
-    setUserFormData({
-      displayName: u.displayName || '',
-      email: u.email || '',
-      password: u.password !== undefined ? String(u.password) : '',
-      role: u.role || ROLES.EDITOR,
-      status: u.status || 'ACTIVE'
-    });
-    setShowPassword(false);
-    setUserModalOpen(true);
-  };
-
-  const handleSaveUser = async (e) => {
+  const handleCreateUser = async (e) => {
     e.preventDefault();
-    if (!userFormData.email || !userFormData.email.trim()) {
+    if (!userFormData.email.trim()) {
       showToast('Email người dùng không được để trống!', 'error');
       return;
     }
-
-    const cleanEmail = userFormData.email.trim().toLowerCase();
-    const cleanPass = (userFormData.password !== undefined && userFormData.password !== null)
-      ? String(userFormData.password).trim()
-      : '';
-
-    // Nếu tạo mới, bắt buộc phải có mật khẩu
-    if (!editingUser && !cleanPass) {
-      showToast('Vui lòng nhập Mật khẩu để tài khoản có thể đăng nhập!', 'error');
-      return;
-    }
-
-    if (cleanPass && cleanPass.length < 3) {
-      showToast('Mật khẩu quá ngắn, vui lòng nhập tối thiểu 3 ký tự!', 'error');
-      return;
-    }
-
-    const targetUid = editingUser ? (editingUser.uid || editingUser.id) : `usr_${Date.now()}`;
-    const userToSave = {
-      ...(editingUser || {}),
+    const newUser = {
+      uid: `usr_${Date.now()}`,
       ...userFormData,
-      uid: targetUid,
-      id: targetUid,
-      email: cleanEmail,
-      displayName: userFormData.displayName.trim() || cleanEmail.split('@')[0],
-      password: cleanPass || (editingUser?.password !== undefined ? editingUser.password : ''),
-      role: userFormData.role || ROLES.EDITOR,
-      status: userFormData.status || 'ACTIVE',
-      updatedAt: new Date().toISOString(),
-      createdAt: editingUser?.createdAt || new Date().toISOString()
+      createdAt: 'Hôm nay'
     };
-
-    if (editingUser) {
-      setUsersList((prev) => prev.map((u) => ((u.uid === targetUid || u.id === targetUid) ? userToSave : u)));
-      await saveRtdbUser(userToSave);
-      showToast(`Đã cập nhật tài khoản [${cleanEmail}] thành công!`, 'success');
-    } else {
-      setUsersList((prev) => [...prev, userToSave]);
-      await saveRtdbUser(userToSave);
-      showToast(`Đã tạo tài khoản mới [${cleanEmail}] với quyền [${userToSave.role}]!`, 'success');
-    }
-
+    setUsersList((prev) => [...prev, newUser]);
+    await saveRtdbUser(newUser);
+    showToast(`Đã tạo người dùng mới [${userFormData.email}] lên Realtime Database!`, 'success');
     setUserModalOpen(false);
-    setEditingUser(null);
-    setUserFormData({ displayName: '', email: '', password: '', role: ROLES.EDITOR, status: 'ACTIVE' });
-    setShowPassword(false);
+    setUserFormData({ displayName: '', email: '', role: ROLES.EDITOR, status: 'ACTIVE' });
   };
 
   const handleChangeUserRole = async (targetUid, newRole) => {
@@ -3010,7 +2939,7 @@ export default function AdminDashboard() {
 
               {canManageUsers(role) && (
                 <button
-                  onClick={handleOpenCreateUser}
+                  onClick={() => setUserModalOpen(true)}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-tea-sm transition-all"
                 >
                   <Plus className="w-4 h-4" />
@@ -3025,7 +2954,6 @@ export default function AdminDashboard() {
                   <tr className="border-b border-gray-100 bg-indigo-50/50 text-gray-500 uppercase tracking-wider">
                     <th className="p-3.5 font-bold">Người Dùng</th>
                     <th className="p-3.5 font-bold">Email</th>
-                    <th className="p-3.5 font-bold">Mật Khẩu</th>
                     <th className="p-3.5 font-bold">Cấp Phân Quyền (Role)</th>
                     <th className="p-3.5 font-bold text-center">Trạng Thái</th>
                     <th className="p-3.5 font-bold text-right">Thao Tác</th>
@@ -3033,22 +2961,12 @@ export default function AdminDashboard() {
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-gray-700">
                   {usersList.map((u) => (
-                    <tr key={u.uid || u.id} className="hover:bg-indigo-50/20 transition-colors">
+                    <tr key={u.uid} className="hover:bg-indigo-50/20 transition-colors">
                       <td className="p-3.5">
                         <strong className="text-tea-dark block font-bold text-sm">{u.displayName}</strong>
-                        <span className="font-mono text-[10px] text-gray-400">UID: {u.uid || u.id}</span>
+                        <span className="font-mono text-[10px] text-gray-400">UID: {u.uid}</span>
                       </td>
                       <td className="p-3.5 font-mono text-gray-700">{u.email}</td>
-                      <td className="p-3.5">
-                        {u.password !== undefined && u.password !== '' ? (
-                          <div className="inline-flex items-center gap-1.5 font-mono text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg border border-gray-200">
-                            <Key className="w-3 h-3 text-emerald-600 shrink-0" />
-                            <span>••••••</span>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] text-amber-600 font-medium italic">Chưa đặt pass</span>
-                        )}
-                      </td>
                       <td className="p-3.5">
                         {canManageUsers(role) && u.uid !== userProfile?.uid ? (
                           <select
@@ -3080,20 +2998,11 @@ export default function AdminDashboard() {
                           {u.status}
                         </button>
                       </td>
-                      <td className="p-3.5 text-right space-x-1 whitespace-nowrap">
-                        {canManageUsers(role) && (
-                          <button
-                            onClick={() => handleOpenEditUser(u)}
-                            className="p-2 rounded-xl text-indigo-600 hover:bg-indigo-50 transition-colors inline-block"
-                            title="Chỉnh sửa thông tin & Đổi mật khẩu"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                        )}
+                      <td className="p-3.5 text-right">
                         {canManageUsers(role) && u.uid !== userProfile?.uid && (
                           <button
                             onClick={() => handleDeleteUser(u.uid, u.email)}
-                            className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors inline-block"
+                            className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
                             title="Xóa tài khoản"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -4399,18 +4308,15 @@ export default function AdminDashboard() {
               className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-tea-border shadow-tea-xl space-y-4 text-xs"
             >
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <h3 className="text-base font-bold text-tea-dark flex items-center gap-2">
-                  <Key className="w-5 h-5 text-indigo-600" />
-                  <span>
-                    {editingUser ? 'Chỉnh Sửa Tài Khoản & Mật Khẩu' : 'Cấp Tài Khoản Mới & Phân Quyền (Create User)'}
-                  </span>
+                <h3 className="text-base font-bold text-tea-dark">
+                  Thêm Người Dùng & Phân Quyền (Create User)
                 </h3>
-                <button onClick={() => { setUserModalOpen(false); setEditingUser(null); }}>
+                <button onClick={() => setUserModalOpen(false)}>
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
 
-              <form onSubmit={handleSaveUser} className="space-y-3">
+              <form onSubmit={handleCreateUser} className="space-y-3">
                 <div>
                   <label className="block font-bold text-gray-700 mb-1">Họ & Tên Hiển Thị</label>
                   <input
@@ -4433,42 +4339,6 @@ export default function AdminDashboard() {
                     onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-indigo-500/30"
                   />
-                </div>
-
-                {/* TRƯỜNG MẬT KHẨU ĐĂNG NHẬP */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-gray-700 flex items-center gap-1.5">
-                      <Key className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Mật Khẩu Đăng Nhập {editingUser ? '(Đổi mới)' : '*'}</span>
-                    </label>
-                    {editingUser && (
-                      <span className="text-[10px] text-gray-400">Để trống nếu không đổi</span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required={!editingUser}
-                      placeholder={editingUser ? 'Nhập mật khẩu mới nếu muốn đổi...' : 'Nhập mật khẩu (VD: 123456 hoặc Casa@2026)'}
-                      value={userFormData.password}
-                      onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                      className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-indigo-500/30 font-mono text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 cursor-pointer"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-gray-500 mt-1">
-                    {editingUser
-                      ? 'Nhập mật khẩu mới để cấp lại quyền đăng nhập vào trang quản trị /admin.'
-                      : 'Mật khẩu để tài khoản đăng nhập trực tiếp vào hệ thống quản trị CASA TEA.'}
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -4502,16 +4372,16 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
                   <button
                     type="button"
-                    onClick={() => { setUserModalOpen(false); setEditingUser(null); }}
-                    className="px-4 py-2 rounded-xl border border-gray-200 font-bold hover:bg-gray-50"
+                    onClick={() => setUserModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-gray-200 font-bold"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-colors shadow-sm"
+                    className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold"
                   >
-                    {editingUser ? 'Lưu Thay Đổi' : 'Tạo & Cấp Tài Khoản'}
+                    Thêm Người Dùng
                   </button>
                 </div>
               </form>

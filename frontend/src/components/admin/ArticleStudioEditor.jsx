@@ -41,7 +41,9 @@ import {
   AlertCircle,
   HelpCircle,
   Table,
-  Minus
+  Minus,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { optimizeImageToDataUrl } from '../../services/storageService';
 import { slugify } from '../../utils/slugify';
@@ -150,6 +152,23 @@ export default function ArticleStudioEditor({
 
   // Trạng thái đang lưu bài
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Chế độ giao diện: 'light' (Sáng - Mặc định, chuẩn Word / CMS) | 'dark' (Tối)
+  const [editorTheme, setEditorTheme] = useState(() => {
+    try {
+      return localStorage.getItem('casa_editor_theme') || 'light';
+    } catch (_) {
+      return 'light';
+    }
+  });
+  const isDark = editorTheme === 'dark';
+  const toggleTheme = () => {
+    const next = isDark ? 'light' : 'dark';
+    setEditorTheme(next);
+    try {
+      localStorage.setItem('casa_editor_theme', next);
+    } catch (_) {}
+  };
 
   // Ref của vùng soạn thảo WYSIWYG
   const editorRef = useRef(null);
@@ -567,17 +586,40 @@ export default function ArticleStudioEditor({
   ].filter(Boolean).length;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-[#0A100C] text-gray-100 flex flex-col font-sans">
+    <div className={`fixed inset-0 z-50 overflow-hidden flex flex-col font-sans transition-colors duration-200 ${isDark ? "dark bg-[#0A100C] text-gray-100" : "bg-[#F6F8F7] text-gray-900"}`}>
+      <style>{`
+        .wysiwyg-canvas[contenteditable]:empty:before {
+          content: attr(data-placeholder);
+          color: ${isDark ? '#6B7280' : '#9CA3AF'};
+          pointer-events: none;
+          display: block;
+          font-style: italic;
+        }
+        .wysiwyg-canvas {
+          color: ${isDark ? '#F1F5F9' : '#111827'} !important;
+        }
+        .wysiwyg-canvas p, .wysiwyg-canvas div, .wysiwyg-canvas span, .wysiwyg-canvas li {
+          color: ${isDark ? '#F1F5F9' : '#1F2937'};
+        }
+        .wysiwyg-canvas h1, .wysiwyg-canvas h2, .wysiwyg-canvas h3, .wysiwyg-canvas h4 {
+          color: ${isDark ? '#FFFFFF' : '#0E2218'} !important;
+        }
+        .wysiwyg-canvas blockquote {
+          border-left-color: ${isDark ? '#10B981' : '#059669'};
+          color: ${isDark ? '#D1D5DB' : '#4B5563'};
+        }
+      `}</style>
+
       {/* ==================================================================== */}
       {/* 1. TOP HEADER BAR: Điều hướng, Tiêu đề, Xem trước, Lưu nháp, Xuất bản */}
       {/* ==================================================================== */}
-      <header className="h-16 px-4 sm:px-6 border-b border-[#1E2E23] bg-[#0E1611]/95 backdrop-blur-md flex items-center justify-between gap-4 shrink-0 z-20">
+      <header className="h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-[#1E2E23] bg-white/95 dark:bg-[#0E1611]/95 backdrop-blur-md flex items-center justify-between gap-4 shrink-0 z-20 shadow-xs dark:shadow-none">
         {/* Left: Nút Quay lại & Tiêu đề studio */}
         <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#17231B] hover:bg-[#203126] text-gray-300 hover:text-white border border-[#273B2E] transition-all text-xs font-semibold cursor-pointer shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-[#17231B] hover:bg-gray-200 dark:hover:bg-[#203126] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-[#273B2E] transition-all text-xs font-semibold cursor-pointer shrink-0 shadow-2xs"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" />
             <span className="hidden sm:inline">Quay lại</span>
@@ -586,7 +628,7 @@ export default function ArticleStudioEditor({
           <div className="h-4 w-px bg-white/10 hidden sm:block" />
 
           <div className="min-w-0">
-            <h1 className="text-sm sm:text-base font-bold text-white truncate flex items-center gap-2">
+            <h1 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white truncate flex items-center gap-2">
               <span>{editingNews ? 'Chỉnh sửa bài viết' : 'Viết bài mới'}</span>
               <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                 newsFormData.status === 'DRAFT'
@@ -606,7 +648,7 @@ export default function ArticleStudioEditor({
             type="button"
             disabled={isTranslatingNews}
             onClick={() => handleTranslateArticle('zh')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 text-purple-200 hover:text-white border border-purple-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-200 hover:text-purple-900 dark:hover:text-white border border-purple-200 dark:border-purple-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-2xs"
             title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt và Toàn văn nội dung) sang Tiếng Trung Phồn Thể 繁中"
           >
             <span className="text-sm">🇹🇼</span>
@@ -618,7 +660,7 @@ export default function ArticleStudioEditor({
             type="button"
             disabled={isTranslatingNewsEn}
             onClick={() => handleTranslateArticle('en')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-950/40 hover:bg-blue-900/50 text-blue-200 hover:text-white border border-blue-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-200 hover:text-blue-900 dark:hover:text-white border border-blue-200 dark:border-blue-500/40 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-2xs"
             title="Dịch toàn bộ bài viết (Cả Tiêu đề, Tóm tắt và Toàn văn nội dung) sang Tiếng Anh English"
           >
             <span className="text-sm">🇬🇧</span>
@@ -630,7 +672,7 @@ export default function ArticleStudioEditor({
             <button
               type="button"
               onClick={() => setAiMenuOpen(!aiMenuOpen)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600/30 via-indigo-600/30 to-purple-600/30 hover:from-blue-600/50 hover:to-purple-600/50 text-blue-200 border border-blue-500/40 text-xs font-bold transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-600/30 dark:via-indigo-600/30 dark:to-purple-600/30 text-indigo-700 dark:text-blue-200 border border-indigo-200 dark:border-blue-500/40 text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
               <span className="hidden md:inline">Công cụ AI</span>
@@ -638,7 +680,7 @@ export default function ArticleStudioEditor({
             </button>
 
             {aiMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#141E17] border border-[#273B2E] shadow-2xl p-2 z-50 space-y-1 text-xs">
+              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-[#141E17] border border-gray-200 dark:border-[#273B2E] shadow-xl p-2 z-50 space-y-1 text-xs text-gray-800 dark:text-gray-200">
                 <div className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   Tự động thiết kế bài viết (AI)
                 </div>
@@ -649,7 +691,7 @@ export default function ArticleStudioEditor({
                     setAiMenuOpen(false);
                     onAiAutoDesign('recipe');
                   }}
-                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1E2E23] text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <ChefHat className="w-4 h-4 text-amber-400" />
                   <span>🍹 Mẫu Công thức Barista SOP</span>
@@ -661,7 +703,7 @@ export default function ArticleStudioEditor({
                     setAiMenuOpen(false);
                     onAiAutoDesign('trend');
                   }}
-                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1E2E23] text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4 text-cyan-400" />
                   <span>📈 Mẫu Báo cáo Xu hướng 2026</span>
@@ -673,7 +715,7 @@ export default function ArticleStudioEditor({
                     setAiMenuOpen(false);
                     onAiAutoDesign('knowledge');
                   }}
-                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#1E2E23] text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <BookOpen className="w-4 h-4 text-emerald-400" />
                   <span>🔬 Mẫu Bí quyết Chiết xuất R&D</span>
@@ -691,7 +733,7 @@ export default function ArticleStudioEditor({
                     setAiMenuOpen(false);
                     handleTranslateArticle('zh');
                   }}
-                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-purple-300 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-[#1E2E23] text-purple-700 dark:text-purple-300 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <span>🇹🇼</span>
                   <span>{isTranslatingNews ? 'Đang dịch toàn bài...' : 'Dịch toàn bộ bài viết sang 繁中'}</span>
@@ -703,7 +745,7 @@ export default function ArticleStudioEditor({
                     setAiMenuOpen(false);
                     handleTranslateArticle('en');
                   }}
-                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-[#1E2E23] text-blue-300 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-[#1E2E23] text-blue-700 dark:text-blue-300 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <span>🇬🇧</span>
                   <span>{isTranslatingNewsEn ? 'Đang dịch toàn bài...' : 'Dịch toàn bộ bài viết sang English'}</span>
@@ -711,6 +753,21 @@ export default function ArticleStudioEditor({
               </div>
             )}
           </div>
+
+          {/* Nút Chuyển đổi giao diện Sáng / Tối */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+              isDark
+                ? 'bg-[#17231B] hover:bg-[#203126] text-amber-300 border border-[#273B2E]'
+                : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs'
+            }`}
+            title={isDark ? 'Chuyển sang Giao diện Sáng (Chuẩn giấy trắng chữ đen)' : 'Chuyển sang Giao diện Tối (Dark Mode)'}
+          >
+            {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-amber-600" />}
+            <span className="hidden md:inline">{isDark ? 'Giao diện Sáng' : 'Giao diện Tối'}</span>
+          </button>
 
           {/* Xem trước */}
           <button
@@ -725,7 +782,7 @@ export default function ArticleStudioEditor({
               setPreviewLang(activeLanguageTab);
               setIsPreviewModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#17231B] hover:bg-[#203126] text-gray-200 hover:text-white border border-[#273B2E] transition-all text-xs font-semibold cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#17231B] hover:bg-gray-200 dark:hover:bg-[#203126] text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-[#273B2E] transition-all text-xs font-semibold cursor-pointer shadow-2xs"
           >
             <Eye className="w-3.5 h-3.5 text-gray-400" />
             <span className="hidden sm:inline">Xem trước</span>
@@ -736,7 +793,7 @@ export default function ArticleStudioEditor({
             type="button"
             disabled={isSubmitting}
             onClick={() => handleSaveAction('DRAFT')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1B291F] hover:bg-[#233528] text-amber-300 border border-amber-500/30 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-[#1B291F] hover:bg-amber-100 dark:hover:bg-[#233528] text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-2xs"
           >
             <Save className="w-3.5 h-3.5" />
             <span>Lưu nháp</span>
@@ -768,7 +825,7 @@ export default function ArticleStudioEditor({
             <div className="lg:col-span-8 space-y-6">
               
               {/* THANH CHUYỂN ĐỔI TAB NGÔN NGỮ (VI | ZH | EN) */}
-              <div className="p-3 sm:p-4 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider pl-1 hidden sm:inline">
                     Ngôn ngữ soạn thảo:
@@ -781,7 +838,7 @@ export default function ArticleStudioEditor({
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                       activeLanguageTab === 'vi'
                         ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-2 ring-emerald-400/50'
-                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                        : 'bg-gray-100 dark:bg-[#152219] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-[#1C2C21] border border-gray-200 dark:border-[#26382B]'
                     }`}
                   >
                     <span className="text-base">🇻🇳</span>
@@ -795,7 +852,7 @@ export default function ArticleStudioEditor({
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                       activeLanguageTab === 'zh'
                         ? 'bg-purple-600 text-white shadow-lg shadow-purple-950/50 ring-2 ring-purple-400/50'
-                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                        : 'bg-gray-100 dark:bg-[#152219] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-[#1C2C21] border border-gray-300 dark:border-[#26382B]'
                     }`}
                   >
                     <span className="text-base">🇹🇼</span>
@@ -818,7 +875,7 @@ export default function ArticleStudioEditor({
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                       activeLanguageTab === 'en'
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/50 ring-2 ring-blue-400/50'
-                        : 'bg-[#152219] text-gray-300 hover:text-white hover:bg-[#1C2C21] border border-[#26382B]'
+                        : 'bg-gray-100 dark:bg-[#152219] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-[#1C2C21] border border-gray-300 dark:border-[#26382B]'
                     }`}
                   >
                     <span className="text-base">🇬🇧</span>
@@ -862,7 +919,7 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 1. Tiêu đề bài viết */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                     {activeLanguageTab === 'vi' && 'Tiêu đề bài viết (Tiếng Việt - Bản gốc) *'}
@@ -925,7 +982,7 @@ export default function ArticleStudioEditor({
                       });
                     }
                   }}
-                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
                 />
                 
                 {/* Đường dẫn Slug URL */}
@@ -945,14 +1002,14 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 2. Trình soạn thảo Rich Text Editor (Word-like WYSIWYG) */}
-              <div className="rounded-2xl bg-[#111A13] border border-[#223326] shadow-md overflow-hidden">
+              <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-sm overflow-hidden">
                 {/* Thanh công cụ Toolbar giống Word */}
-                <div className="sticky top-0 z-10 p-2 sm:p-2.5 bg-[#141F17] border-b border-[#223326] flex flex-wrap items-center gap-1 text-xs select-none">
+                <div className="sticky top-0 z-10 p-2 sm:p-2.5 bg-gray-50/95 dark:bg-[#141F17] border-b border-gray-200 dark:border-[#223326] flex flex-wrap items-center gap-1 text-xs select-none text-gray-700 dark:text-gray-300 backdrop-blur-sm">
                   
                   {/* Dropdown Định dạng khối (Paragraph / Headings) */}
                   <select
                     onChange={(e) => execCmd('formatBlock', e.target.value)}
-                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-gray-200 border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer"
+                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer shadow-2xs"
                     defaultValue="p"
                   >
                     <option value="p">Paragraph</option>
@@ -966,7 +1023,7 @@ export default function ArticleStudioEditor({
                   {/* Dropdown Phông chữ */}
                   <select
                     onChange={(e) => execCmd('fontName', e.target.value)}
-                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-gray-200 border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden sm:block"
+                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer hidden sm:block shadow-2xs"
                     defaultValue="Montserrat, sans-serif"
                   >
                     <option value="Montserrat, sans-serif">Mặc định</option>
@@ -979,7 +1036,7 @@ export default function ArticleStudioEditor({
                   {/* Dropdown Cỡ chữ */}
                   <select
                     onChange={(e) => execCmd('fontSize', e.target.value)}
-                    className="h-8 px-2 rounded-lg bg-[#0E1611] text-gray-200 border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden md:block"
+                    className="h-8 px-2 rounded-lg bg-white dark:bg-[#0E1611] text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-[#273B2E] text-xs font-semibold outline-none hover:border-gray-400 dark:hover:border-emerald-500/50 cursor-pointer hidden md:block shadow-2xs"
                     defaultValue="3"
                   >
                     <option value="2">13px</option>
@@ -996,7 +1053,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="In đậm (Bold - Ctrl+B)"
                     onClick={() => execCmd('bold')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <Bold className="w-4 h-4 font-bold" />
                   </button>
@@ -1005,7 +1062,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="In nghiêng (Italic - Ctrl+I)"
                     onClick={() => execCmd('italic')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <Italic className="w-4 h-4 italic" />
                   </button>
@@ -1014,7 +1071,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Gạch dưới (Underline - Ctrl+U)"
                     onClick={() => execCmd('underline')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <Underline className="w-4 h-4" />
                   </button>
@@ -1023,7 +1080,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Gạch ngang chữ (Strikethrough)"
                     onClick={() => execCmd('strikeThrough')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden sm:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden sm:flex"
                   >
                     <Strikethrough className="w-4 h-4" />
                   </button>
@@ -1035,7 +1092,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Chèn liên kết (Link)"
                     onClick={openInsertLinkModal}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-[#203126] flex items-center justify-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
                   >
                     <LinkIcon className="w-4 h-4" />
                   </button>
@@ -1058,7 +1115,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Căn trái"
                     onClick={() => execCmd('justifyLeft')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <AlignLeft className="w-4 h-4" />
                   </button>
@@ -1067,7 +1124,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Căn giữa"
                     onClick={() => execCmd('justifyCenter')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <AlignCenter className="w-4 h-4" />
                   </button>
@@ -1076,7 +1133,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Căn phải"
                     onClick={() => execCmd('justifyRight')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <AlignRight className="w-4 h-4" />
                   </button>
@@ -1085,7 +1142,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Căn đều hai bên"
                     onClick={() => execCmd('justifyFull')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden md:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden md:flex"
                   >
                     <AlignJustify className="w-4 h-4" />
                   </button>
@@ -1097,7 +1154,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Danh sách gạch đầu dòng"
                     onClick={() => execCmd('insertUnorderedList')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <List className="w-4 h-4" />
                   </button>
@@ -1106,7 +1163,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Danh sách đánh số thứ tự"
                     onClick={() => execCmd('insertOrderedList')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                   >
                     <ListOrdered className="w-4 h-4" />
                   </button>
@@ -1116,7 +1173,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Trích dẫn (Quote)"
                     onClick={() => execCmd('formatBlock', 'blockquote')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden sm:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden sm:flex"
                   >
                     <Quote className="w-4 h-4" />
                   </button>
@@ -1125,7 +1182,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Chèn bảng biểu so sánh F&B"
                     onClick={handleInsertTable}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden md:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden md:flex"
                   >
                     <Table className="w-4 h-4 text-emerald-400" />
                   </button>
@@ -1134,7 +1191,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Chèn đường kẻ ngang phân đoạn"
                     onClick={() => execCmd('insertHorizontalRule')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden md:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden md:flex"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
@@ -1145,7 +1202,7 @@ export default function ArticleStudioEditor({
                   <div className="flex items-center gap-1">
                     <label
                       title="Màu chữ"
-                      className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center cursor-pointer relative"
+                      className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center cursor-pointer relative"
                     >
                       <span className="font-extrabold text-sm text-emerald-400 underline">A</span>
                       <input
@@ -1157,7 +1214,7 @@ export default function ArticleStudioEditor({
 
                     <label
                       title="Màu nền dạ quang (Highlight)"
-                      className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center cursor-pointer relative"
+                      className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center cursor-pointer relative"
                     >
                       <span className="px-1 py-0.5 rounded bg-yellow-400/20 text-yellow-300 font-bold text-xs">ab</span>
                       <input
@@ -1175,7 +1232,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Hoàn tác (Undo - Ctrl+Z)"
                     onClick={() => execCmd('undo')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden sm:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden sm:flex"
                   >
                     <Undo className="w-4 h-4" />
                   </button>
@@ -1184,7 +1241,7 @@ export default function ArticleStudioEditor({
                     type="button"
                     title="Làm lại (Redo - Ctrl+Y)"
                     onClick={() => execCmd('redo')}
-                    className="w-8 h-8 rounded-lg hover:bg-[#203126] flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer hidden sm:flex"
+                    className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-[#203126] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer hidden sm:flex"
                   >
                     <Redo className="w-4 h-4" />
                   </button>
@@ -1203,7 +1260,7 @@ export default function ArticleStudioEditor({
                     className={`ml-auto px-2.5 h-8 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer ${
                       editorMode === 'code'
                         ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-[#0E1611] text-gray-400 hover:text-white border border-[#273B2E]'
+                        : 'bg-white dark:bg-[#0E1611] text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-[#273B2E]'
                     }`}
                   >
                     <Code className="w-3.5 h-3.5" />
@@ -1267,7 +1324,7 @@ export default function ArticleStudioEditor({
                         ? 'Type English content here... (Format text, insert images for each section)'
                         : "Bắt đầu viết nội dung bài viết... (Bạn có thể gõ trực tiếp, bôi đen để định dạng và bấm 'Thêm ảnh' để chèn hình minh họa vào từng đoạn)"
                     }
-                    className="article-content wysiwyg-canvas p-6 sm:p-8 min-h-[500px] max-h-[750px] overflow-y-auto bg-[#0B120E] text-gray-100 text-base leading-relaxed outline-none focus:ring-0 space-y-4"
+                    className="article-content wysiwyg-canvas p-6 sm:p-10 min-h-[550px] max-h-[800px] overflow-y-auto bg-white dark:bg-[#0B120E] text-gray-900 dark:text-gray-100 text-base leading-relaxed outline-none focus:ring-0 space-y-4 shadow-inner/5"
                     style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                   />
                 ) : (
@@ -1290,12 +1347,12 @@ export default function ArticleStudioEditor({
                       }
                     }}
                     placeholder={`Mã HTML bài viết (${activeLanguageTab === 'zh' ? '繁體中文' : activeLanguageTab === 'en' ? 'English' : 'Tiếng Việt'})...`}
-                    className="w-full p-6 bg-[#0B120E] text-emerald-300 font-mono text-xs leading-relaxed outline-none resize-y min-h-[500px]"
+                    className="w-full p-6 bg-gray-900 text-emerald-400 font-mono text-xs leading-relaxed outline-none resize-y min-h-[550px]"
                   />
                 )}
 
                 {/* Thanh thông tin dưới đáy editor */}
-                <div className="px-4 py-2 bg-[#0E1611] border-t border-[#223326] flex items-center justify-between text-[11px] text-gray-400">
+                <div className="px-4 py-2 bg-gray-50 dark:bg-[#0E1611] border-t border-gray-200 dark:border-[#223326] flex items-center justify-between text-[11px] text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-4">
                     <span>Ngôn ngữ đang soạn: <strong className={activeLanguageTab === 'zh' ? 'text-purple-300' : activeLanguageTab === 'en' ? 'text-blue-300' : 'text-emerald-400'}>{activeLanguageTab === 'zh' ? '🇹🇼 繁體中文' : activeLanguageTab === 'en' ? '🇬🇧 English' : '🇻🇳 Tiếng Việt'}</strong></span>
                     <span>Số từ: <strong className="text-white">{wordCount}</strong></span>
@@ -1308,9 +1365,9 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 3. Tóm tắt ngắn (Excerpt) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                  <label className="block text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Tóm tắt (Excerpt) {activeLanguageTab === 'zh' ? '— 繁體中文' : activeLanguageTab === 'en' ? '— English' : '— Tiếng Việt'}
                   </label>
                   <span className={`text-[11px] font-medium ${
@@ -1338,22 +1395,22 @@ export default function ArticleStudioEditor({
                       setNewsFormData({ ...newsFormData, excerpt: e.target.value });
                     }
                   }}
-                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-gray-200 placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none shadow-2xs"
                 />
               </div>
 
               {/* 4. Khối Mở rộng: Hộp Công Thức SOP, Sản Phẩm Gắn Kèm, Đa Ngôn Ngữ */}
               <div className="space-y-3 pt-2">
                 {/* Accordion: Hộp công thức Barista SOP */}
-                <div className="rounded-2xl bg-[#111A13] border border-[#223326] overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] overflow-hidden shadow-xs">
                   <button
                     type="button"
                     onClick={() => setShowRecipeBox(!showRecipeBox)}
-                    className="w-full p-4 flex items-center justify-between text-left hover:bg-[#152219] transition-colors cursor-pointer"
+                    className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-[#152219] transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5">
                       <ChefHat className="w-4 h-4 text-amber-400" />
-                      <span className="font-bold text-xs sm:text-sm text-gray-200">
+                      <span className="font-bold text-xs sm:text-sm text-gray-800 dark:text-gray-200">
                         Hộp Công Thức Barista SOP (Tùy chọn dành cho bài viết công thức)
                       </span>
                     </div>
@@ -1361,10 +1418,10 @@ export default function ArticleStudioEditor({
                   </button>
 
                   {showRecipeBox && (
-                    <div className="p-4 sm:p-5 border-t border-[#223326] bg-[#0C140F] space-y-4">
+                    <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-[#223326] bg-gray-50/60 dark:bg-[#0C140F] space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-300 mb-1">Tên Món Uống:</label>
+                          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tên Món Uống:</label>
                           <input
                             type="text"
                             value={newsFormData.recipeBox?.title || ''}
@@ -1375,11 +1432,11 @@ export default function ArticleStudioEditor({
                               })
                             }
                             placeholder="Ví dụ: Trà Ô Long Nướng Kem Muối Biển"
-                            className="w-full px-3 py-2 rounded-xl bg-[#080E0A] border border-[#243729] text-white text-xs outline-none focus:border-amber-400"
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#080E0A] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-white text-xs outline-none focus:border-amber-500 shadow-2xs"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-gray-300 mb-1">Giá Vốn Dự Kiến (Cost):</label>
+                          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Giá Vốn Dự Kiến (Cost):</label>
                           <input
                             type="text"
                             value={newsFormData.recipeBox?.cost || ''}
@@ -1390,14 +1447,14 @@ export default function ArticleStudioEditor({
                               })
                             }
                             placeholder="Ví dụ: ~4.500đ / Ly 500ml"
-                            className="w-full px-3 py-2 rounded-xl bg-[#080E0A] border border-[#243729] text-white text-xs outline-none focus:border-amber-400"
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#080E0A] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-white text-xs outline-none focus:border-amber-400 shadow-2xs"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-300 mb-1">Định Lượng Nguyên Liệu (Mỗi dòng 1 món):</label>
+                          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Định Lượng Nguyên Liệu (Mỗi dòng 1 món):</label>
                           <textarea
                             rows={4}
                             value={(newsFormData.recipeBox?.ingredients || []).join('\n')}
@@ -1411,11 +1468,11 @@ export default function ArticleStudioEditor({
                               })
                             }
                             placeholder="120ml Trà Ô Long Nướng CASA&#10;30g Bột Kem Béo CASA&#10;20ml Syrup Đường Mía"
-                            className="w-full px-3 py-2 rounded-xl bg-[#080E0A] border border-[#243729] text-white text-xs font-mono outline-none focus:border-amber-400 leading-relaxed"
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#080E0A] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-white text-xs font-mono outline-none focus:border-amber-500 leading-relaxed shadow-2xs"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-gray-300 mb-1">Các Bước Pha Chế SOP (Mỗi dòng 1 bước):</label>
+                          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Các Bước Pha Chế SOP (Mỗi dòng 1 bước):</label>
                           <textarea
                             rows={4}
                             value={(newsFormData.recipeBox?.steps || []).join('\n')}
@@ -1429,7 +1486,7 @@ export default function ArticleStudioEditor({
                               })
                             }
                             placeholder="Ủ 30g Trà với 1000ml nước 90°C trong 10 phút.&#10;Khuấy tan bột béo khi nước cốt trà còn nóng.&#10;Thêm đá viên và lắc đều trong shaker."
-                            className="w-full px-3 py-2 rounded-xl bg-[#080E0A] border border-[#243729] text-white text-xs font-mono outline-none focus:border-amber-400 leading-relaxed"
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#080E0A] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-white text-xs font-mono outline-none focus:border-amber-400 leading-relaxed shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1438,15 +1495,15 @@ export default function ArticleStudioEditor({
                 </div>
 
                 {/* Accordion: Gắn sản phẩm F&B đính kèm */}
-                <div className="rounded-2xl bg-[#111A13] border border-[#223326] overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] overflow-hidden shadow-xs">
                   <button
                     type="button"
                     onClick={() => setShowAttachedProducts(!showAttachedProducts)}
-                    className="w-full p-4 flex items-center justify-between text-left hover:bg-[#152219] transition-colors cursor-pointer"
+                    className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-[#152219] transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5">
                       <Package className="w-4 h-4 text-emerald-400" />
-                      <span className="font-bold text-xs sm:text-sm text-gray-200">
+                      <span className="font-bold text-xs sm:text-sm text-gray-800 dark:text-gray-200">
                         Gắn Sản Phẩm F&B CASA Vào Bài Viết ({((newsFormData.relatedProductIds || []).length)})
                       </span>
                     </div>
@@ -1454,7 +1511,7 @@ export default function ArticleStudioEditor({
                   </button>
 
                   {showAttachedProducts && (
-                    <div className="p-4 sm:p-5 border-t border-[#223326] bg-[#0C140F] space-y-3">
+                    <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-[#223326] bg-gray-50/60 dark:bg-[#0C140F] space-y-3">
                       <div className="relative">
                         <Search className="w-4 h-4 absolute left-3 top-3 text-gray-500" />
                         <input
@@ -1462,12 +1519,12 @@ export default function ArticleStudioEditor({
                           placeholder="Tìm trà, bột béo, topping để gắn vào bài viết..."
                           value={productSearch}
                           onChange={(e) => setProductSearch(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#080E0A] border border-[#243729] text-white text-xs outline-none focus:border-emerald-500"
+                          className="w-full pl-9 pr-3 py-2 rounded-xl bg-white dark:bg-[#080E0A] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                         />
                       </div>
 
                       {productSearch.trim() && (
-                        <div className="max-h-48 overflow-y-auto space-y-1 p-2 rounded-xl bg-[#080E0A] border border-[#243729]">
+                        <div className="max-h-48 overflow-y-auto space-y-1 p-2 rounded-xl bg-gray-50 dark:bg-[#080E0A] border border-gray-200 dark:border-[#243729]">
                           {products
                             .filter((p) => (p.name || '').toLowerCase().includes(productSearch.toLowerCase()))
                             .slice(0, 5)
@@ -1475,7 +1532,7 @@ export default function ArticleStudioEditor({
                               const isAdded = (newsFormData.relatedProductIds || []).includes(prod.id);
                               return (
                                 <div key={prod.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 text-xs">
-                                  <span className="text-gray-300 truncate">{prod.name}</span>
+                                  <span className="text-gray-700 dark:text-gray-300 truncate">{prod.name}</span>
                                   <button
                                     type="button"
                                     disabled={isAdded}
@@ -1501,7 +1558,7 @@ export default function ArticleStudioEditor({
                         {(newsFormData.relatedProductIds || []).map((pId) => {
                           const prod = products.find((p) => p.id === pId);
                           return (
-                            <span key={pId} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-800/40 text-emerald-300 text-xs font-semibold">
+                            <span key={pId} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
                               <span>{prod ? prod.name : pId}</span>
                               <button
                                 type="button"
@@ -1524,15 +1581,15 @@ export default function ArticleStudioEditor({
                 </div>
 
                 {/* Accordion: Bản dịch đa ngôn ngữ */}
-                <div className="rounded-2xl bg-[#111A13] border border-[#223326] overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] overflow-hidden shadow-xs">
                   <button
                     type="button"
                     onClick={() => setShowTranslations(!showTranslations)}
-                    className="w-full p-4 flex items-center justify-between text-left hover:bg-[#152219] transition-colors cursor-pointer"
+                    className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-[#152219] transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5">
                       <Globe className="w-4 h-4 text-purple-400" />
-                      <span className="font-bold text-xs sm:text-sm text-gray-200">
+                      <span className="font-bold text-xs sm:text-sm text-gray-800 dark:text-gray-200">
                         Bản Dịch Đa Ngôn Ngữ (Tiếng Trung 繁體中文 & Tiếng Anh English)
                       </span>
                     </div>
@@ -1540,7 +1597,7 @@ export default function ArticleStudioEditor({
                   </button>
 
                   {showTranslations && (
-                    <div className="p-4 sm:p-5 border-t border-[#223326] bg-[#0C140F] space-y-5">
+                    <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-[#223326] bg-gray-50/60 dark:bg-[#0C140F] space-y-5">
                       {/* Tiếng Trung */}
                       <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-800/40 space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1561,7 +1618,7 @@ export default function ArticleStudioEditor({
                             <button
                               type="button"
                               onClick={() => handleSwitchLanguageTab('zh')}
-                              className="px-2.5 py-1 rounded-lg bg-[#19271E] hover:bg-[#223529] text-gray-300 hover:text-white border border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors"
+                              className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-[#19271E] hover:bg-gray-200 dark:hover:bg-[#223529] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
                             >
                               Mở soạn trong Word Canvas →
                             </button>
@@ -1584,7 +1641,7 @@ export default function ArticleStudioEditor({
                             placeholder="Tiêu đề tiếng Trung (繁體中文)..."
                             value={newsFormData.titleZh || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, titleZh: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none focus:border-purple-500"
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#080E0A] border border-purple-300 dark:border-purple-800/40 text-gray-900 dark:text-purple-100 text-xs outline-none focus:border-purple-500 shadow-2xs"
                           />
                         </div>
 
@@ -1595,7 +1652,7 @@ export default function ArticleStudioEditor({
                             placeholder="Tóm tắt bài viết tiếng Trung (繁體中文)..."
                             value={newsFormData.excerptZh || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, excerptZh: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 text-xs outline-none focus:border-purple-500 resize-none"
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#080E0A] border border-purple-300 dark:border-purple-800/40 text-gray-900 dark:text-purple-100 text-xs outline-none focus:border-purple-500 resize-none shadow-2xs"
                           />
                         </div>
 
@@ -1609,7 +1666,7 @@ export default function ArticleStudioEditor({
                             placeholder="Toàn bộ nội dung bài viết bằng tiếng Trung phồn thể..."
                             value={newsFormData.contentZh || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, contentZh: e.target.value })}
-                            className="w-full p-3 rounded-lg bg-[#080E0A] border border-purple-800/40 text-purple-100 font-mono text-[11px] leading-relaxed outline-none focus:border-purple-500"
+                            className="w-full p-3 rounded-lg bg-white dark:bg-[#080E0A] border border-purple-300 dark:border-purple-800/40 text-gray-900 dark:text-purple-100 font-mono text-[11px] leading-relaxed outline-none focus:border-purple-500 shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1634,7 +1691,7 @@ export default function ArticleStudioEditor({
                             <button
                               type="button"
                               onClick={() => handleSwitchLanguageTab('en')}
-                              className="px-2.5 py-1 rounded-lg bg-[#19271E] hover:bg-[#223529] text-gray-300 hover:text-white border border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors"
+                              className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-[#19271E] hover:bg-gray-200 dark:hover:bg-[#223529] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-[#2B4232] text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
                             >
                               Mở soạn trong Word Canvas →
                             </button>
@@ -1657,7 +1714,7 @@ export default function ArticleStudioEditor({
                             placeholder="Article title in English..."
                             value={newsFormData.titleEn || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, titleEn: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none focus:border-blue-500"
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#080E0A] border border-blue-300 dark:border-blue-800/40 text-gray-900 dark:text-blue-100 text-xs outline-none focus:border-blue-500 shadow-2xs"
                           />
                         </div>
 
@@ -1668,7 +1725,7 @@ export default function ArticleStudioEditor({
                             placeholder="Article summary in English..."
                             value={newsFormData.excerptEn || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, excerptEn: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 text-xs outline-none focus:border-blue-500 resize-none"
+                            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#080E0A] border border-blue-300 dark:border-blue-800/40 text-gray-900 dark:text-blue-100 text-xs outline-none focus:border-blue-500 resize-none shadow-2xs"
                           />
                         </div>
 
@@ -1682,7 +1739,7 @@ export default function ArticleStudioEditor({
                             placeholder="Full article content in English..."
                             value={newsFormData.contentEn || ''}
                             onChange={(e) => setNewsFormData({ ...newsFormData, contentEn: e.target.value })}
-                            className="w-full p-3 rounded-lg bg-[#080E0A] border border-blue-800/40 text-blue-100 font-mono text-[11px] leading-relaxed outline-none focus:border-blue-500"
+                            className="w-full p-3 rounded-lg bg-white dark:bg-[#080E0A] border border-blue-300 dark:border-blue-800/40 text-gray-900 dark:text-blue-100 font-mono text-[11px] leading-relaxed outline-none focus:border-blue-500 shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1698,7 +1755,7 @@ export default function ArticleStudioEditor({
             <div className="lg:col-span-4 space-y-6">
               
               {/* 1. Bài nổi bật (Spotlight) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm space-y-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <span className="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
@@ -1737,15 +1794,15 @@ export default function ArticleStudioEditor({
               </div>
 
               {/* 2. Switcher 2 Tabs: Cài đặt | SEO Check */}
-              <div className="rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm overflow-hidden">
-                <div className="grid grid-cols-2 border-b border-[#223326] bg-[#0E1611]">
+              <div className="rounded-2xl bg-white dark:bg-[#111A13] border border-gray-200 dark:border-[#223326] shadow-xs overflow-hidden">
+                <div className="grid grid-cols-2 border-b border-gray-200 dark:border-[#223326] bg-gray-100 dark:bg-[#0E1611]">
                   <button
                     type="button"
                     onClick={() => setActiveSidebarTab('settings')}
                     className={`py-3 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       activeSidebarTab === 'settings'
-                        ? 'text-emerald-400 border-b-2 border-emerald-500 bg-[#141F17]'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-500 bg-white dark:bg-[#141F17]'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <Sliders className="w-3.5 h-3.5" />
@@ -1757,8 +1814,8 @@ export default function ArticleStudioEditor({
                     onClick={() => setActiveSidebarTab('seo')}
                     className={`py-3 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       activeSidebarTab === 'seo'
-                        ? 'text-emerald-400 border-b-2 border-emerald-500 bg-[#141F17]'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-500 bg-white dark:bg-[#141F17]'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1772,12 +1829,12 @@ export default function ArticleStudioEditor({
                     
                     {/* Hình ảnh đại diện */}
                     <div className="space-y-3">
-                      <label className="block text-xs font-bold text-gray-200">
+                      <label className="block text-xs font-bold text-gray-800 dark:text-gray-200">
                         Hình ảnh đại diện
                       </label>
 
                       {newsFormData.image ? (
-                        <div className="relative rounded-2xl overflow-hidden border border-[#273B2E] aspect-[16/10] group bg-black/40">
+                        <div className="relative rounded-2xl overflow-hidden border border-gray-300 dark:border-[#273B2E] aspect-[16/10] group bg-gray-100 dark:bg-black/40">
                           <img
                             src={newsFormData.image}
                             alt="Ảnh đại diện bài viết"
@@ -1798,17 +1855,17 @@ export default function ArticleStudioEditor({
                           </div>
                         </div>
                       ) : (
-                        <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-[#2A3E30] hover:border-emerald-500/70 bg-[#090F0B] hover:bg-[#0E1712] cursor-pointer transition-all text-center">
-                          <UploadCloud className="w-8 h-8 text-emerald-400 mb-2" />
-                          <span className="font-bold text-xs text-white">Nhấn để tải ảnh</span>
+                        <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-[#2A3E30] hover:border-emerald-500 bg-gray-50 dark:bg-[#090F0B] hover:bg-gray-100 dark:hover:bg-[#0E1712] cursor-pointer transition-all text-center">
+                          <UploadCloud className="w-8 h-8 text-emerald-500 dark:text-emerald-400 mb-2" />
+                          <span className="font-bold text-xs text-gray-800 dark:text-white">Nhấn để tải ảnh</span>
                           <span className="text-[10px] text-gray-500 mt-0.5">SVG, PNG, JPG hoặc WebP</span>
                           <input type="file" accept="image/*" onChange={handleThumbnailSelect} className="hidden" />
                         </label>
                       )}
 
                       {/* Khuyến nghị kích thước chuẩn theo ảnh khách chụp */}
-                      <div className="p-3 rounded-xl bg-[#090F0B] border border-white/5 space-y-1 text-[11px] text-gray-400">
-                        <span className="font-semibold text-gray-300 block">Kích thước chuẩn tối ưu SEO:</span>
+                      <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5 space-y-1 text-[11px] text-gray-600 dark:text-gray-400">
+                        <span className="font-semibold text-gray-700 dark:text-gray-300 block">Kích thước chuẩn tối ưu SEO:</span>
                         <div className="space-y-0.5 text-[10px]">
                           <div>• Vuông: 1200x1200px</div>
                           <div>• Ngang: 1200x630px</div>
@@ -1818,7 +1875,7 @@ export default function ArticleStudioEditor({
 
                       {/* Văn bản thay thế (Alt Text) */}
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
                           Văn bản thay thế (Alt Text)
                         </label>
                         <input
@@ -1826,16 +1883,16 @@ export default function ArticleStudioEditor({
                           placeholder="Mô tả hình ảnh cho SEO..."
                           value={newsFormData.alt || ''}
                           onChange={(e) => setNewsFormData({ ...newsFormData, alt: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl bg-[#090F0B] border border-[#243729] text-gray-200 text-xs outline-none focus:border-emerald-500"
+                          className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-gray-200 text-xs outline-none focus:border-emerald-500 shadow-2xs"
                         />
                       </div>
                     </div>
 
                     {/* Phân loại danh mục */}
                     <div className="space-y-2">
-                      <label className="block text-xs font-bold text-gray-200">Phân loại</label>
+                      <label className="block text-xs font-bold text-gray-800 dark:text-gray-200">Phân loại</label>
                       <div>
-                        <span className="block text-[11px] text-gray-400 mb-1">Danh mục</span>
+                        <span className="block text-[11px] text-gray-600 dark:text-gray-400 mb-1">Danh mục</span>
                         <select
                           value={newsFormData.category || 'cong-thuc'}
                           onChange={(e) => {
@@ -1852,7 +1909,7 @@ export default function ArticleStudioEditor({
                               categoryName: catMap[cat] || cat
                             });
                           }}
-                          className="w-full px-3 py-2.5 rounded-xl bg-[#090F0B] border border-[#243729] text-gray-200 text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer"
+                          className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-gray-200 text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
                         >
                           <option value="cong-thuc">Công Thức Pha Chế (Barista SOP)</option>
                           <option value="xu-huong">Xu Hướng Đồ Uống 2026</option>
@@ -1865,7 +1922,7 @@ export default function ArticleStudioEditor({
                     {/* Thẻ (Tags) */}
                     <div className="space-y-3">
                       <div>
-                        <span className="block text-[11px] text-gray-400 mb-1">Thẻ (Tags)</span>
+                        <span className="block text-[11px] text-gray-600 dark:text-gray-400 mb-1">Thẻ (Tags)</span>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -1878,12 +1935,12 @@ export default function ArticleStudioEditor({
                                 handleAddTag();
                               }
                             }}
-                            className="flex-1 px-3 py-2 rounded-xl bg-[#090F0B] border border-[#243729] text-gray-200 text-xs outline-none focus:border-emerald-500"
+                            className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#243729] text-gray-900 dark:text-gray-200 text-xs outline-none focus:border-emerald-500 shadow-2xs"
                           />
                           <button
                             type="button"
                             onClick={() => handleAddTag()}
-                            className="px-3 py-2 rounded-xl bg-[#1A281E] hover:bg-[#233829] text-emerald-400 border border-emerald-500/30 text-xs font-bold cursor-pointer"
+                            className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-[#1A281E] hover:bg-emerald-100 dark:hover:bg-[#233829] text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 text-xs font-bold cursor-pointer shadow-2xs"
                           >
                             + Thêm
                           </button>
@@ -1892,11 +1949,11 @@ export default function ArticleStudioEditor({
 
                       {/* Danh sách thẻ đang có */}
                       {(newsFormData.tags || []).length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-[#090F0B] border border-[#243729]">
+                        <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-[#243729]">
                           {newsFormData.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 text-[11px] font-semibold"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700/50 text-emerald-800 dark:text-emerald-300 text-[11px] font-semibold"
                             >
                               <span>{tag}</span>
                               <button
@@ -1927,8 +1984,8 @@ export default function ArticleStudioEditor({
                                 onClick={() => handleAddTag(sugTag)}
                                 className={`px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${
                                   isAdded
-                                    ? 'bg-[#121B14] text-gray-600 border border-transparent opacity-40 cursor-default'
-                                    : 'bg-[#0E1611] hover:bg-[#18261D] text-gray-300 hover:text-emerald-300 border border-[#223326] hover:border-emerald-500/40 cursor-pointer'
+                                    ? 'bg-gray-100 dark:bg-[#121B14] text-gray-400 dark:text-gray-600 border border-transparent opacity-60 cursor-default'
+                                    : 'bg-gray-100 dark:bg-[#0E1611] hover:bg-emerald-50 dark:hover:bg-[#18261D] text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-300 border border-gray-200 dark:border-[#223326] hover:border-emerald-300 dark:hover:border-emerald-500/40 cursor-pointer'
                                 }`}
                               >
                                 {sugTag} {isAdded ? '✓' : '+'}
@@ -1946,7 +2003,7 @@ export default function ArticleStudioEditor({
                   <div className="p-4 sm:p-5 space-y-6">
                     {/* Google SERP Snippet Preview */}
                     <div className="space-y-2">
-                      <span className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
+                      <span className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         Xem trước trên kết quả tìm kiếm Google
                       </span>
                       <div className="p-4 rounded-xl bg-white text-gray-900 shadow-md space-y-1">
@@ -1965,48 +2022,48 @@ export default function ArticleStudioEditor({
 
                     {/* Danh sách tiêu chí SEO */}
                     <div className="space-y-2.5">
-                      <span className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
+                      <span className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         Tiêu chí xếp hạng SEO Google
                       </span>
 
                       <div className="space-y-2 text-xs">
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Độ dài tiêu đề (40-70 ký tự):</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Độ dài tiêu đề (40-70 ký tự):</span>
                           <span className={titleLength >= 40 && titleLength <= 70 ? 'text-emerald-400 font-bold' : 'text-amber-400'}>
                             {titleLength} ký tự
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Độ dài tóm tắt meta (90-180 ký tự):</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Độ dài tóm tắt meta (90-180 ký tự):</span>
                           <span className={excerptLength >= 90 && excerptLength <= 180 ? 'text-emerald-400 font-bold' : 'text-amber-400'}>
                             {excerptLength} ký tự
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Hình ảnh đại diện:</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Hình ảnh đại diện:</span>
                           <span className={hasThumbnail ? 'text-emerald-400 font-bold' : 'text-red-400'}>
                             {hasThumbnail ? '✓ Đã có' : '✗ Chưa có'}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Thẻ Tags SEO (tối thiểu 3 thẻ):</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Thẻ Tags SEO (tối thiểu 3 thẻ):</span>
                           <span className={tagsCount >= 3 ? 'text-emerald-400 font-bold' : 'text-amber-400'}>
                             {tagsCount} thẻ
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Phân đoạn đề mục (H2 / H3):</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Phân đoạn đề mục (H2 / H3):</span>
                           <span className={hasHeadings ? 'text-emerald-400 font-bold' : 'text-amber-400'}>
                             {hasHeadings ? '✓ Tốt' : 'Khuyên dùng'}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-[#090F0B] border border-white/5">
-                          <span className="text-gray-300">Hình ảnh minh họa trong nội dung:</span>
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#090F0B] border border-gray-200 dark:border-white/5">
+                          <span className="text-gray-700 dark:text-gray-300">Hình ảnh minh họa trong nội dung:</span>
                           <span className={hasInlineImages ? 'text-emerald-400 font-bold' : 'text-amber-400'}>
                             {hasInlineImages ? '✓ Đã chèn ảnh' : 'Chưa có ảnh'}
                           </span>
@@ -2031,29 +2088,29 @@ export default function ArticleStudioEditor({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#121C15] border border-[#273B2E] rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-5 text-xs text-gray-200"
+              className="bg-white dark:bg-[#121C15] border border-gray-200 dark:border-[#273B2E] rounded-3xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-5 text-xs text-gray-800 dark:text-gray-200"
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
                   <ImagePlus className="w-5 h-5 text-emerald-400" />
-                  <h3 className="text-sm font-bold text-white">Chèn hình ảnh vào bài viết</h3>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Chèn hình ảnh vào bài viết</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setImageModalOpen(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Tabs nguồn ảnh */}
-              <div className="flex rounded-xl bg-[#0A100C] p-1 border border-white/5">
+              <div className="flex rounded-xl bg-gray-100 dark:bg-[#0A100C] p-1 border border-gray-200 dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => setImageModalTab('upload')}
                   className={`flex-1 py-1.5 rounded-lg font-bold text-center transition-colors cursor-pointer ${
-                    imageModalTab === 'upload' ? 'bg-[#1C2C20] text-emerald-300' : 'text-gray-400'
+                    imageModalTab === 'upload' ? 'bg-white dark:bg-[#1C2C20] text-emerald-700 dark:text-emerald-300 shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   📁 Tải từ máy tính
@@ -2062,7 +2119,7 @@ export default function ArticleStudioEditor({
                   type="button"
                   onClick={() => setImageModalTab('url')}
                   className={`flex-1 py-1.5 rounded-lg font-bold text-center transition-colors cursor-pointer ${
-                    imageModalTab === 'url' ? 'bg-[#1C2C20] text-emerald-300' : 'text-gray-400'
+                    imageModalTab === 'url' ? 'bg-white dark:bg-[#1C2C20] text-emerald-700 dark:text-emerald-300 shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   🔗 Dán link ảnh (URL)
@@ -2071,7 +2128,7 @@ export default function ArticleStudioEditor({
                   type="button"
                   onClick={() => setImageModalTab('samples')}
                   className={`flex-1 py-1.5 rounded-lg font-bold text-center transition-colors cursor-pointer ${
-                    imageModalTab === 'samples' ? 'bg-[#1C2C20] text-emerald-300' : 'text-gray-400'
+                    imageModalTab === 'samples' ? 'bg-white dark:bg-[#1C2C20] text-emerald-700 dark:text-emerald-300 shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   🍃 Kho ảnh CASA
@@ -2081,9 +2138,9 @@ export default function ArticleStudioEditor({
               {/* Tab 1: Upload từ máy tính */}
               {imageModalTab === 'upload' && (
                 <div className="space-y-3">
-                  <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-[#2A3E30] hover:border-emerald-500 bg-[#0A100C] hover:bg-[#0E1712] cursor-pointer transition-all text-center">
-                    <UploadCloud className="w-8 h-8 text-emerald-400 mb-2" />
-                    <span className="font-bold text-xs text-white">
+                  <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-[#2A3E30] hover:border-emerald-500 bg-gray-50 dark:bg-[#0A100C] hover:bg-gray-100 dark:hover:bg-[#0E1712] cursor-pointer transition-all text-center">
+                    <UploadCloud className="w-8 h-8 text-emerald-500 dark:text-emerald-400 mb-2" />
+                    <span className="font-bold text-xs text-gray-800 dark:text-white">
                       {isUploadingImage ? 'Đang nén WebP siêu tốc...' : 'Nhấn để chọn ảnh từ thiết bị'}
                     </span>
                     <span className="text-[10px] text-gray-500 mt-0.5">Tự động nén WebP siêu nhẹ, nét căng chuẩn F&B</span>
@@ -2101,13 +2158,13 @@ export default function ArticleStudioEditor({
               {/* Tab 2: URL */}
               {imageModalTab === 'url' && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">Đường dẫn hình ảnh (URL):</label>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300">Đường dẫn hình ảnh (URL):</label>
                   <input
                     type="url"
                     placeholder="https://images.unsplash.com/... hoặc link ảnh bất kỳ"
                     value={imageSrc}
                     onChange={(e) => setImageSrc(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                   />
                 </div>
               )}
@@ -2139,7 +2196,7 @@ export default function ArticleStudioEditor({
 
               {/* Xem trước ảnh đã chọn */}
               {imageSrc && (
-                <div className="rounded-2xl overflow-hidden border border-[#273B2E] aspect-[16/9] bg-black/30 relative">
+                <div className="rounded-2xl overflow-hidden border border-gray-300 dark:border-[#273B2E] aspect-[16/9] bg-gray-100 dark:bg-black/30 relative">
                   <img src={imageSrc} alt="Preview" className="w-full h-full object-contain" />
                   <div className="absolute top-2 right-2">
                     <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-white font-bold text-[10px]">
@@ -2152,7 +2209,7 @@ export default function ArticleStudioEditor({
               {/* Cấu hình Chú thích & Căn lề giống Word */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Chú thích ảnh (Caption hiển thị dưới ảnh):
                   </label>
                   <input
@@ -2160,12 +2217,12 @@ export default function ArticleStudioEditor({
                     placeholder="Ví dụ: Hình 1: Quy trình ủ trà Ô Long CASA..."
                     value={imageCaption}
                     onChange={(e) => setImageCaption(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Thẻ Alt Text (Tối ưu SEO Google):
                   </label>
                   <input
@@ -2173,7 +2230,7 @@ export default function ArticleStudioEditor({
                     placeholder="Mô tả cho Google..."
                     value={imageAlt}
                     onChange={(e) => setImageAlt(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                   />
                 </div>
               </div>
@@ -2181,11 +2238,11 @@ export default function ArticleStudioEditor({
               {/* Lựa chọn Căn lề & Kích thước */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">Vị trí căn lề:</label>
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Vị trí căn lề:</label>
                   <select
                     value={imageAlign}
                     onChange={(e) => setImageAlign(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none cursor-pointer"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none cursor-pointer shadow-2xs"
                   >
                     <option value="center">↔️ Căn giữa (Khuyên dùng)</option>
                     <option value="left">⬅️ Căn trái (Chữ bọc quanh)</option>
@@ -2195,11 +2252,11 @@ export default function ArticleStudioEditor({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">Độ rộng ảnh:</label>
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Độ rộng ảnh:</label>
                   <select
                     value={imageWidth}
                     onChange={(e) => setImageWidth(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none cursor-pointer"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none cursor-pointer shadow-2xs"
                   >
                     <option value="100%">100% (Tiêu chuẩn)</option>
                     <option value="75%">75% (Vừa vặn)</option>
@@ -2213,7 +2270,7 @@ export default function ArticleStudioEditor({
                 <button
                   type="button"
                   onClick={() => setImageModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-[#17231B] text-gray-300 hover:text-white font-semibold cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#17231B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:text-white font-semibold cursor-pointer border border-gray-300 dark:border-transparent"
                 >
                   Hủy
                 </button>
@@ -2241,38 +2298,38 @@ export default function ArticleStudioEditor({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#121C15] border border-[#273B2E] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 text-xs text-gray-200"
+              className="bg-white dark:bg-[#121C15] border border-gray-200 dark:border-[#273B2E] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 text-xs text-gray-800 dark:text-gray-200"
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <LinkIcon className="w-4 h-4 text-blue-400" />
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                   <span>Chèn liên kết (Link)</span>
                 </h3>
-                <button type="button" onClick={() => setLinkModalOpen(false)} className="text-gray-400 hover:text-white cursor-pointer">
+                <button type="button" onClick={() => setLinkModalOpen(false)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">Địa chỉ liên kết (URL):</label>
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Địa chỉ liên kết (URL):</label>
                   <input
                     type="text"
                     placeholder="https://nguyenlieuphachecasa.com/products/..."
                     value={linkUrl}
                     onChange={(e) => setLinkUrl(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none focus:border-blue-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-300 mb-1">Văn bản hiển thị:</label>
+                  <label className="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Văn bản hiển thị:</label>
                   <input
                     type="text"
                     placeholder="Chữ hiển thị thay cho link..."
                     value={linkText}
                     onChange={(e) => setLinkText(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0A100C] border border-[#273B2E] text-white text-xs outline-none focus:border-blue-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0A100C] border border-gray-300 dark:border-[#273B2E] text-gray-900 dark:text-white text-xs outline-none focus:border-blue-400 shadow-2xs"
                   />
                 </div>
 
@@ -2281,9 +2338,9 @@ export default function ArticleStudioEditor({
                     type="checkbox"
                     checked={linkNewTab}
                     onChange={(e) => setLinkNewTab(e.target.checked)}
-                    className="w-4 h-4 text-emerald-600 rounded bg-[#0A100C] border-[#273B2E]"
+                    className="w-4 h-4 text-emerald-600 rounded bg-white dark:bg-[#0A100C] border-gray-300 dark:border-[#273B2E]"
                   />
-                  <span className="text-xs text-gray-300">Mở trong tab mới (target="_blank")</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">Mở trong tab mới (target="_blank")</span>
                 </label>
               </div>
 
@@ -2291,7 +2348,7 @@ export default function ArticleStudioEditor({
                 <button
                   type="button"
                   onClick={() => setLinkModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#17231B] text-gray-300 hover:text-white font-semibold cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-gray-100 dark:bg-[#17231B] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:text-white font-semibold cursor-pointer border border-gray-300 dark:border-transparent"
                 >
                   Hủy
                 </button>
@@ -2319,26 +2376,26 @@ export default function ArticleStudioEditor({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="bg-[#0B130E] border border-white/10 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-10 space-y-6 text-gray-100"
+              className="bg-[#FAF9F5] dark:bg-[#0B130E] border border-gray-200 dark:border-white/10 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-10 space-y-6 text-gray-900 dark:text-gray-100"
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">
                   <Eye className="w-5 h-5 text-emerald-400" />
-                  <span className="font-bold text-sm text-white">Xem trước bố cục thực tế trên Website</span>
+                  <span className="font-bold text-sm text-gray-900 dark:text-white">Xem trước bố cục thực tế trên Website</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
-                  className="p-1 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                  className="p-1 rounded-xl bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-700 dark:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Language Switcher in Preview Modal */}
-              <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111A14] p-3 rounded-2xl border border-white/5">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#111A14] p-3 rounded-2xl border border-gray-200 dark:border-white/5 shadow-xs">
                 <span className="text-xs font-semibold text-gray-400">Xem trước theo ngôn ngữ:</span>
-                <div className="flex items-center gap-1.5 bg-[#080E0A] p-1 rounded-xl border border-white/10">
+                <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-[#080E0A] p-1 rounded-xl border border-gray-200 dark:border-white/10">
                   <button
                     type="button"
                     onClick={() => setPreviewLang('vi')}
@@ -2398,11 +2455,11 @@ export default function ArticleStudioEditor({
                       <span className="inline-block px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-800/40">
                         {newsFormData.categoryName || newsFormData.category || 'Tin tức'}
                       </span>
-                      <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
                         {previewTitle}
                       </h1>
                       <div className="flex items-center gap-4 text-xs text-gray-400">
-                        <span>Tác giả: <strong className="text-gray-200">{newsFormData.author || 'CASA R&D Team'}</strong></span>
+                        <span>Tác giả: <strong className="text-gray-800 dark:text-gray-200">{newsFormData.author || 'CASA R&D Team'}</strong></span>
                         <span>•</span>
                         <span>{newsFormData.date || 'Hôm nay'}</span>
                         <span>•</span>
@@ -2419,14 +2476,14 @@ export default function ArticleStudioEditor({
 
                     {/* Tóm tắt */}
                     {previewExcerpt && (
-                      <p className="text-base sm:text-lg font-medium text-gray-300 italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed">
+                      <p className="text-base sm:text-lg font-medium text-gray-700 dark:text-gray-300 italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed">
                         {previewExcerpt}
                       </p>
                     )}
 
                     {/* Nội dung bài viết */}
                     <div
-                      className="article-content prose prose-invert max-w-none text-gray-200 leading-relaxed space-y-4 text-base"
+                      className="article-content prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed space-y-4 text-base"
                       dangerouslySetInnerHTML={{ __html: previewContent }}
                     />
                   </>
@@ -2435,10 +2492,10 @@ export default function ArticleStudioEditor({
 
               {/* Hộp công thức nếu có */}
               {newsFormData.recipeBox && (
-                <div className="p-6 rounded-3xl bg-[#142017] border-2 border-emerald-600/40 space-y-4">
+                <div className="p-6 rounded-3xl bg-white dark:bg-[#142017] border border-gray-200 dark:border-emerald-600/40 shadow-md space-y-4">
                   <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
                     <ChefHat className="w-5 h-5 text-amber-400" />
-                    <h3 className="font-bold text-white text-base">{newsFormData.recipeBox.title || 'Công Thức Barista SOP'}</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base">{newsFormData.recipeBox.title || 'Công Thức Barista SOP'}</h3>
                     {newsFormData.recipeBox.cost && (
                       <span className="ml-auto px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                         Giá vốn: {newsFormData.recipeBox.cost}
@@ -2448,7 +2505,7 @@ export default function ArticleStudioEditor({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
                       <span className="font-bold text-emerald-400 block mb-1">Nguyên liệu:</span>
-                      <ul className="list-disc pl-4 space-y-1 text-gray-300">
+                      <ul className="list-disc pl-4 space-y-1 text-gray-700 dark:text-gray-300">
                         {(newsFormData.recipeBox.ingredients || []).map((ing, i) => (
                           <li key={i}>{ing}</li>
                         ))}
@@ -2456,7 +2513,7 @@ export default function ArticleStudioEditor({
                     </div>
                     <div>
                       <span className="font-bold text-emerald-400 block mb-1">Các bước thực hiện:</span>
-                      <ol className="list-decimal pl-4 space-y-1 text-gray-300">
+                      <ol className="list-decimal pl-4 space-y-1 text-gray-700 dark:text-gray-300">
                         {(newsFormData.recipeBox.steps || []).map((st, i) => (
                           <li key={i}>{st}</li>
                         ))}

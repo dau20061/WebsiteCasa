@@ -400,67 +400,22 @@ export async function deleteContact(contactId) {
 // ============================================================================
 // USERS
 // ============================================================================
-export async function getUsers() {
-  try {
-    const [snapUsers, snapUser] = await Promise.all([
-      get(ref(rtdb, 'users')).catch(() => null),
-      get(ref(rtdb, 'user')).catch(() => null),
-    ]);
-    const map = {};
-    if (snapUsers && snapUsers.exists()) {
-      const val = snapUsers.val();
-      Object.keys(val).forEach((k) => { map[k] = { id: k, uid: k, ...val[k] }; });
-    }
-    if (snapUser && snapUser.exists()) {
-      const val = snapUser.val();
-      Object.keys(val).forEach((k) => { map[k] = { ...(map[k] || {}), id: k, uid: k, ...val[k] }; });
-    }
-    const list = Object.values(map);
-    if (list.length > 0) return list;
-  } catch (_) {}
-
-  const [dataUsers, dataUser] = await Promise.all([
-    restRtdb('users').catch(() => null),
-    restRtdb('user').catch(() => null),
-  ]);
-  const map = {};
-  if (dataUsers && typeof dataUsers === 'object') {
-    Object.keys(dataUsers).forEach((k) => { map[k] = { id: k, uid: k, ...dataUsers[k] }; });
-  }
-  if (dataUser && typeof dataUser === 'object') {
-    Object.keys(dataUser).forEach((k) => { map[k] = { ...(map[k] || {}), id: k, uid: k, ...dataUser[k] }; });
-  }
-  return Object.values(map);
-}
-
 export async function saveUser(user) {
-  const cleanUid = user.uid || user.id || `user_${Date.now()}`;
-  const record = { ...user, uid: cleanUid, id: cleanUid, updatedAt: new Date().toISOString() };
+  const cleanUid = user.uid || `user_${Date.now()}`;
+  const record = { ...user, uid: cleanUid, updatedAt: new Date().toISOString() };
   try {
-    await Promise.allSettled([
-      set(ref(rtdb, `users/${cleanUid}`), record),
-      set(ref(rtdb, `user/${cleanUid}`), record),
-    ]);
+    await set(ref(rtdb, `users/${cleanUid}`), record);
   } catch (_) {
-    await Promise.allSettled([
-      restRtdb(`users/${cleanUid}`, 'PUT', record),
-      restRtdb(`user/${cleanUid}`, 'PUT', record),
-    ]);
+    await restRtdb(`users/${cleanUid}`, 'PUT', record);
   }
   return record;
 }
 
 export async function deleteUser(uid) {
   try {
-    await Promise.allSettled([
-      remove(ref(rtdb, `users/${uid}`)),
-      remove(ref(rtdb, `user/${uid}`)),
-    ]);
+    await remove(ref(rtdb, `users/${uid}`));
   } catch (_) {
-    await Promise.allSettled([
-      restRtdb(`users/${uid}`, 'DELETE'),
-      restRtdb(`user/${uid}`, 'DELETE'),
-    ]);
+    await restRtdb(`users/${uid}`, 'DELETE');
   }
   return { success: true, uid };
 }

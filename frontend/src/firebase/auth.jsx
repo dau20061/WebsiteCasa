@@ -32,19 +32,15 @@ export async function loginWithEmail(email, password) {
 
         // Fallback qua REST API trực tiếp nếu SDK chưa kết nối xong
         try {
-          const res = await fetch(`https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app/${nodeName}.json?_t=${Date.now()}`);
+          const res = await fetch(`https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app/${nodeName}.json`);
           if (res.ok) return await res.json();
         } catch (_) {}
 
         return null;
       };
 
-      // Tải và hợp nhất cả 2 node "user" và "users" để luôn tìm thấy tài khoản
-      const [nodeUser, nodeUsers] = await Promise.all([
-        fetchRtdbNode('user'),
-        fetchRtdbNode('users')
-      ]);
-      const usersData = { ...(nodeUsers || {}), ...(nodeUser || {}) };
+      // Thử cả 2 node "user" (số ít như trên hình) và "users" (số nhiều)
+      const usersData = (await fetchRtdbNode('user')) || (await fetchRtdbNode('users'));
 
       if (usersData) {
         // Tìm user có email khớp (hỗ trợ cả admin@casate.com và admin@casatea...)
@@ -139,7 +135,7 @@ export async function getUserProfile(uid) {
 
       // Fallback REST
       try {
-        const res = await fetch(`https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app/${nodeName}.json?_t=${Date.now()}`);
+        const res = await fetch(`https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app/${nodeName}.json`);
         if (res.ok) {
           const val = await res.json();
           if (val && val[uid]) return val[uid];
