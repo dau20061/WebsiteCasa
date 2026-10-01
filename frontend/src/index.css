@@ -34,16 +34,16 @@
     color: #f3f4f6;
   }
 
-  /* Any input/textarea/select in light containers or Admin Portal ALWAYS has dark text (except Article Studio) */
-  input.bg-white,
-  textarea.bg-white,
-  select.bg-white,
-  .bg-white input,
-  .bg-white textarea,
-  .bg-white select,
-  .admin-portal:not(.article-studio-root) input:not(.article-studio-root input),
-  .admin-portal:not(.article-studio-root) textarea:not(.article-studio-root textarea),
-  .admin-portal:not(.article-studio-root) select:not(.article-studio-root select) {
+  /* Any input/textarea/select in light containers or Admin Portal ALWAYS has dark text (except in Dark Mode or Article Studio) */
+  body:not(.dark) input.bg-white,
+  body:not(.dark) textarea.bg-white,
+  body:not(.dark) select.bg-white,
+  :not(.dark):not(.article-studio-root) .bg-white:not(.dark *) input:not(.article-studio-root *),
+  :not(.dark):not(.article-studio-root) .bg-white:not(.dark *) textarea:not(.article-studio-root *),
+  :not(.dark):not(.article-studio-root) .bg-white:not(.dark *) select:not(.article-studio-root *),
+  .admin-portal:not(.article-studio-root):not(.dark *) input:not(.article-studio-root *),
+  .admin-portal:not(.article-studio-root):not(.dark *) textarea:not(.article-studio-root *),
+  .admin-portal:not(.article-studio-root):not(.dark *) select:not(.article-studio-root *) {
     color: #111827 !important;
   }
 
@@ -687,4 +687,40 @@
 .dark .article-content [class*="bg-[#FAF9F5]"] .text-gray-600 {
   color: #4B5563 !important;
   -webkit-text-fill-color: #4B5563 !important;
+}
+
+/* ==========================================================================
+   Article Studio: Absolute Priority Text Visibility & Code Editor Theme
+   ========================================================================== */
+.article-studio-root textarea.html-code-editor,
+.article-studio-root .html-code-editor,
+.admin-portal .article-studio-root textarea.html-code-editor,
+.admin-portal .article-studio-root .html-code-editor {
+  color: #34D399 !important;
+  -webkit-text-fill-color: #34D399 !important;
+  background-color: #070D09 !important;
+  caret-color: #34D399 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+.article-studio-root:not(.theme-light) input,
+.article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
+.article-studio-root:not(.theme-light) select,
+.admin-portal .article-studio-root:not(.theme-light) input,
+.admin-portal .article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
+.admin-portal .article-studio-root:not(.theme-light) select,
+.article-studio-root:not(.theme-light) .bg-white input,
+.article-studio-root:not(.theme-light) .bg-white textarea:not(.html-code-editor) {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.article-studio-root.theme-light input,
+.article-studio-root.theme-light textarea:not(.html-code-editor),
+.article-studio-root.theme-light select,
+.admin-portal .article-studio-root.theme-light input,
+.admin-portal .article-studio-root.theme-light textarea:not(.html-code-editor),
+.admin-portal .article-studio-root.theme-light select {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
 }

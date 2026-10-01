@@ -1351,8 +1351,9 @@ export default function AdminDashboard() {
       }
     }
 
-    const cleanArticleSlug = slugify(finalData.title) || editingNews?.slug || '';
+    const cleanArticleSlug = (finalData.slug && finalData.slug.trim()) || slugify(finalData.title) || editingNews?.slug || '';
     const targetArticleSlug = cleanArticleSlug || editingNews?.slug || editingNews?.id || `news_${Date.now()}`;
+    finalData.slug = targetArticleSlug;
 
     // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
     if (finalData.image && finalData.image.startsWith('data:image/')) {

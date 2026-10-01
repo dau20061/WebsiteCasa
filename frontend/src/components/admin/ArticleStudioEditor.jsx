@@ -43,7 +43,8 @@ import {
   Table,
   Minus,
   Sun,
-  Moon
+  Moon,
+  RefreshCw
 } from 'lucide-react';
 import { optimizeImageToDataUrl } from '../../services/storageService';
 import { slugify } from '../../utils/slugify';
@@ -187,6 +188,13 @@ export default function ArticleStudioEditor({
   const [activeLanguageTab, setActiveLanguageTab] = useState('vi');
   const [previewLang, setPreviewLang] = useState('vi');
   const [previewTheme, setPreviewTheme] = useState('light');
+
+  // Tự động khởi tạo Slug nếu có Title mà chưa có Slug
+  useEffect(() => {
+    if (newsFormData?.title && !newsFormData?.slug) {
+      setNewsFormData((prev) => ({ ...prev, slug: slugify(prev.title) }));
+    }
+  }, [newsFormData?.title, newsFormData?.slug]);
 
   // Lấy nội dung theo ngôn ngữ đang chọn
   const getCurrentContent = () => {
@@ -593,13 +601,27 @@ export default function ArticleStudioEditor({
       <style>{`
         /* Force crisp white text on all inputs, textareas, selects */
         .article-studio-root:not(.theme-light) input,
-        .article-studio-root:not(.theme-light) textarea,
+        .article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
         .article-studio-root:not(.theme-light) select,
         .admin-portal .article-studio-root:not(.theme-light) input,
-        .admin-portal .article-studio-root:not(.theme-light) textarea,
-        .admin-portal .article-studio-root:not(.theme-light) select {
+        .admin-portal .article-studio-root:not(.theme-light) textarea:not(.html-code-editor),
+        .admin-portal .article-studio-root:not(.theme-light) select,
+        .article-studio-root:not(.theme-light) .bg-white input,
+        .article-studio-root:not(.theme-light) .bg-white textarea:not(.html-code-editor) {
           color: #FFFFFF !important;
           -webkit-text-fill-color: #FFFFFF !important;
+        }
+
+        /* HTML Code Editor specifically */
+        .article-studio-root textarea.html-code-editor,
+        .article-studio-root .html-code-editor,
+        .admin-portal .article-studio-root textarea.html-code-editor,
+        .admin-portal .article-studio-root .html-code-editor {
+          color: #34D399 !important;
+          -webkit-text-fill-color: #34D399 !important;
+          background-color: #070D09 !important;
+          caret-color: #34D399 !important;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
         }
         .article-studio-root:not(.theme-light) input::placeholder,
         .article-studio-root:not(.theme-light) textarea::placeholder,
@@ -1006,7 +1028,7 @@ export default function ArticleStudioEditor({
                       setNewsFormData({
                         ...newsFormData,
                         title: val,
-                        slug: newsFormData.slug || slugify(val)
+                        slug: slugify(val)
                       });
                     } else if (activeLanguageTab === 'zh') {
                       setNewsFormData({
@@ -1020,23 +1042,42 @@ export default function ArticleStudioEditor({
                       });
                     }
                   }}
-                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                  style={{ color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
                   className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
                 />
                 
                 {/* Đường dẫn Slug URL */}
-                <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
-                  <span className="text-gray-500">Đường dẫn:</span>
-                  <span className="text-emerald-400 font-mono text-[11px]">
-                    https://nguyenlieuphachecasa.com/news/
-                    <input
-                      type="text"
-                      value={newsFormData.slug || ''}
-                      onChange={(e) => setNewsFormData({ ...newsFormData, slug: slugify(e.target.value) })}
-                      placeholder="duong-dan-bai-viet"
-                      className="bg-transparent text-emerald-400 font-mono text-[11px] border-b border-dashed border-emerald-500/50 outline-none px-1"
-                    />
-                  </span>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 pt-1">
+                  <span className="text-gray-500 font-semibold">Đường dẫn (Slug URL):</span>
+                  <div className="flex items-center gap-2 flex-1 min-w-[260px]">
+                    <span className="text-emerald-400 font-mono text-[11px] flex items-center gap-1 flex-1">
+                      <span className="text-gray-500 hidden sm:inline">https://nguyenlieuphachecasa.com/news/</span>
+                      <input
+                        type="text"
+                        value={newsFormData.slug || ''}
+                        onChange={(e) => setNewsFormData({ ...newsFormData, slug: slugify(e.target.value) })}
+                        placeholder="duong-dan-bai-viet"
+                        className="bg-transparent text-emerald-400 font-mono text-[11px] border-b border-dashed border-emerald-500/50 outline-none px-1 flex-1 min-w-[150px]"
+                        style={{ color: '#34D399', WebkitTextFillColor: '#34D399' }}
+                      />
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const titleToUse = newsFormData.title || '';
+                        const generated = slugify(titleToUse);
+                        setNewsFormData((prev) => ({ ...prev, slug: generated }));
+                        if (showToast) {
+                          showToast(`Đã đồng bộ Slug: ${generated}`, 'success');
+                        }
+                      }}
+                      title="Tự động đồng bộ Slug theo tiêu đề bài viết"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1 shadow-2xs"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      <span>Tạo theo tiêu đề</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1367,11 +1408,12 @@ export default function ArticleStudioEditor({
                         : "Bắt đầu viết nội dung bài viết... (Bạn có thể gõ trực tiếp, bôi đen để định dạng và bấm 'Thêm ảnh' để chèn hình minh họa vào từng đoạn)"
                     }
                     className="article-content wysiwyg-canvas p-6 sm:p-10 min-h-[550px] max-h-[800px] overflow-y-auto bg-white dark:bg-[#0B120E] text-gray-900 dark:text-gray-100 text-base leading-relaxed outline-none focus:ring-0 space-y-4 shadow-inner/5"
-                    style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                    style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
                   />
                 ) : (
                   <textarea
                     rows={20}
+                    spellCheck={false}
                     value={
                       activeLanguageTab === 'zh'
                         ? (newsFormData.contentZh || '')
@@ -1389,7 +1431,13 @@ export default function ArticleStudioEditor({
                       }
                     }}
                     placeholder={`Mã HTML bài viết (${activeLanguageTab === 'zh' ? '繁體中文' : activeLanguageTab === 'en' ? 'English' : 'Tiếng Việt'})...`}
-                    className="w-full p-6 bg-gray-900 text-emerald-400 font-mono text-xs leading-relaxed outline-none resize-y min-h-[550px]"
+                    className="w-full p-6 bg-[#070D09] text-emerald-400 font-mono text-xs leading-relaxed outline-none resize-y min-h-[550px] html-code-editor border border-emerald-900/40"
+                    style={{
+                      color: '#34D399',
+                      WebkitTextFillColor: '#34D399',
+                      backgroundColor: '#070D09',
+                      caretColor: '#34D399'
+                    }}
                   />
                 )}
 
@@ -1437,7 +1485,7 @@ export default function ArticleStudioEditor({
                       setNewsFormData({ ...newsFormData, excerpt: e.target.value });
                     }
                   }}
-                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                  style={{ color: isDark ? '#FFFFFF' : '#111827', WebkitTextFillColor: isDark ? '#FFFFFF' : '#111827' }}
                   className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#090F0B] border border-gray-300 dark:border-[#26382B] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm leading-relaxed outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none shadow-2xs"
                 />
               </div>
