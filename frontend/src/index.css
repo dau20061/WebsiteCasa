@@ -34,16 +34,16 @@
     color: #f3f4f6;
   }
 
-  /* Any input/textarea/select in light containers or Admin Portal ALWAYS has dark text */
+  /* Any input/textarea/select in light containers or Admin Portal ALWAYS has dark text (except Article Studio) */
   input.bg-white,
   textarea.bg-white,
   select.bg-white,
   .bg-white input,
   .bg-white textarea,
   .bg-white select,
-  .admin-portal input,
-  .admin-portal textarea,
-  .admin-portal select {
+  .admin-portal:not(.article-studio-root) input:not(.article-studio-root input),
+  .admin-portal:not(.article-studio-root) textarea:not(.article-studio-root textarea),
+  .admin-portal:not(.article-studio-root) select:not(.article-studio-root select) {
     color: #111827 !important;
   }
 
@@ -65,7 +65,7 @@
   }
   select.bg-white option,
   .bg-white select option,
-  .admin-portal select option {
+  .admin-portal:not(.article-studio-root) select:not(.article-studio-root select) option {
     background-color: #ffffff !important;
     color: #111827 !important;
   }
@@ -344,5 +344,76 @@
   }
 }
 
+/* ==========================================================================
+   Article Studio Editor: Guaranteed Pure White Text for High Contrast
+   ========================================================================== */
+.article-studio-root input,
+.article-studio-root textarea,
+.article-studio-root select,
+.admin-portal .article-studio-root input,
+.admin-portal .article-studio-root textarea,
+.admin-portal .article-studio-root select {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
 
+.article-studio-root input::placeholder,
+.article-studio-root textarea::placeholder,
+.admin-portal .article-studio-root input::placeholder,
+.admin-portal .article-studio-root textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+  opacity: 1 !important;
+}
 
+.article-studio-root select option,
+.admin-portal .article-studio-root select option {
+  background-color: #121C15 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.article-studio-root .wysiwyg-canvas,
+.article-studio-root .wysiwyg-canvas *,
+.article-studio-root .wysiwyg-canvas p,
+.article-studio-root .wysiwyg-canvas div,
+.article-studio-root .wysiwyg-canvas span,
+.article-studio-root .wysiwyg-canvas li,
+.article-studio-root .wysiwyg-canvas td,
+.article-studio-root .wysiwyg-canvas th {
+  color: #F8FAFC !important;
+  -webkit-text-fill-color: #F8FAFC !important;
+}
+
+.article-studio-root .wysiwyg-canvas h1,
+.article-studio-root .wysiwyg-canvas h2,
+.article-studio-root .wysiwyg-canvas h3,
+.article-studio-root .wysiwyg-canvas h4,
+.article-studio-root .wysiwyg-canvas h5,
+.article-studio-root .wysiwyg-canvas h6,
+.article-studio-root .wysiwyg-canvas strong,
+.article-studio-root .wysiwyg-canvas b {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.article-studio-root .wysiwyg-canvas a {
+  color: #38BDF8 !important;
+  -webkit-text-fill-color: #38BDF8 !important;
+  text-decoration: underline !important;
+}
+
+.article-studio-root .wysiwyg-canvas blockquote {
+  border-left-color: #10B981 !important;
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
+}
+
+.article-studio-root .wysiwyg-canvas:empty:before,
+.article-studio-root .wysiwyg-canvas[data-placeholder]:empty:before {
+  content: attr(data-placeholder) !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+  font-style: italic !important;
+  display: block !important;
+}
