@@ -599,6 +599,16 @@ export default function ArticleStudioEditor({
   return (
     <div className={`fixed inset-0 z-50 overflow-hidden flex flex-col font-sans transition-colors duration-200 article-studio-root ${isDark ? "dark bg-[#0A100C] text-gray-100 theme-dark" : "bg-[#F6F8F7] text-gray-900 theme-light"}`}>
       <style>{`
+        /* Force color-scheme: dark so Chromium/Windows never uses black OS brushes */
+        .article-studio-root,
+        .article-studio-root *,
+        .article-studio-root input,
+        .article-studio-root textarea,
+        .article-studio-root select,
+        .article-studio-root select option {
+          color-scheme: dark !important;
+        }
+
         /* Force crisp pure white text on EVERYTHING in Article Studio */
         .article-studio-root,
         .article-studio-root input,
@@ -620,10 +630,12 @@ export default function ArticleStudioEditor({
 
         .article-studio-root input::placeholder,
         .article-studio-root textarea::placeholder,
+        .article-studio-root input::-webkit-input-placeholder,
+        .article-studio-root textarea::-webkit-input-placeholder,
         .admin-portal .article-studio-root input::placeholder,
         .admin-portal .article-studio-root textarea::placeholder {
-          color: rgba(255, 255, 255, 0.45) !important;
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+          color: #D1D5DB !important;
+          -webkit-text-fill-color: #D1D5DB !important;
           opacity: 1 !important;
         }
 
@@ -634,12 +646,13 @@ export default function ArticleStudioEditor({
           background-color: #0E1611 !important;
           color: #FFFFFF !important;
           -webkit-text-fill-color: #FFFFFF !important;
+          color-scheme: dark !important;
         }
 
         .wysiwyg-canvas[contenteditable]:empty:before {
           content: attr(data-placeholder) !important;
-          color: rgba(255, 255, 255, 0.45) !important;
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+          color: #9CA3AF !important;
+          -webkit-text-fill-color: #9CA3AF !important;
           pointer-events: none;
           display: block;
           font-style: italic;
@@ -1030,8 +1043,8 @@ export default function ArticleStudioEditor({
                       });
                     }
                   }}
-                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
-                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder-gray-500 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
+                  style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B', colorScheme: 'dark' }}
+                  className="w-full px-4 py-3 rounded-xl bg-[#090F0B] border border-[#26382B] text-white placeholder:text-gray-300 text-lg sm:text-xl font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-2xs"
                 />
                 
                 {/* Đường dẫn Slug URL */}
@@ -1072,49 +1085,49 @@ export default function ArticleStudioEditor({
               {/* 2. Trình soạn thảo Rich Text Editor (Word-like WYSIWYG) */}
               <div className="rounded-2xl bg-[#111A13] border border-[#223326] shadow-sm overflow-hidden">
                 {/* Thanh công cụ Toolbar giống Word */}
-                <div className="sticky top-0 z-10 p-2 sm:p-2.5 bg-gray-50/95 dark:bg-[#141F17] border-b border-gray-200 dark:border-[#223326] flex flex-wrap items-center gap-1 text-xs select-none text-gray-700 dark:text-gray-300 backdrop-blur-sm">
+                <div className="sticky top-0 z-10 p-2 sm:p-2.5 bg-[#141F17] border-b border-[#223326] flex flex-wrap items-center gap-1 text-xs select-none text-white backdrop-blur-sm">
                   
                   {/* Dropdown Định dạng khối (Paragraph / Headings) */}
                   <select
                     onChange={(e) => execCmd('formatBlock', e.target.value)}
-                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
+                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611', colorScheme: 'dark' }}
                     className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer shadow-2xs"
                     defaultValue="p"
                   >
-                    <option value="p">Paragraph</option>
-                    <option value="h1">Tiêu đề 1 (H1)</option>
-                    <option value="h2">Tiêu đề 2 (H2)</option>
-                    <option value="h3">Tiêu đề 3 (H3)</option>
-                    <option value="h4">Tiêu đề 4 (H4)</option>
-                    <option value="blockquote">Trích dẫn (Quote)</option>
+                    <option value="p" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Paragraph</option>
+                    <option value="h1" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Tiêu đề 1 (H1)</option>
+                    <option value="h2" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Tiêu đề 2 (H2)</option>
+                    <option value="h3" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Tiêu đề 3 (H3)</option>
+                    <option value="h4" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Tiêu đề 4 (H4)</option>
+                    <option value="blockquote" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Trích dẫn (Quote)</option>
                   </select>
 
                   {/* Dropdown Phông chữ */}
                   <select
                     onChange={(e) => execCmd('fontName', e.target.value)}
-                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
+                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611', colorScheme: 'dark' }}
                     className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden sm:block shadow-2xs"
                     defaultValue="Montserrat, sans-serif"
                   >
-                    <option value="Montserrat, sans-serif">Mặc định</option>
-                    <option value="Arial, sans-serif">Arial</option>
-                    <option value="Times New Roman, serif">Times New Roman</option>
-                    <option value="Georgia, serif">Georgia</option>
-                    <option value="Courier New, monospace">Monospace</option>
+                    <option value="Montserrat, sans-serif" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Mặc định</option>
+                    <option value="Arial, sans-serif" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Arial</option>
+                    <option value="Times New Roman, serif" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Times New Roman</option>
+                    <option value="Georgia, serif" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Georgia</option>
+                    <option value="Courier New, monospace" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>Monospace</option>
                   </select>
 
                   {/* Dropdown Cỡ chữ */}
                   <select
                     onChange={(e) => execCmd('fontSize', e.target.value)}
-                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611' }}
+                    style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#0E1611', colorScheme: 'dark' }}
                     className="h-8 px-2 rounded-lg bg-[#0E1611] text-white border border-[#273B2E] text-xs font-semibold outline-none hover:border-emerald-500/50 cursor-pointer hidden md:block shadow-2xs"
                     defaultValue="3"
                   >
-                    <option value="2">13px</option>
-                    <option value="3">15px</option>
-                    <option value="4">18px</option>
-                    <option value="5">24px</option>
-                    <option value="6">32px</option>
+                    <option value="2" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>13px</option>
+                    <option value="3" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>15px</option>
+                    <option value="4" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>18px</option>
+                    <option value="5" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>24px</option>
+                    <option value="6" style={{ backgroundColor: '#0E1611', color: '#FFFFFF' }}>32px</option>
                   </select>
 
                   <div className="w-px h-5 bg-white/10 mx-0.5" />

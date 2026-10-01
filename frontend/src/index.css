@@ -689,6 +689,15 @@
    ALWAYS have crisp, pure white (#FFFFFF) text in Article Studio.
    ========================================================================== */
 .article-studio-root,
+.article-studio-root *,
+.article-studio-root input,
+.article-studio-root textarea,
+.article-studio-root select,
+.article-studio-root select option {
+  color-scheme: dark !important;
+}
+
+.article-studio-root,
 .article-studio-root input,
 .article-studio-root textarea,
 .article-studio-root select,
@@ -719,10 +728,13 @@
 
 .article-studio-root input::placeholder,
 .article-studio-root textarea::placeholder,
+.article-studio-root input::-webkit-input-placeholder,
+.article-studio-root textarea::-webkit-input-placeholder,
 .admin-portal .article-studio-root input::placeholder,
 .admin-portal .article-studio-root textarea::placeholder {
-  color: rgba(255, 255, 255, 0.45) !important;
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+  color: #D1D5DB !important;
+  -webkit-text-fill-color: #D1D5DB !important;
+  opacity: 1 !important;
 }
 
 .article-studio-root select,
@@ -732,6 +744,7 @@
   background-color: #0E1611 !important;
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
+  color-scheme: dark !important;
 }
 
 /* Maintain light mode inside preview modal if toggled to Website Sáng */
