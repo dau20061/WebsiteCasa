@@ -417,3 +417,274 @@
   font-style: italic !important;
   display: block !important;
 }
+
+/* ==========================================================================
+   Article Content Contrast Protection & Preview Theme Support:
+   Guarantees that ANY white or light background container ALWAYS renders crisp,
+   readable dark text, preventing white-on-white text in preview or dark mode.
+   ========================================================================== */
+
+/* Scoped rules for Preview Modal in Light Mode */
+.preview-theme-light,
+.article-studio-root .preview-theme-light {
+  background-color: #FAF9F5 !important;
+  color: #1F2937 !important;
+}
+
+.preview-theme-light .article-content,
+.preview-theme-light .prose {
+  color: #374151 !important;
+}
+
+.preview-theme-light .article-content h1,
+.preview-theme-light .article-content h2,
+.preview-theme-light .article-content h3,
+.preview-theme-light .article-content h4,
+.preview-theme-light .article-content h5,
+.preview-theme-light .article-content h6,
+.preview-theme-light .article-content strong,
+.preview-theme-light .article-content b,
+.preview-theme-light .prose h1,
+.preview-theme-light .prose h2,
+.preview-theme-light .prose h3,
+.preview-theme-light .prose h4,
+.preview-theme-light .prose h5,
+.preview-theme-light .prose h6 {
+  color: #0E2218 !important;
+  -webkit-text-fill-color: #0E2218 !important;
+}
+
+.preview-theme-light .article-content p,
+.preview-theme-light .article-content li,
+.preview-theme-light .prose p,
+.preview-theme-light .prose li {
+  color: #374151 !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+.preview-theme-light .article-content .text-tea-dark {
+  color: #0E2218 !important;
+  -webkit-text-fill-color: #0E2218 !important;
+}
+
+.preview-theme-light .article-content .text-gray-600,
+.preview-theme-light .article-content .text-gray-700,
+.preview-theme-light .article-content .text-gray-800,
+.preview-theme-light .prose .text-gray-600,
+.preview-theme-light .prose .text-gray-700,
+.preview-theme-light .prose .text-gray-800 {
+  color: #4B5563 !important;
+  -webkit-text-fill-color: #4B5563 !important;
+}
+
+/* Light Containers Protection (both in dark mode & preview modal) */
+.article-content [class*="bg-white"],
+.article-content [class*="bg-gray-50"],
+.article-content [class*="bg-gray-100"],
+.article-content [class*="bg-amber-50"],
+.article-content [class*="bg-emerald-50"],
+.article-content [class*="bg-blue-50"],
+.article-content [class*="bg-purple-50"],
+.article-content [class*="bg-tea-mist"],
+.article-content [class*="bg-tea-soft"],
+.article-content [class*="bg-[#FAF9F5]"],
+.article-content [class*="bg-[#faf9f5]"],
+.article-content [class*="bg-[#EEF8F1]"],
+.article-content [class*="bg-[#eef8f1]"],
+.article-content [style*="background: white"],
+.article-content [style*="background-color: white"],
+.article-content [style*="background: rgb(255"],
+.article-content [style*="background-color: rgb(255"],
+.article-content [style*="background: #fff"],
+.article-content [style*="background-color: #fff"],
+.article-content [style*="background:#fff"],
+.article-content [style*="background-color:#fff"],
+.dark .article-content [class*="bg-white"],
+.dark .article-content [class*="bg-gray-50"],
+.dark .article-content [class*="bg-gray-100"],
+.dark .article-content [class*="bg-amber-50"],
+.dark .article-content [class*="bg-emerald-50"],
+.dark .article-content [class*="bg-blue-50"],
+.dark .article-content [class*="bg-purple-50"],
+.dark .article-content [class*="bg-tea-mist"],
+.dark .article-content [class*="bg-tea-soft"],
+.dark .article-content [class*="bg-[#FAF9F5]"],
+.dark .article-content [class*="bg-[#faf9f5]"],
+.dark .article-content [class*="bg-[#EEF8F1]"],
+.dark .article-content [class*="bg-[#eef8f1]"],
+.dark .article-content [style*="background: white"],
+.dark .article-content [style*="background-color: white"],
+.dark .article-content [style*="background: rgb(255"],
+.dark .article-content [style*="background-color: rgb(255"],
+.dark .article-content [style*="background: #fff"],
+.dark .article-content [style*="background-color: #fff"],
+.dark .article-content [style*="background:#fff"],
+.dark .article-content [style*="background-color:#fff"] {
+  color: #1F2937 !important;
+  -webkit-text-fill-color: #1F2937 !important;
+}
+
+/* Headings inside light containers */
+.article-content [class*="bg-white"] h1,
+.article-content [class*="bg-white"] h2,
+.article-content [class*="bg-white"] h3,
+.article-content [class*="bg-white"] h4,
+.article-content [class*="bg-white"] h5,
+.article-content [class*="bg-white"] h6,
+.article-content [class*="bg-white"] strong,
+.article-content [class*="bg-white"] b,
+.article-content [class*="bg-[#FAF9F5]"] h1,
+.article-content [class*="bg-[#FAF9F5]"] h2,
+.article-content [class*="bg-[#FAF9F5]"] h3,
+.article-content [class*="bg-[#FAF9F5]"] h4,
+.article-content [class*="bg-[#FAF9F5]"] h5,
+.article-content [class*="bg-[#FAF9F5]"] h6,
+.article-content [class*="bg-[#FAF9F5]"] strong,
+.article-content [class*="bg-[#FAF9F5]"] b,
+.article-content [class*="bg-[#EEF8F1]"] h1,
+.article-content [class*="bg-[#EEF8F1]"] h2,
+.article-content [class*="bg-[#EEF8F1]"] h3,
+.article-content [class*="bg-[#EEF8F1]"] h4,
+.article-content [class*="bg-[#EEF8F1]"] h5,
+.article-content [class*="bg-[#EEF8F1]"] h6,
+.article-content [class*="bg-[#EEF8F1]"] strong,
+.article-content [class*="bg-[#EEF8F1]"] b,
+.article-content [style*="background: white"] h1,
+.article-content [style*="background: white"] h2,
+.article-content [style*="background: white"] h3,
+.article-content [style*="background: white"] h4,
+.article-content [style*="background: white"] h5,
+.article-content [style*="background: white"] h6,
+.article-content [style*="background: white"] strong,
+.article-content [style*="background: white"] b,
+.article-content [style*="background-color: white"] h1,
+.article-content [style*="background-color: white"] h2,
+.article-content [style*="background-color: white"] h3,
+.article-content [style*="background-color: white"] h4,
+.article-content [style*="background-color: white"] h5,
+.article-content [style*="background-color: white"] h6,
+.article-content [style*="background-color: white"] strong,
+.article-content [style*="background-color: white"] b,
+.article-content [style*="background: #fff"] h1,
+.article-content [style*="background: #fff"] h2,
+.article-content [style*="background: #fff"] h3,
+.article-content [style*="background: #fff"] h4,
+.article-content [style*="background: #fff"] h5,
+.article-content [style*="background: #fff"] h6,
+.article-content [style*="background: #fff"] strong,
+.article-content [style*="background: #fff"] b,
+.article-content [style*="background-color: #fff"] h1,
+.article-content [style*="background-color: #fff"] h2,
+.article-content [style*="background-color: #fff"] h3,
+.article-content [style*="background-color: #fff"] h4,
+.article-content [style*="background-color: #fff"] h5,
+.article-content [style*="background-color: #fff"] h6,
+.article-content [style*="background-color: #fff"] strong,
+.article-content [style*="background-color: #fff"] b,
+.dark .article-content [class*="bg-white"] h1,
+.dark .article-content [class*="bg-white"] h2,
+.dark .article-content [class*="bg-white"] h3,
+.dark .article-content [class*="bg-white"] h4,
+.dark .article-content [class*="bg-white"] h5,
+.dark .article-content [class*="bg-white"] h6,
+.dark .article-content [class*="bg-white"] strong,
+.dark .article-content [class*="bg-white"] b,
+.dark .article-content [class*="bg-[#FAF9F5]"] h1,
+.dark .article-content [class*="bg-[#FAF9F5]"] h2,
+.dark .article-content [class*="bg-[#FAF9F5]"] h3,
+.dark .article-content [class*="bg-[#FAF9F5]"] h4,
+.dark .article-content [class*="bg-[#FAF9F5]"] h5,
+.dark .article-content [class*="bg-[#FAF9F5]"] h6,
+.dark .article-content [class*="bg-[#FAF9F5]"] strong,
+.dark .article-content [class*="bg-[#FAF9F5]"] b,
+.dark .article-content [class*="bg-[#EEF8F1]"] h1,
+.dark .article-content [class*="bg-[#EEF8F1]"] h2,
+.dark .article-content [class*="bg-[#EEF8F1]"] h3,
+.dark .article-content [class*="bg-[#EEF8F1]"] h4,
+.dark .article-content [class*="bg-[#EEF8F1]"] h5,
+.dark .article-content [class*="bg-[#EEF8F1]"] h6,
+.dark .article-content [class*="bg-[#EEF8F1]"] strong,
+.dark .article-content [class*="bg-[#EEF8F1]"] b,
+.dark .article-content [style*="background: white"] h1,
+.dark .article-content [style*="background: white"] h2,
+.dark .article-content [style*="background: white"] h3,
+.dark .article-content [style*="background: white"] h4,
+.dark .article-content [style*="background: white"] h5,
+.dark .article-content [style*="background: white"] h6,
+.dark .article-content [style*="background: white"] strong,
+.dark .article-content [style*="background: white"] b,
+.dark .article-content [style*="background-color: white"] h1,
+.dark .article-content [style*="background-color: white"] h2,
+.dark .article-content [style*="background-color: white"] h3,
+.dark .article-content [style*="background-color: white"] h4,
+.dark .article-content [style*="background-color: white"] h5,
+.dark .article-content [style*="background-color: white"] h6,
+.dark .article-content [style*="background-color: white"] strong,
+.dark .article-content [style*="background-color: white"] b,
+.dark .article-content [style*="background: #fff"] h1,
+.dark .article-content [style*="background: #fff"] h2,
+.dark .article-content [style*="background: #fff"] h3,
+.dark .article-content [style*="background: #fff"] h4,
+.dark .article-content [style*="background: #fff"] h5,
+.dark .article-content [style*="background: #fff"] h6,
+.dark .article-content [style*="background: #fff"] strong,
+.dark .article-content [style*="background: #fff"] b,
+.dark .article-content [style*="background-color: #fff"] h1,
+.dark .article-content [style*="background-color: #fff"] h2,
+.dark .article-content [style*="background-color: #fff"] h3,
+.dark .article-content [style*="background-color: #fff"] h4,
+.dark .article-content [style*="background-color: #fff"] h5,
+.dark .article-content [style*="background-color: #fff"] h6,
+.dark .article-content [style*="background-color: #fff"] strong,
+.dark .article-content [style*="background-color: #fff"] b {
+  color: #0E2218 !important;
+  -webkit-text-fill-color: #0E2218 !important;
+}
+
+/* Paragraphs & list items inside light containers */
+.article-content [class*="bg-white"] p,
+.article-content [class*="bg-white"] li,
+.article-content [class*="bg-white"] td,
+.article-content [class*="bg-white"] th,
+.article-content [class*="bg-[#FAF9F5]"] p,
+.article-content [class*="bg-[#FAF9F5]"] li,
+.article-content [class*="bg-[#EEF8F1]"] p,
+.article-content [class*="bg-[#EEF8F1]"] li,
+.article-content [style*="background: white"] p,
+.article-content [style*="background: white"] li,
+.article-content [style*="background-color: white"] p,
+.article-content [style*="background-color: white"] li,
+.article-content [style*="background: #fff"] p,
+.article-content [style*="background: #fff"] li,
+.article-content [style*="background-color: #fff"] p,
+.article-content [style*="background-color: #fff"] li,
+.dark .article-content [class*="bg-white"] p,
+.dark .article-content [class*="bg-white"] li,
+.dark .article-content [class*="bg-white"] td,
+.dark .article-content [class*="bg-white"] th,
+.dark .article-content [class*="bg-[#FAF9F5]"] p,
+.dark .article-content [class*="bg-[#FAF9F5]"] li,
+.dark .article-content [class*="bg-[#EEF8F1]"] p,
+.dark .article-content [class*="bg-[#EEF8F1]"] li,
+.dark .article-content [style*="background: white"] p,
+.dark .article-content [style*="background: white"] li,
+.dark .article-content [style*="background-color: white"] p,
+.dark .article-content [style*="background-color: white"] li,
+.dark .article-content [style*="background: #fff"] p,
+.dark .article-content [style*="background: #fff"] li,
+.dark .article-content [style*="background-color: #fff"] p,
+.dark .article-content [style*="background-color: #fff"] li {
+  color: #374151 !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+/* Muted / secondary text inside light containers */
+.article-content [class*="bg-white"] .text-gray-500,
+.article-content [class*="bg-white"] .text-gray-600,
+.dark .article-content [class*="bg-white"] .text-gray-500,
+.dark .article-content [class*="bg-white"] .text-gray-600,
+.dark .article-content [class*="bg-[#FAF9F5]"] .text-gray-500,
+.dark .article-content [class*="bg-[#FAF9F5]"] .text-gray-600 {
+  color: #4B5563 !important;
+  -webkit-text-fill-color: #4B5563 !important;
+}

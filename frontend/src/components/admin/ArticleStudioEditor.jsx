@@ -186,6 +186,7 @@ export default function ArticleStudioEditor({
   // Tab ngôn ngữ đang soạn thảo trực tiếp: 'vi' (Tiếng Việt) | 'zh' (繁體中文) | 'en' (English)
   const [activeLanguageTab, setActiveLanguageTab] = useState('vi');
   const [previewLang, setPreviewLang] = useState('vi');
+  const [previewTheme, setPreviewTheme] = useState('light');
 
   // Lấy nội dung theo ngôn ngữ đang chọn
   const getCurrentContent = () => {
@@ -2426,25 +2427,58 @@ export default function ArticleStudioEditor({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="bg-[#FAF9F5] dark:bg-[#0B130E] border border-gray-200 dark:border-white/10 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-10 space-y-6 text-gray-900 dark:text-gray-100"
+              className={`border rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-10 space-y-6 transition-colors ${
+                previewTheme === 'light'
+                  ? 'bg-[#FAF9F5] border-gray-200 text-gray-900 preview-theme-light'
+                  : 'bg-[#0B130E] border-white/10 text-gray-100 preview-theme-dark'
+              }`}
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4">
                 <div className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-emerald-400" />
-                  <span className="font-bold text-sm text-gray-900 dark:text-white">Xem trước bố cục thực tế trên Website</span>
+                  <Eye className="w-5 h-5 text-emerald-500" />
+                  <span className={`font-bold text-sm ${previewTheme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                    Xem trước bố cục thực tế trên Website
+                  </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
-                  className="p-1 rounded-xl bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-700 dark:text-white cursor-pointer"
+                  className={`p-1.5 rounded-xl cursor-pointer transition-colors ${
+                    previewTheme === 'light'
+                      ? 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                      : 'bg-white/10 hover:bg-white/20 text-white'
+                  }`}
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Language Switcher in Preview Modal */}
+              {/* Controls in Preview Modal: Ngôn ngữ & Chế độ xem */}
               <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#111A14] p-3 rounded-2xl border border-gray-200 dark:border-white/5 shadow-xs">
-                <span className="text-xs font-semibold text-gray-400">Xem trước theo ngôn ngữ:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-300">Giao diện xem trước:</span>
+                  <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#080E0A] p-1 rounded-xl border border-gray-200 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewTheme('light')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        previewTheme === 'light' ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-xs' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400'
+                      }`}
+                    >
+                      ☀️ Chuẩn Website (Sáng)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewTheme('dark')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        previewTheme === 'dark' ? 'bg-[#17231B] text-emerald-300 border border-emerald-500/40 shadow-xs' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400'
+                      }`}
+                    >
+                      🌙 Giao diện Tối
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-[#080E0A] p-1 rounded-xl border border-gray-200 dark:border-white/10">
                   <button
                     type="button"
@@ -2505,11 +2539,11 @@ export default function ArticleStudioEditor({
                       <span className="inline-block px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-800/40">
                         {newsFormData.categoryName || newsFormData.category || 'Tin tức'}
                       </span>
-                      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                      <h1 className={`text-2xl sm:text-3xl font-extrabold leading-tight ${previewTheme === 'light' ? 'text-[#0E2218]' : 'text-white'}`}>
                         {previewTitle}
                       </h1>
                       <div className="flex items-center gap-4 text-xs text-gray-400">
-                        <span>Tác giả: <strong className="text-gray-800 dark:text-gray-200">{newsFormData.author || 'CASA R&D Team'}</strong></span>
+                        <span>Tác giả: <strong className={`${previewTheme === 'light' ? 'text-gray-900' : 'text-gray-200'}`}>{newsFormData.author || 'CASA R&D Team'}</strong></span>
                         <span>•</span>
                         <span>{newsFormData.date || 'Hôm nay'}</span>
                         <span>•</span>
@@ -2526,23 +2560,33 @@ export default function ArticleStudioEditor({
 
                     {/* Tóm tắt */}
                     {previewExcerpt && (
-                      <p className="text-base sm:text-lg font-medium text-gray-700 dark:text-gray-300 italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed">
+                      <p className={`text-base sm:text-lg font-medium italic border-l-4 border-emerald-500 pl-4 py-1 leading-relaxed ${previewTheme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
                         {previewExcerpt}
                       </p>
                     )}
 
-                    {/* Nội dung bài viết */}
-                    <div
-                      className="article-content prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed space-y-4 text-base"
-                      dangerouslySetInnerHTML={{ __html: previewContent }}
-                    />
+                    {/* Khối bài viết hoàn chỉnh (Mô phỏng chuẩn Card của trang Web chi tiết) */}
+                    <div className={`p-6 sm:p-10 rounded-3xl border shadow-sm transition-colors ${
+                      previewTheme === 'light' ? 'bg-white border-gray-200 text-gray-900' : 'bg-[#132018] border-white/10 text-gray-100'
+                    }`}>
+                      <div
+                        className={`article-content prose prose-lg max-w-none leading-relaxed space-y-4 text-base ${
+                          previewTheme === 'light' ? 'text-gray-800' : 'prose-invert text-gray-200'
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: previewContent }}
+                      />
+                    </div>
                   </>
                 );
               })()}
 
               {/* Hộp công thức nếu có */}
               {newsFormData.recipeBox && (
-                <div className="p-6 rounded-3xl bg-white dark:bg-[#142017] border border-gray-200 dark:border-emerald-600/40 shadow-md space-y-4">
+                <div className={`p-6 rounded-3xl border shadow-md space-y-4 transition-colors ${
+                  previewTheme === 'light'
+                    ? 'bg-emerald-50/40 border-emerald-200 text-gray-900'
+                    : 'bg-[#142017] border-emerald-600/40 text-gray-100'
+                }`}>
                   <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
                     <ChefHat className="w-5 h-5 text-amber-400" />
                     <h3 className="font-bold text-gray-900 dark:text-white text-base">{newsFormData.recipeBox.title || 'Công Thức Barista SOP'}</h3>
