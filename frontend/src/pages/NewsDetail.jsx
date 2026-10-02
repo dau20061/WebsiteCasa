@@ -21,6 +21,7 @@ import { useToast } from '../components/Toast';
 import { useLanguage } from '../context/LanguageContext';
 import ArticleAttachedProducts from '../components/ArticleAttachedProducts';
 import { resolveArticleProducts } from '../utils/articleProductsHelper';
+import { slugify } from '../utils/slugify';
 
 export default function NewsDetail() {
   const { slug } = useParams();
@@ -325,10 +326,11 @@ export default function NewsDetail() {
               </span>
               {article.tags.map((tag, i) => {
                 const cleanTag = String(tag).replace(/^#+/, '').trim();
+                const tagSlug = slugify(cleanTag);
                 return (
                   <Link
                     key={i}
-                    to={`/news?tag=${encodeURIComponent(cleanTag)}`}
+                    to={`/news?tag=${tagSlug}`}
                     className="px-3.5 py-1.5 rounded-full bg-[#FAF9F5] hover:bg-tea-leaf/10 dark:bg-[#0B130E] dark:hover:bg-tea-mint/10 text-xs font-semibold text-gray-700 hover:text-tea-primary dark:text-gray-300 dark:hover:text-tea-mint border border-tea-border hover:border-tea-primary/40 dark:border-white/10 dark:hover:border-tea-mint/40 transition-all cursor-pointer shadow-2xs hover:shadow-xs group"
                     title={`Xem tất cả bài viết có thẻ #${cleanTag}`}
                   >

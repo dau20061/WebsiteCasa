@@ -40,6 +40,7 @@ export default function AppRoutes() {
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="news" element={<News />} />
+          <Route path="news/tag/:tagSlug" element={<News />} />
           <Route path="news/:slug" element={<NewsDetail />} />
           <Route path="contact" element={<Contact />} />
           <Route path="faq" element={<FAQ />} />

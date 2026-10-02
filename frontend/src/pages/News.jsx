@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag, X } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
@@ -10,12 +10,15 @@ import { NEWS_CATEGORIES } from '../constants/categories';
 import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
-import { getArticleImageUrl } from '../utils/slugify';
+import { getArticleImageUrl, slugify } from '../utils/slugify';
 
 export default function News() {
   const { t, isChinese, isEnglish } = useLanguage();
+  const { tagSlug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTag = (searchParams.get('tag') || '').trim();
+  const navigate = useNavigate();
+  const activeTag = (tagSlug || searchParams.get('tag') || '').trim();
+  const activeTagSlug = slugify(activeTag);
 
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,6 +33,41 @@ export default function News() {
       if (res && res.length > 0) setArticles(res);
     });
   }, []);
+
+  // Tên hiển thị có dấu của thẻ tag đang được lọc
+  const activeTagDisplayName = useMemo(() => {
+    if (!activeTag) return '';
+    for (const art of articles) {
+      if (Array.isArray(art.tags)) {
+        for (const t of art.tags) {
+          const cleanT = String(t).replace(/^#+/, '').trim();
+          if (slugify(cleanT) === activeTagSlug) {
+            return cleanT;
+          }
+        }
+      }
+    }
+    try {
+      const saved = localStorage.getItem('casa_admin_saved_tags');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const found = parsed.find((t) => slugify(t) === activeTagSlug);
+          if (found) return String(found).replace(/^#+/, '').trim();
+        }
+      }
+    } catch (_) {}
+    return activeTag.replace(/-/g, ' ');
+  }, [activeTag, activeTagSlug, articles]);
+
+  const handleClearTagFilter = () => {
+    if (tagSlug) {
+      navigate('/news');
+    } else {
+      searchParams.delete('tag');
+      setSearchParams(searchParams);
+    }
+  };
 
   const sortByDateDesc = (arr) =>
     [...arr].sort((a, b) => new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0));
@@ -50,8 +88,8 @@ export default function News() {
 
     const matchesTag = !activeTag || (
       Array.isArray(article.tags) && article.tags.some((t) => {
-        const cleanT = String(t).replace(/^#+/, '').trim().toLowerCase();
-        return cleanT === activeTag.toLowerCase();
+        const cleanT = String(t).replace(/^#+/, '').trim();
+        return slugify(cleanT) === activeTagSlug || cleanT.toLowerCase() === activeTag.toLowerCase();
       })
     );
 
@@ -241,17 +279,14 @@ export default function News() {
                 <Tag className="w-4 h-4 text-tea-leaf dark:text-tea-mint shrink-0" />
                 <span className="font-medium">
                   {isEnglish ? 'Filtering by tag:' : (isChinese ? '正在篩選標籤：' : 'Đang lọc bài viết theo thẻ:')}
-                  <span className="ml-1.5 font-bold text-sm text-tea-primary dark:text-tea-mint">#{activeTag}</span>
+                  <span className="ml-1.5 font-bold text-sm text-tea-primary dark:text-tea-mint">#{activeTagDisplayName || activeTag}</span>
                   <span className="ml-2 text-gray-500 dark:text-gray-400 font-normal">
                     ({filteredArticles.length} {isEnglish ? 'articles' : (isChinese ? '篇文章' : 'bài viết')})
                   </span>
                 </span>
               </div>
               <button
-                onClick={() => {
-                  searchParams.delete('tag');
-                  setSearchParams(searchParams);
-                }}
+                onClick={handleClearTagFilter}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 border border-tea-border dark:border-white/10 hover:border-red-300 text-xs font-semibold transition-all cursor-pointer shadow-2xs hover:shadow-xs"
               >
                 <X className="w-3.5 h-3.5" />
@@ -271,10 +306,7 @@ export default function News() {
               <p>{isEnglish ? 'No articles found matching your search.' : (isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.')}</p>
               {activeTag && (
                 <button
-                  onClick={() => {
-                    searchParams.delete('tag');
-                    setSearchParams(searchParams);
-                  }}
+                  onClick={handleClearTagFilter}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tea-primary text-white text-xs font-bold shadow-tea-sm hover:bg-tea-emerald transition-all cursor-pointer"
                 >
                   <X className="w-4 h-4" />
