@@ -2008,6 +2008,7 @@ export default function ArticleStudioEditor({
                             });
                           }}
                           style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
+                          style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
                           className="w-full px-3 py-2.5 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
                         >
                           <option value="cong-thuc">Công Thức Pha Chế (Barista SOP)</option>
@@ -2034,6 +2035,7 @@ export default function ArticleStudioEditor({
                                 handleAddTag();
                               }
                             }}
+                            style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                             style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
                             className="flex-1 px-3 py-2 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                           />
