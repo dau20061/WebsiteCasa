@@ -8,6 +8,7 @@ import { getArticleImageUrl } from '../utils/slugify';
 export default function NewsCard({ article }) {
   const { t, isChinese, isEnglish } = useLanguage();
   const { slug, title, category, date, readTime, excerpt, image, author } = article;
+  const targetSlug = slug || article.id || '';
   const displayImageUrl = getArticleImageUrl(article);
 
   const displayTitle = isEnglish
@@ -31,7 +32,7 @@ export default function NewsCard({ article }) {
       transition={{ duration: 0.3 }}
       className="group bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-border dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 transition-all flex flex-col h-full"
     >
-      <Link to={`/news/${slug}`} className="relative h-52 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21] block">
+      <Link to={`/news/${targetSlug}`} className="relative h-52 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21] block">
         <img
           src={displayImageUrl}
           alt={`${displayTitle} – Tạp Chí F&B & Công Thức CASA TEA`}
@@ -73,7 +74,7 @@ export default function NewsCard({ article }) {
             </span>
           </div>
 
-          <Link to={`/news/${slug}`}>
+          <Link to={`/news/${targetSlug}`}>
             <h3 className="text-lg font-bold text-tea-dark dark:text-white group-hover:text-tea-green dark:group-hover:text-tea-mint transition-colors line-clamp-2 leading-snug">
               {displayTitle}
             </h3>
@@ -90,7 +91,7 @@ export default function NewsCard({ article }) {
           </span>
 
           <Link
-            to={`/news/${slug}`}
+            to={`/news/${targetSlug}`}
             className="inline-flex items-center gap-1 text-xs font-bold text-tea-primary dark:text-tea-mint hover:text-tea-emerald transition-colors"
           >
             <span>{t('news_read_more', 'Đọc tiếp')}</span>

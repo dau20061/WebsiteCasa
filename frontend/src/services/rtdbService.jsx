@@ -8,6 +8,7 @@
 
 import { productApi, categoryApi, newsApi, faqApi, machineryApi, certificationApi, contactApi, userApi } from '../api/client';
 import { PRODUCT_CATEGORIES } from '../constants/categories';
+import { slugify } from '../utils/slugify';
 
 const DIRECT_RTDB_BASE = 'https://websitecasa-15d46-default-rtdb.asia-southeast1.firebasedatabase.app';
 
@@ -318,15 +319,32 @@ export async function getRtdbNews() {
 }
 
 export async function saveRtdbNews(newsItem) {
-  const isNew = !newsItem.id || String(newsItem.id).startsWith('news_');
-  const targetId = newsItem.id || `news_${Date.now()}`;
-  const itemToSave = { ...newsItem, id: targetId, updatedAt: newsItem.updatedAt || new Date().toISOString() };
+  // Ưu tiên tuyệt đối slug chuẩn theo tiêu đề bài viết
+  const isTemp = !newsItem.slug || !newsItem.slug.trim() ||
+    newsItem.slug.startsWith('bai-viet-') ||
+    newsItem.slug.startsWith('news_') ||
+    newsItem.slug.startsWith('new-');
+  const cleanSlug = (!isTemp && newsItem.slug.trim())
+    ? slugify(newsItem.slug)
+    : slugify(newsItem.title || '');
+  const targetId = cleanSlug || newsItem.id || `news_${Date.now()}`;
+  const oldId = (newsItem.id && newsItem.id !== targetId) ? newsItem.id : null;
+
+  const itemToSave = {
+    ...newsItem,
+    id: targetId,
+    slug: targetId,
+    updatedAt: newsItem.updatedAt || new Date().toISOString()
+  };
 
   // 1. Luôn cập nhật localStorage ngay lập tức
   try {
     const saved = localStorage.getItem('casa_admin_news');
     let list = saved ? JSON.parse(saved) : [];
-    const idx = list.findIndex((n) => String(n.id) === String(targetId));
+    if (oldId) {
+      list = list.filter((n) => String(n.id) !== String(oldId) && String(n.slug) !== String(oldId));
+    }
+    const idx = list.findIndex((n) => String(n.id) === String(targetId) || String(n.slug) === String(targetId));
     if (idx >= 0) {
       list[idx] = itemToSave;
     } else {
@@ -335,8 +353,11 @@ export async function saveRtdbNews(newsItem) {
     localStorage.setItem('casa_admin_news', JSON.stringify(list));
   } catch (_) {}
 
-  // 2. Ghi trực tiếp lên Firebase Realtime Database (0ms trễ)
+  // 2. Ghi trực tiếp lên Firebase Realtime Database với key là slug tiêu đề (0ms trễ)
   try {
+    if (oldId) {
+      await fetchDirectRtdb(`news/${oldId}`, 'DELETE');
+    }
     await fetchDirectRtdb(`news/${targetId}`, 'PUT', itemToSave);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb save news error:', directErr);
@@ -344,7 +365,7 @@ export async function saveRtdbNews(newsItem) {
 
   // 3. Đồng bộ với Backend API
   try {
-    const result = isNew ? await newsApi.create(itemToSave) : await newsApi.update(targetId, itemToSave);
+    const result = await newsApi.create(itemToSave);
     return result?.id || targetId;
   } catch (err) {
     console.warn('[Frontend Service] saveRtdbNews backend sync notice:', err.message);

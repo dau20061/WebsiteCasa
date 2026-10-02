@@ -135,7 +135,7 @@ export default function News() {
                   <span>{t('news_featured_badge', 'Bài viết nổi bật')}</span>
                 </div>
 
-                <Link to={`/news/${featuredArticle.slug}`}>
+                <Link to={`/news/${featuredArticle.slug || featuredArticle.id}`}>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-tea-dark dark:text-white hover:text-tea-green dark:hover:text-tea-mint transition-colors leading-tight">
                     {isEnglish ? (featuredArticle.titleEn || featuredArticle.title) : ((isChinese && (featuredArticle.titleZh || featuredArticle.title_zh)) || featuredArticle.title)}
                   </h2>
@@ -158,7 +158,7 @@ export default function News() {
 
                 <div className="pt-4">
                   <Link
-                    to={`/news/${featuredArticle.slug}`}
+                    to={`/news/${featuredArticle.slug || featuredArticle.id}`}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-tea-primary hover:bg-tea-emerald text-white text-xs font-bold transition-all shadow-tea-sm group"
                   >
                     <span>{t('news_read_more', 'Đọc bài viết chi tiết')}</span>

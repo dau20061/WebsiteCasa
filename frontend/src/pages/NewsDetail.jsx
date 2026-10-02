@@ -50,7 +50,10 @@ export default function NewsDetail() {
   const article = allArticles.find((a) => 
     a.slug === slug || 
     a.id === slug ||
-    (slug === 'bai-viet-1790837327379' && a.id === 'news_1790837787012')
+    (slug === 'bai-viet-1790837327379' && (a.slug === 'may-pha-tra-vien-nen-popcha-mls2501' || a.id === 'may-pha-tra-vien-nen-popcha-mls2501' || a.id === 'news_1790837787012')) ||
+    (slug === 'bai-viet-1790903664977' && (a.slug === '7-meo-su-dung-bot-kem-beo-giup-do-uong-thom-ngon-va-tiet-kiem-chi-phi-cho-quan' || a.id === '7-meo-su-dung-bot-kem-beo-giup-do-uong-thom-ngon-va-tiet-kiem-chi-phi-cho-quan' || a.id === 'news_1790903882259')) ||
+    (slug === 'news_1790837787012' && (a.slug === 'may-pha-tra-vien-nen-popcha-mls2501' || a.id === 'may-pha-tra-vien-nen-popcha-mls2501')) ||
+    (slug === 'news_1790903882259' && (a.slug === '7-meo-su-dung-bot-kem-beo-giup-do-uong-thom-ngon-va-tiet-kiem-chi-phi-cho-quan' || a.id === '7-meo-su-dung-bot-kem-beo-giup-do-uong-thom-ngon-va-tiet-kiem-chi-phi-cho-quan'))
   );
 
   // Tự động chuyển hướng về Canonical Slug theo tiêu đề chuẩn SEO nếu người dùng truy cập từ URL cũ

@@ -189,10 +189,40 @@ export async function getNewsById(id) {
   return newsList.find((n) => String(n.id) === String(id)) || null;
 }
 
+function slugify(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s-]+/g, '-');
+}
+
 export async function saveNews(newsItem) {
-  const cleanId = newsItem.id || `news_${Date.now()}`;
-  const record = { ...newsItem, id: cleanId, updatedAt: new Date().toISOString() };
-  
+  const isTemp = !newsItem.slug || !newsItem.slug.trim() ||
+    newsItem.slug.startsWith('bai-viet-') ||
+    newsItem.slug.startsWith('news_') ||
+    newsItem.slug.startsWith('new-');
+  const cleanSlug = (!isTemp && newsItem.slug.trim())
+    ? slugify(newsItem.slug)
+    : slugify(newsItem.title || '');
+  const cleanId = cleanSlug || newsItem.id || `news_${Date.now()}`;
+  const oldId = (newsItem.id && newsItem.id !== cleanId) ? newsItem.id : null;
+  const record = { ...newsItem, id: cleanId, slug: cleanId, updatedAt: new Date().toISOString() };
+
+  if (oldId) {
+    try {
+      await remove(ref(rtdb, `news/${oldId}`));
+    } catch (_) {
+      await restRtdb(`news/${oldId}`, 'DELETE');
+    }
+    memoryStore.news = memoryStore.news.filter((n) => String(n.id) !== String(oldId));
+  }
+
   try {
     await set(ref(rtdb, `news/${cleanId}`), record);
   } catch (_) {

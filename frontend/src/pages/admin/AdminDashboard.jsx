@@ -1360,11 +1360,15 @@ export default function AdminDashboard() {
       }
     }
 
-    const isTempSlug = !finalData.slug || !finalData.slug.trim() || finalData.slug.startsWith('bai-viet-') || finalData.slug.startsWith('news_');
+    const isTempSlug = !finalData.slug || !finalData.slug.trim() ||
+      finalData.slug.startsWith('bai-viet-') ||
+      finalData.slug.startsWith('news_') ||
+      finalData.slug.startsWith('new-');
     const titleSlug = slugify(finalData.title || '');
-    const cleanArticleSlug = (!isTempSlug && finalData.slug.trim()) ? slugify(finalData.slug) : (titleSlug || editingNews?.slug || `news_${Date.now()}`);
+    const cleanArticleSlug = (!isTempSlug && finalData.slug.trim()) ? slugify(finalData.slug) : titleSlug;
     const targetArticleSlug = cleanArticleSlug || `news_${Date.now()}`;
     finalData.slug = targetArticleSlug;
+    finalData.id = targetArticleSlug;
 
     // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn
     if (finalData.image && finalData.image.startsWith('data:image/')) {
@@ -1380,6 +1384,8 @@ export default function AdminDashboard() {
       const updated = {
         ...editingNews,
         ...finalData,
+        id: targetArticleSlug,
+        slug: targetArticleSlug,
         featured: isHero,
         featuredNews: isHero,
         featuredHome: isHome,
@@ -1387,7 +1393,7 @@ export default function AdminDashboard() {
       };
 
       let updatedList = news.map((n) => {
-        if (n.id === editingNews.id) return updated;
+        if (n.id === editingNews.id || n.slug === editingNews.slug) return updated;
         if (isHero && (n.featuredNews || n.featured)) {
           return { ...n, featuredNews: false, featured: false, updatedAt: nowIso };
         }
@@ -1402,16 +1408,17 @@ export default function AdminDashboard() {
       await saveRtdbNews(updated);
       if (isHero) {
         for (const item of updatedList) {
-          if (item.id !== editingNews.id && !item.featuredNews) {
+          if (item.id !== updated.id && !item.featuredNews) {
             await saveRtdbNews(item);
           }
         }
       }
-      showToast(`Đã cập nhật bài viết [${finalData.title}] (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
+      showToast(`Đã cập nhật bài viết [${finalData.title}] lên Realtime Database!`, 'success');
     } else {
       const newArticle = {
-        id: `news_${Date.now()}`,
         ...finalData,
+        id: targetArticleSlug,
+        slug: targetArticleSlug,
         featured: isHero,
         featuredNews: isHero,
         featuredHome: isHome,
@@ -1438,7 +1445,7 @@ export default function AdminDashboard() {
           }
         }
       }
-      showToast(`Đã xuất bản bài viết mới (kèm bản dịch 繁體中文) lên Realtime Database!`, 'success');
+      showToast(`Đã xuất bản bài viết mới [${finalData.title}] lên Realtime Database!`, 'success');
     }
     setNewsModalOpen(false);
   };
