@@ -23,6 +23,8 @@ import {
   Filter,
   X,
   Eye,
+  EyeOff,
+  Key,
   Check,
   RefreshCw,
   Tag,
@@ -617,9 +619,12 @@ export default function AdminDashboard() {
         ];
   });
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showUserPassword, setShowUserPassword] = useState(false);
   const [userFormData, setUserFormData] = useState({
     displayName: '',
     email: '',
+    password: '',
     role: ROLES.EDITOR,
     status: 'ACTIVE'
   });
@@ -1849,24 +1854,81 @@ export default function AdminDashboard() {
   };
 
   // ============================================================================
-  // HANDLERS: USERS MANAGEMENT CRUD
+  // HANDLERS: USERS MANAGEMENT CRUD (CREATE, EDIT, PASSWORD, ROLE, STATUS, DELETE)
   // ============================================================================
-  const handleCreateUser = async (e) => {
+  const handleOpenUserModal = (userToEdit = null) => {
+    if (userToEdit) {
+      setEditingUser(userToEdit);
+      setUserFormData({
+        displayName: userToEdit.displayName || '',
+        email: userToEdit.email || '',
+        password: userToEdit.password || '',
+        role: userToEdit.role || ROLES.EDITOR,
+        status: userToEdit.status || 'ACTIVE'
+      });
+    } else {
+      setEditingUser(null);
+      setUserFormData({
+        displayName: '',
+        email: '',
+        password: '',
+        role: ROLES.EDITOR,
+        status: 'ACTIVE'
+      });
+    }
+    setShowUserPassword(false);
+    setUserModalOpen(true);
+  };
+
+  const handleSaveUser = async (e) => {
     e.preventDefault();
-    if (!userFormData.email.trim()) {
+    const cleanEmail = (userFormData.email || '').trim().toLowerCase();
+    if (!cleanEmail) {
       showToast('Email người dùng không được để trống!', 'error');
       return;
     }
-    const newUser = {
-      uid: `usr_${Date.now()}`,
-      ...userFormData,
-      createdAt: 'Hôm nay'
-    };
-    setUsersList((prev) => [...prev, newUser]);
-    await saveRtdbUser(newUser);
-    showToast(`Đã tạo người dùng mới [${userFormData.email}] lên Realtime Database!`, 'success');
+    const cleanPassword = (userFormData.password || '').trim();
+    if (!editingUser && cleanPassword.length < 6) {
+      showToast('Mật khẩu đăng nhập phải có ít nhất 6 ký tự!', 'error');
+      return;
+    }
+    if (editingUser && cleanPassword && cleanPassword.length < 6) {
+      showToast('Mật khẩu mới phải có ít nhất 6 ký tự!', 'error');
+      return;
+    }
+
+    if (editingUser) {
+      const updatedUser = {
+        ...editingUser,
+        displayName: userFormData.displayName.trim() || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        role: userFormData.role,
+        status: userFormData.status,
+        // Nếu không nhập mật khẩu mới, giữ nguyên mật khẩu cũ
+        password: cleanPassword ? cleanPassword : (editingUser.password || '123456'),
+        updatedAt: new Date().toISOString()
+      };
+      setUsersList((prev) => prev.map((u) => (u.uid === editingUser.uid ? updatedUser : u)));
+      await saveRtdbUser(updatedUser);
+      showToast(`Đã cập nhật thông tin tài khoản [${cleanEmail}] thành công!`, 'success');
+    } else {
+      const newUser = {
+        uid: `usr_${Date.now()}`,
+        displayName: userFormData.displayName.trim() || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        password: cleanPassword,
+        role: userFormData.role,
+        status: userFormData.status,
+        createdAt: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      };
+      setUsersList((prev) => [...prev, newUser]);
+      await saveRtdbUser(newUser);
+      showToast(`Đã tạo tài khoản mới [${cleanEmail}] với mật khẩu thành công!`, 'success');
+    }
+
     setUserModalOpen(false);
-    setUserFormData({ displayName: '', email: '', role: ROLES.EDITOR, status: 'ACTIVE' });
+    setEditingUser(null);
+    setUserFormData({ displayName: '', email: '', password: '', role: ROLES.EDITOR, status: 'ACTIVE' });
   };
 
   const handleChangeUserRole = async (targetUid, newRole) => {
@@ -2942,7 +3004,7 @@ export default function AdminDashboard() {
 
               {canManageUsers(role) && (
                 <button
-                  onClick={() => setUserModalOpen(true)}
+                  onClick={() => handleOpenUserModal(null)}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-tea-sm transition-all"
                 >
                   <Plus className="w-4 h-4" />
@@ -3002,15 +3064,26 @@ export default function AdminDashboard() {
                         </button>
                       </td>
                       <td className="p-3.5 text-right">
-                        {canManageUsers(role) && u.uid !== userProfile?.uid && (
-                          <button
-                            onClick={() => handleDeleteUser(u.uid, u.email)}
-                            className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
-                            title="Xóa tài khoản"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
+                        <div className="flex items-center justify-end gap-1.5">
+                          {canManageUsers(role) && (
+                            <button
+                              onClick={() => handleOpenUserModal(u)}
+                              className="p-2 rounded-xl text-indigo-600 hover:bg-indigo-50 transition-colors"
+                              title="Sửa thông tin & đổi mật khẩu"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          )}
+                          {canManageUsers(role) && u.uid !== userProfile?.uid && (
+                            <button
+                              onClick={() => handleDeleteUser(u.uid, u.email)}
+                              className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+                              title="Xóa tài khoản"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -4311,15 +4384,16 @@ export default function AdminDashboard() {
               className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-tea-border shadow-tea-xl space-y-4 text-xs"
             >
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <h3 className="text-base font-bold text-tea-dark">
-                  Thêm Người Dùng & Phân Quyền (Create User)
+                <h3 className="text-base font-bold text-tea-dark flex items-center gap-2">
+                  <Key className="w-5 h-5 text-indigo-600" />
+                  <span>{editingUser ? 'Chỉnh Sửa Tài Khoản & Mật Khẩu' : 'Thêm Người Dùng & Phân Quyền (Create User)'}</span>
                 </h3>
                 <button onClick={() => setUserModalOpen(false)}>
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateUser} className="space-y-3">
+              <form onSubmit={handleSaveUser} className="space-y-3">
                 <div>
                   <label className="block font-bold text-gray-700 mb-1">Họ & Tên Hiển Thị</label>
                   <input
@@ -4342,6 +4416,50 @@ export default function AdminDashboard() {
                     onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-indigo-500/30"
                   />
+                </div>
+
+                {/* MẬT KHẨU ĐĂNG NHẬP */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-gray-700">
+                      Mật Khẩu Đăng Nhập {editingUser ? '(Đổi Mật Khẩu)' : '*'}
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const randomPass = 'Casa@' + Math.floor(100000 + Math.random() * 900000);
+                        setUserFormData({ ...userFormData, password: randomPass });
+                        setShowUserPassword(true);
+                        showToast(`Đã tạo mật khẩu ngẫu nhiên: ${randomPass}`, 'info');
+                      }}
+                      className="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold"
+                    >
+                      ⚡ Tạo ngẫu nhiên
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showUserPassword ? 'text' : 'password'}
+                      required={!editingUser}
+                      placeholder={editingUser ? 'Để trống nếu muốn giữ nguyên mật khẩu cũ...' : 'Tối thiểu 6 ký tự để đăng nhập...'}
+                      value={userFormData.password || ''}
+                      onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                      className="w-full pl-3 pr-10 py-2 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-indigo-500/30 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowUserPassword(!showUserPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      title={showUserPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showUserPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    {editingUser
+                      ? '💡 Nhập mật khẩu mới nếu muốn đổi, bỏ trống thì tài khoản vẫn dùng mật khẩu cũ.'
+                      : '💡 Mật khẩu dùng để đăng nhập vào trang quản trị (/admin/login).'}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -4376,15 +4494,15 @@ export default function AdminDashboard() {
                   <button
                     type="button"
                     onClick={() => setUserModalOpen(false)}
-                    className="px-4 py-2 rounded-xl border border-gray-200 font-bold"
+                    className="px-4 py-2 rounded-xl border border-gray-200 font-bold hover:bg-gray-50 transition-colors"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold"
+                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-tea-sm transition-all"
                   >
-                    Thêm Người Dùng
+                    {editingUser ? 'Lưu Thay Đổi' : 'Thêm Người Dùng'}
                   </button>
                 </div>
               </form>

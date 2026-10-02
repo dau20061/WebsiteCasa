@@ -405,8 +405,10 @@ export async function saveUser(user) {
   const record = { ...user, uid: cleanUid, updatedAt: new Date().toISOString() };
   try {
     await set(ref(rtdb, `users/${cleanUid}`), record);
+    await set(ref(rtdb, `user/${cleanUid}`), record);
   } catch (_) {
     await restRtdb(`users/${cleanUid}`, 'PUT', record);
+    await restRtdb(`user/${cleanUid}`, 'PUT', record);
   }
   return record;
 }
@@ -414,8 +416,10 @@ export async function saveUser(user) {
 export async function deleteUser(uid) {
   try {
     await remove(ref(rtdb, `users/${uid}`));
+    await remove(ref(rtdb, `user/${uid}`));
   } catch (_) {
     await restRtdb(`users/${uid}`, 'DELETE');
+    await restRtdb(`user/${uid}`, 'DELETE');
   }
   return { success: true, uid };
 }

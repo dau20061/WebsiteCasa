@@ -653,6 +653,7 @@ export async function saveRtdbUser(user) {
 
   try {
     await fetchDirectRtdb(`users/${targetId}`, 'PUT', itemToSave);
+    await fetchDirectRtdb(`user/${targetId}`, 'PUT', itemToSave);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb save user error:', directErr);
   }
@@ -668,6 +669,7 @@ export async function saveRtdbUser(user) {
 export async function deleteRtdbUser(uid) {
   try {
     await fetchDirectRtdb(`users/${uid}`, 'DELETE');
+    await fetchDirectRtdb(`user/${uid}`, 'DELETE');
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb delete user error:', directErr);
   }
