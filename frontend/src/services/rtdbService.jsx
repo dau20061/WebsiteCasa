@@ -727,3 +727,61 @@ export async function deleteRtdbUser(uid) {
     return { success: true };
   }
 }
+
+// ============================================================================
+// NEWS TAGS (TAG LIBRARY PERSISTENCE)
+// ============================================================================
+export async function getRtdbTags() {
+  try {
+    const directData = await fetchDirectRtdb('tags');
+    if (directData && Array.isArray(directData) && directData.length > 0) {
+      const tagList = directData.map((t) => (typeof t === 'string' ? t : t.name || t.id)).filter(Boolean);
+      try {
+        localStorage.setItem('casa_admin_saved_tags', JSON.stringify(tagList));
+      } catch (_) {}
+      return tagList;
+    }
+  } catch (err) {
+    console.warn('[Frontend Service] fetchDirectRtdb tags error:', err);
+  }
+
+  // Dự phòng localStorage
+  try {
+    const saved = localStorage.getItem('casa_admin_saved_tags');
+    if (saved) return JSON.parse(saved);
+  } catch (_) {}
+
+  return [];
+}
+
+export async function saveRtdbTag(tag) {
+  if (!tag || typeof tag !== 'string') return;
+  const cleanTag = tag.trim().replace(/^#+/, '');
+  if (!cleanTag) return;
+
+  const tagKey = slugify(cleanTag) || `tag_${Date.now()}`;
+  const payload = {
+    id: tagKey,
+    name: cleanTag,
+    createdAt: new Date().toISOString()
+  };
+
+  // Cập nhật localStorage
+  try {
+    const saved = localStorage.getItem('casa_admin_saved_tags');
+    let list = saved ? JSON.parse(saved) : [];
+    if (!list.includes(cleanTag)) {
+      list.push(cleanTag);
+      localStorage.setItem('casa_admin_saved_tags', JSON.stringify(list));
+    }
+  } catch (_) {}
+
+  // Lưu lên RTDB
+  try {
+    await fetchDirectRtdb(`tags/${tagKey}`, 'PUT', payload);
+  } catch (err) {
+    console.warn('[Frontend Service] saveRtdbTag error:', err);
+  }
+
+  return cleanTag;
+}

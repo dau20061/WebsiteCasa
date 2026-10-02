@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag, X } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import NewsCard from '../components/NewsCard';
 import WaveDivider from '../components/WaveDivider';
@@ -14,6 +14,9 @@ import { getArticleImageUrl } from '../utils/slugify';
 
 export default function News() {
   const { t, isChinese, isEnglish } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTag = (searchParams.get('tag') || '').trim();
+
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -45,6 +48,13 @@ export default function News() {
     const matchesCat =
       selectedCategory === 'all' || article.categorySlug === selectedCategory || article.category === selectedCategory;
 
+    const matchesTag = !activeTag || (
+      Array.isArray(article.tags) && article.tags.some((t) => {
+        const cleanT = String(t).replace(/^#+/, '').trim().toLowerCase();
+        return cleanT === activeTag.toLowerCase();
+      })
+    );
+
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       searchQuery === '' ||
@@ -53,9 +63,10 @@ export default function News() {
       (article.titleZh && article.titleZh.toLowerCase().includes(q)) ||
       (article.excerpt && article.excerpt.toLowerCase().includes(q)) ||
       (article.excerptEn && article.excerptEn.toLowerCase().includes(q)) ||
-      (article.excerptZh && article.excerptZh.toLowerCase().includes(q));
+      (article.excerptZh && article.excerptZh.toLowerCase().includes(q)) ||
+      (Array.isArray(article.tags) && article.tags.some((t) => t.toLowerCase().includes(q)));
 
-    return matchesCat && matchesSearch;
+    return matchesCat && matchesTag && matchesSearch;
   });
 
   const sortedArticles = [...filteredArticles].sort((a, b) => {
@@ -122,7 +133,7 @@ export default function News() {
       />
 
       {/* 2. FEATURED HERO ARTICLE */}
-      {featuredArticle && (
+      {featuredArticle && !activeTag && (
         <section className="py-12 bg-white dark:bg-[#0B130E] transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-[#FAF9F5] dark:bg-[#132018] rounded-4xl p-6 sm:p-10 border border-tea-border dark:border-white/10 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
@@ -223,6 +234,32 @@ export default function News() {
       {/* 4. ARTICLES GRID */}
       <section className="py-12 bg-[#FAF9F5] dark:bg-[#0B130E] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Active Tag Filter Banner */}
+          {activeTag && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 px-5 rounded-2xl bg-tea-leaf/10 dark:bg-tea-mint/10 border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-dark dark:text-white text-xs mb-8 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <Tag className="w-4 h-4 text-tea-leaf dark:text-tea-mint shrink-0" />
+                <span className="font-medium">
+                  {isEnglish ? 'Filtering by tag:' : (isChinese ? '正在篩選標籤：' : 'Đang lọc bài viết theo thẻ:')}
+                  <span className="ml-1.5 font-bold text-sm text-tea-primary dark:text-tea-mint">#{activeTag}</span>
+                  <span className="ml-2 text-gray-500 dark:text-gray-400 font-normal">
+                    ({filteredArticles.length} {isEnglish ? 'articles' : (isChinese ? '篇文章' : 'bài viết')})
+                  </span>
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  searchParams.delete('tag');
+                  setSearchParams(searchParams);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 border border-tea-border dark:border-white/10 hover:border-red-300 text-xs font-semibold transition-all cursor-pointer shadow-2xs hover:shadow-xs"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>{isEnglish ? 'Clear filter' : (isChinese ? '清除篩選' : 'Bỏ lọc thẻ')}</span>
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sortedArticles.map((article) => (
               <NewsCard key={article.id} article={article} />
@@ -230,8 +267,20 @@ export default function News() {
           </div>
 
           {filteredArticles.length === 0 && (
-            <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8">
-              {isEnglish ? 'No articles found matching your search.' : (isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.')}
+            <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8 space-y-4">
+              <p>{isEnglish ? 'No articles found matching your search.' : (isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.')}</p>
+              {activeTag && (
+                <button
+                  onClick={() => {
+                    searchParams.delete('tag');
+                    setSearchParams(searchParams);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tea-primary text-white text-xs font-bold shadow-tea-sm hover:bg-tea-emerald transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                  <span>{isEnglish ? 'Remove tag filter' : (isChinese ? '清除標籤篩選' : 'Bỏ lọc theo thẻ')}</span>
+                </button>
+              )}
             </div>
           )}
         </div>

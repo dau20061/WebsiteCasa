@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { optimizeImageToDataUrl } from '../../services/storageService';
 import { slugify } from '../../utils/slugify';
+import { getRtdbTags, saveRtdbTag } from '../../services/rtdbService';
 
 // Kho ảnh mẫu nguyên liệu F&B cao cấp được chuẩn bị sẵn cho CASA TEA
 const CASA_SAMPLE_IMAGES = [
@@ -126,8 +127,38 @@ export default function ArticleStudioEditor({
   // Chế độ soạn thảo: 'wysiwyg' (Word trực quan) | 'code' (Mã HTML)
   const [editorMode, setEditorMode] = useState('wysiwyg');
 
-  // Input thẻ Tag mới
+  // Input thẻ Tag mới & Danh sách gợi ý thẻ (Tự động đồng bộ và lưu trữ vĩnh viễn)
   const [customTagInput, setCustomTagInput] = useState('');
+  const [tagSuggestions, setTagSuggestions] = useState(() => {
+    const list = [...SUGGESTED_TAGS_COLLECTION];
+    try {
+      const saved = localStorage.getItem('casa_admin_saved_tags');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((t) => {
+            if (t && !list.includes(t)) list.push(t);
+          });
+        }
+      }
+    } catch (_) {}
+    return list;
+  });
+
+  useEffect(() => {
+    getRtdbTags().then((fetchedTags) => {
+      if (fetchedTags && Array.isArray(fetchedTags) && fetchedTags.length > 0) {
+        setTagSuggestions((prev) => {
+          const merged = [...prev];
+          fetchedTags.forEach((t) => {
+            if (t && !merged.includes(t)) merged.push(t);
+          });
+          return merged;
+        });
+      }
+    });
+  }, []);
+
   // Tìm kiếm sản phẩm đính kèm
   const [productSearch, setProductSearch] = useState('');
 
@@ -503,15 +534,27 @@ export default function ArticleStudioEditor({
     }
   };
 
-  // Thêm / gỡ Thẻ Tag
+  // Thêm / gỡ Thẻ Tag & Tự động lưu vào thư viện dùng chung
   const handleAddTag = (tagToAdd) => {
-    const val = (tagToAdd || customTagInput).trim();
+    const raw = (tagToAdd || customTagInput).trim();
+    if (!raw) return;
+    const val = raw.replace(/^#+/, '').trim();
     if (!val) return;
+
     const currentTags = Array.isArray(newsFormData.tags) ? [...newsFormData.tags] : [];
     if (!currentTags.includes(val)) {
       setNewsFormData({ ...newsFormData, tags: [...currentTags, val] });
     }
     setCustomTagInput('');
+
+    // Tự động lưu tag vào thư viện để lần sau các bài khác sử dụng
+    setTagSuggestions((prev) => {
+      if (!prev.includes(val)) {
+        return [...prev, val];
+      }
+      return prev;
+    });
+    saveRtdbTag(val);
   };
 
   const handleRemoveTag = (tagToRemove) => {
@@ -2081,7 +2124,7 @@ export default function ArticleStudioEditor({
                           Thẻ gợi ý (Click để thêm)
                         </span>
                         <div className="flex flex-wrap gap-1.5 max-h-56 overflow-y-auto pr-1">
-                          {SUGGESTED_TAGS_COLLECTION.map((sugTag) => {
+                          {tagSuggestions.map((sugTag) => {
                             const isAdded = (newsFormData.tags || []).includes(sugTag);
                             return (
                               <button

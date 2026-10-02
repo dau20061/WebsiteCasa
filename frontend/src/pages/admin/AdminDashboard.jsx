@@ -94,7 +94,8 @@ import {
   deleteRtdbContact,
   getRtdbUsers,
   saveRtdbUser,
-  deleteRtdbUser
+  deleteRtdbUser,
+  saveRtdbTag
 } from '../../services/rtdbService';
 
 export default function AdminDashboard() {
@@ -1293,6 +1294,7 @@ export default function AdminDashboard() {
       tags: [...currentTags, val]
     });
     setNewsTagInput('');
+    saveRtdbTag(val);
   };
 
   // Xóa Tag SEO khỏi bài viết

@@ -317,20 +317,26 @@ export default function NewsDetail() {
           <ArticleAttachedProducts products={attachedProducts} />
 
           {/* Tags */}
-          {article.tags && (
+          {Array.isArray(article.tags) && article.tags.length > 0 && (
             <div className="pt-6 border-t border-gray-100 dark:border-white/10 flex flex-wrap items-center gap-2">
-              <Tag className="w-4 h-4 text-tea-leaf" />
+              <Tag className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
               <span className="text-xs text-gray-700 dark:text-gray-300 mr-2 font-medium">
                 {isEnglish ? 'Article Tags:' : (isChinese ? '文章標籤：' : 'Thẻ bài viết:')}
               </span>
-              {article.tags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 rounded-lg bg-[#FAF9F5] dark:bg-[#0B130E] text-xs font-medium text-gray-700 dark:text-gray-300 border border-tea-border dark:border-white/10"
-                >
-                  #{tag}
-                </span>
-              ))}
+              {article.tags.map((tag, i) => {
+                const cleanTag = String(tag).replace(/^#+/, '').trim();
+                return (
+                  <Link
+                    key={i}
+                    to={`/news?tag=${encodeURIComponent(cleanTag)}`}
+                    className="px-3.5 py-1.5 rounded-full bg-[#FAF9F5] hover:bg-tea-leaf/10 dark:bg-[#0B130E] dark:hover:bg-tea-mint/10 text-xs font-semibold text-gray-700 hover:text-tea-primary dark:text-gray-300 dark:hover:text-tea-mint border border-tea-border hover:border-tea-primary/40 dark:border-white/10 dark:hover:border-tea-mint/40 transition-all cursor-pointer shadow-2xs hover:shadow-xs group"
+                    title={`Xem tất cả bài viết có thẻ #${cleanTag}`}
+                  >
+                    <span className="text-tea-leaf dark:text-tea-mint font-bold mr-0.5">#</span>
+                    <span>{cleanTag}</span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
