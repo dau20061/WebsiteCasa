@@ -47,7 +47,18 @@ export default function NewsDetail() {
     });
   }, []);
 
-  const article = allArticles.find((a) => a.slug === slug || a.id === slug);
+  const article = allArticles.find((a) => 
+    a.slug === slug || 
+    a.id === slug ||
+    (slug === 'bai-viet-1790837327379' && a.id === 'news_1790837787012')
+  );
+
+  // Tự động chuyển hướng về Canonical Slug theo tiêu đề chuẩn SEO nếu người dùng truy cập từ URL cũ
+  useEffect(() => {
+    if (article && article.slug && slug !== article.slug) {
+      navigate(`/news/${article.slug}`, { replace: true });
+    }
+  }, [article, slug, navigate]);
 
   if (!article) {
     return (

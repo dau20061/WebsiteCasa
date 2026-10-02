@@ -1200,7 +1200,7 @@ export default function AdminDashboard() {
         title: '',
         titleZh: '',
         titleEn: '',
-        slug: `bai-viet-${Date.now()}`,
+        slug: '',
         category: 'cong-thuc',
         categoryName: 'Công Thức Pha Chế',
         excerpt: '',
@@ -1351,8 +1351,10 @@ export default function AdminDashboard() {
       }
     }
 
-    const cleanArticleSlug = (finalData.slug && finalData.slug.trim()) || slugify(finalData.title) || editingNews?.slug || '';
-    const targetArticleSlug = cleanArticleSlug || editingNews?.slug || editingNews?.id || `news_${Date.now()}`;
+    const isTempSlug = !finalData.slug || !finalData.slug.trim() || finalData.slug.startsWith('bai-viet-') || finalData.slug.startsWith('news_');
+    const titleSlug = slugify(finalData.title || '');
+    const cleanArticleSlug = (!isTempSlug && finalData.slug.trim()) ? slugify(finalData.slug) : (titleSlug || editingNews?.slug || `news_${Date.now()}`);
+    const targetArticleSlug = cleanArticleSlug || `news_${Date.now()}`;
     finalData.slug = targetArticleSlug;
 
     // Nếu ảnh là dạng Base64 data: -> Lưu vào imageData và chuyển image thành URL HTTPS chuẩn

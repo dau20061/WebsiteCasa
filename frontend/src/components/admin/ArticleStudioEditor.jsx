@@ -189,10 +189,16 @@ export default function ArticleStudioEditor({
   const [previewLang, setPreviewLang] = useState('vi');
   const [previewTheme, setPreviewTheme] = useState('light');
 
-  // Tự động khởi tạo Slug nếu có Title mà chưa có Slug
+  // Tự động khởi tạo / đồng bộ Slug theo Title (nếu chưa có slug hoặc slug đang mang giá trị tạm như bai-viet-...)
   useEffect(() => {
-    if (newsFormData?.title && !newsFormData?.slug) {
-      setNewsFormData((prev) => ({ ...prev, slug: slugify(prev.title) }));
+    if (newsFormData?.title) {
+      const isTempSlug = !newsFormData.slug || newsFormData.slug.startsWith('bai-viet-') || newsFormData.slug.startsWith('news_');
+      if (isTempSlug) {
+        const generated = slugify(newsFormData.title);
+        if (generated) {
+          setNewsFormData((prev) => ({ ...prev, slug: generated }));
+        }
+      }
     }
   }, [newsFormData?.title, newsFormData?.slug]);
 
@@ -552,7 +558,8 @@ export default function ArticleStudioEditor({
 
     setIsSubmitting(true);
     try {
-      const generatedSlug = newsFormData.slug ? slugify(newsFormData.slug) : slugify(newsFormData.title || 'bai-viet-casa');
+      const isTemp = !newsFormData.slug || newsFormData.slug.startsWith('bai-viet-') || newsFormData.slug.startsWith('news_');
+      const generatedSlug = (!isTemp && newsFormData.slug.trim()) ? slugify(newsFormData.slug) : slugify(newsFormData.title || 'bai-viet-casa');
       const articlePayload = {
         ...newsFormData,
         content: finalContent,
@@ -2008,7 +2015,6 @@ export default function ArticleStudioEditor({
                             });
                           }}
                           style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
-                          style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
                           className="w-full px-3 py-2.5 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs font-medium outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
                         >
                           <option value="cong-thuc">Công Thức Pha Chế (Barista SOP)</option>
@@ -2035,7 +2041,6 @@ export default function ArticleStudioEditor({
                                 handleAddTag();
                               }
                             }}
-                            style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                             style={{ color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF', backgroundColor: '#090F0B' }}
                             className="flex-1 px-3 py-2 rounded-xl bg-[#090F0B] border border-[#243729] text-white text-xs outline-none focus:border-emerald-500 shadow-2xs"
                           />
