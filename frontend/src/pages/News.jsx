@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag, X } from 'lucide-react';
+import { Search, Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag, X, Filter, RotateCcw } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import NewsCard from '../components/NewsCard';
 import WaveDivider from '../components/WaveDivider';
 import SEO from '../components/SEO';
-import { NEWS_CATEGORIES } from '../constants/categories';
+import { NEWS_CATEGORIES, getNewsCategoryLabel } from '../constants/categories';
 import { SITE_URL } from '../constants/site';
 import { getRtdbNews } from '../services/rtdbService';
 import { useLanguage } from '../context/LanguageContext';
@@ -20,8 +20,10 @@ export default function News() {
   const activeTag = (tagSlug || searchParams.get('tag') || '').trim();
   const activeTagSlug = slugify(activeTag);
 
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const categoryParam = (searchParams.get('category') || 'all').trim();
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'featured' | 'oldest'
 
   const [articles, setArticles] = useState(() => {
     const saved = localStorage.getItem('casa_admin_news');
@@ -33,6 +35,48 @@ export default function News() {
       if (res && res.length > 0) setArticles(res);
     });
   }, []);
+
+  useEffect(() => {
+    setSelectedCategory(categoryParam);
+  }, [categoryParam]);
+
+  // Đếm số lượng bài viết theo từng danh mục (chuẩn hóa alias)
+  const categoryCounts = useMemo(() => {
+    const counts = { all: articles.length };
+    NEWS_CATEGORIES.forEach((cat) => {
+      if (cat.id === 'all') return;
+      const count = articles.filter((a) => {
+        return (
+          a.category === cat.id ||
+          a.categorySlug === cat.id ||
+          (cat.aliases && (cat.aliases.includes(a.category) || cat.aliases.includes(a.categorySlug)))
+        );
+      }).length;
+      counts[cat.id] = count;
+    });
+    return counts;
+  }, [articles]);
+
+  // Trích xuất danh sách tất cả các Thẻ Tag từ bài viết thực tế
+  const availableTags = useMemo(() => {
+    const tagMap = new Map();
+    articles.forEach((art) => {
+      if (Array.isArray(art.tags)) {
+        art.tags.forEach((t) => {
+          const clean = String(t).replace(/^#+/, '').trim();
+          if (clean) {
+            const slug = slugify(clean);
+            if (!tagMap.has(slug)) {
+              tagMap.set(slug, { name: clean, slug, count: 1 });
+            } else {
+              tagMap.get(slug).count += 1;
+            }
+          }
+        });
+      }
+    });
+    return Array.from(tagMap.values()).sort((a, b) => b.count - a.count);
+  }, [articles]);
 
   // Tên hiển thị có dấu của thẻ tag đang được lọc
   const activeTagDisplayName = useMemo(() => {
@@ -60,14 +104,32 @@ export default function News() {
     return activeTag.replace(/-/g, ' ');
   }, [activeTag, activeTagSlug, articles]);
 
+  const handleSelectCategory = (catId) => {
+    setSelectedCategory(catId);
+    if (catId === 'all') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', catId);
+    }
+    setSearchParams(searchParams);
+  };
+
   const handleClearTagFilter = () => {
     if (tagSlug) {
-      navigate('/news');
+      navigate(selectedCategory !== 'all' ? `/news?category=${selectedCategory}` : '/news');
     } else {
       searchParams.delete('tag');
       setSearchParams(searchParams);
     }
   };
+
+  const handleResetAllFilters = () => {
+    setSelectedCategory('all');
+    setSearchQuery('');
+    navigate('/news');
+  };
+
+  const isFiltering = selectedCategory !== 'all' || Boolean(activeTag) || Boolean(searchQuery.trim());
 
   const sortByDateDesc = (arr) =>
     [...arr].sort((a, b) => new Date(b.updatedAt || b.date || 0) - new Date(a.updatedAt || a.date || 0));
@@ -84,7 +146,13 @@ export default function News() {
 
   const filteredArticles = articles.filter((article) => {
     const matchesCat =
-      selectedCategory === 'all' || article.categorySlug === selectedCategory || article.category === selectedCategory;
+      selectedCategory === 'all' ||
+      article.category === selectedCategory ||
+      article.categorySlug === selectedCategory ||
+      (selectedCategory === 'kien-thuc' && (article.category === 'kien-thuc-tra' || article.categorySlug === 'kien-thuc-tra')) ||
+      (selectedCategory === 'kien-thuc-tra' && (article.category === 'kien-thuc' || article.categorySlug === 'kien-thuc')) ||
+      (selectedCategory === 'tin-doanh-nghiep' && (article.category === 'tin-cong-ty' || article.categorySlug === 'tin-cong-ty')) ||
+      (selectedCategory === 'tin-cong-ty' && (article.category === 'tin-doanh-nghiep' || article.categorySlug === 'tin-doanh-nghiep'));
 
     const matchesTag = !activeTag || (
       Array.isArray(article.tags) && article.tags.some((t) => {
@@ -93,9 +161,9 @@ export default function News() {
       })
     );
 
-    const q = searchQuery.toLowerCase();
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      searchQuery === '' ||
+      q === '' ||
       (article.title && article.title.toLowerCase().includes(q)) ||
       (article.titleEn && article.titleEn.toLowerCase().includes(q)) ||
       (article.titleZh && article.titleZh.toLowerCase().includes(q)) ||
@@ -108,6 +176,15 @@ export default function News() {
   });
 
   const sortedArticles = [...filteredArticles].sort((a, b) => {
+    if (sortBy === 'featured') {
+      const aFeat = a.featuredNews ? 2 : (a.featuredHome || a.featured ? 1 : 0);
+      const bFeat = b.featuredNews ? 2 : (b.featuredHome || b.featured ? 1 : 0);
+      if (bFeat !== aFeat) return bFeat - aFeat;
+    }
+    if (sortBy === 'oldest') {
+      return new Date(a.updatedAt || a.date || 0) - new Date(b.updatedAt || b.date || 0);
+    }
+    // 'newest' default
     const aFeat = a.featuredNews ? 2 : (a.featuredHome || a.featured ? 1 : 0);
     const bFeat = b.featuredNews ? 2 : (b.featuredHome || b.featured ? 1 : 0);
     if (bFeat !== aFeat) return bFeat - aFeat;
@@ -170,15 +247,15 @@ export default function News() {
         flipX={false}
       />
 
-      {/* 2. FEATURED HERO ARTICLE */}
-      {featuredArticle && !activeTag && (
+      {/* 2. FEATURED HERO ARTICLE (Ẩn khi đang lọc bài viết để hiển thị ngay kết quả lọc) */}
+      {featuredArticle && !isFiltering && (
         <section className="py-12 bg-white dark:bg-[#0B130E] transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-[#FAF9F5] dark:bg-[#132018] rounded-4xl p-6 sm:p-10 border border-tea-border dark:border-white/10 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center gap-3 text-xs text-tea-leaf dark:text-tea-mint font-bold">
                   <span className="px-3 py-1 rounded-full bg-tea-soft dark:bg-[#0B130E] text-tea-primary dark:text-tea-mint uppercase">
-                    {isEnglish ? (featuredArticle.categoryEn || featuredArticle.category) : ((isChinese && (featuredArticle.categoryZh || featuredArticle.category_zh)) || featuredArticle.category)}
+                    {getNewsCategoryLabel(featuredArticle.category, isEnglish ? 'en' : (isChinese ? 'zh' : 'vi'))}
                   </span>
                   <span>•</span>
                   <span>{t('news_featured_badge', 'Bài viết nổi bật')}</span>
@@ -233,64 +310,190 @@ export default function News() {
         </section>
       )}
 
-      {/* 3. CONTROLS (SEARCH & CATEGORIES) */}
-      <section className="py-6 bg-[#FAF9F5]/95 dark:bg-[#0E1711]/95 backdrop-blur-md border-y border-tea-border/60 dark:border-white/10 sticky top-16 z-20 shadow-tea-sm transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full md:w-auto">
-              {NEWS_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-tea-primary text-white shadow-tea-sm'
-                      : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10'
-                  }`}
-                >
-                  {isEnglish ? (cat.nameEn || cat.name) : ((isChinese && cat.nameZh) || cat.name)}
-                </button>
-              ))}
+      {/* 3. BỘ LỌC BÀI VIẾT (CONTROLS: CATEGORIES, TAGS, SEARCH & SORT) */}
+      <section className="py-5 bg-[#FAF9F5]/95 dark:bg-[#0E1711]/95 backdrop-blur-md border-y border-tea-border/60 dark:border-white/10 sticky top-16 z-20 shadow-tea-sm transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3.5">
+          {/* Hàng 1: Danh mục bài viết + Ô tìm kiếm + Sắp xếp */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+            {/* Category Pills có số lượng bài viết */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-1">
+              {NEWS_CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat.id || (cat.aliases && cat.aliases.includes(selectedCategory));
+                const count = cat.id === 'all' ? articles.length : (categoryCounts[cat.id] || 0);
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleSelectCategory(cat.id)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                      isSelected
+                        ? 'bg-tea-primary text-white shadow-tea-sm'
+                        : 'bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:bg-tea-soft dark:hover:bg-[#1C2F23] border border-tea-border dark:border-white/10 hover:border-tea-leaf/40'
+                    }`}
+                  >
+                    <span>{isEnglish ? (cat.nameEn || cat.name) : ((isChinese && cat.nameZh) || cat.name)}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      isSelected
+                        ? 'bg-white/20 text-white'
+                        : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Search */}
-            <div className="relative w-full md:w-72">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder={t('news_search_placeholder', 'Tìm bài viết, công thức...')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-tea-border dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#132018] dark:text-white dark:placeholder-gray-400 transition-colors"
-              />
+            {/* Bên phải: Dropdown sắp xếp + Ô tìm kiếm */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              {/* Sắp xếp bài viết */}
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="pl-3 pr-7 py-2 rounded-xl border border-tea-border dark:border-white/10 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 cursor-pointer shadow-2xs"
+                >
+                  <option value="newest">{isEnglish ? 'Newest' : (isChinese ? '最新發布' : 'Mới nhất')}</option>
+                  <option value="featured">{isEnglish ? 'Featured' : (isChinese ? '精選推薦' : 'Nổi bật')}</option>
+                  <option value="oldest">{isEnglish ? 'Oldest' : (isChinese ? '最早發布' : 'Cũ nhất')}</option>
+                </select>
+              </div>
+
+              {/* Ô tìm kiếm từ khóa */}
+              <div className="relative w-full sm:w-64">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder={t('news_search_placeholder', 'Tìm bài viết, công thức...')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-8 py-2 rounded-xl border border-tea-border dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-tea-emerald/30 bg-white dark:bg-[#132018] dark:text-white dark:placeholder-gray-400 transition-colors shadow-2xs"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white p-0.5 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* 4. ARTICLES GRID */}
-      <section className="py-12 bg-[#FAF9F5] dark:bg-[#0B130E] transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Active Tag Filter Banner */}
-          {activeTag && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-4 px-5 rounded-2xl bg-tea-leaf/10 dark:bg-tea-mint/10 border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-dark dark:text-white text-xs mb-8 shadow-xs">
-              <div className="flex items-center gap-2.5">
-                <Tag className="w-4 h-4 text-tea-leaf dark:text-tea-mint shrink-0" />
-                <span className="font-medium">
-                  {isEnglish ? 'Filtering by tag:' : (isChinese ? '正在篩選標籤：' : 'Đang lọc bài viết theo thẻ:')}
-                  <span className="ml-1.5 font-bold text-sm text-tea-primary dark:text-tea-mint">#{activeTagDisplayName || activeTag}</span>
-                  <span className="ml-2 text-gray-500 dark:text-gray-400 font-normal">
-                    ({filteredArticles.length} {isEnglish ? 'articles' : (isChinese ? '篇文章' : 'bài viết')})
-                  </span>
-                </span>
+          {/* Hàng 2: Bộ lọc Thẻ Tag chủ đề (Popular Tags) */}
+          {availableTags.length > 0 && (
+            <div className="pt-2.5 border-t border-tea-border/40 dark:border-white/5 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-bold shrink-0 mr-1 text-[11px]">
+                <Tag className="w-3.5 h-3.5 text-tea-leaf dark:text-tea-mint" />
+                <span>{isEnglish ? 'Topic Tags:' : (isChinese ? '熱門標籤:' : 'Thẻ chủ đề:')}</span>
               </div>
               <button
                 onClick={handleClearTagFilter}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#132018] text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 border border-tea-border dark:border-white/10 hover:border-red-300 text-xs font-semibold transition-all cursor-pointer shadow-2xs hover:shadow-xs"
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  !activeTag
+                    ? 'bg-tea-leaf/20 dark:bg-tea-mint/20 text-tea-dark dark:text-white font-bold border border-tea-leaf/40 dark:border-tea-mint/40 shadow-2xs'
+                    : 'bg-white dark:bg-[#132018] text-gray-600 dark:text-gray-400 border border-tea-border/60 dark:border-white/10 hover:border-tea-leaf/40'
+                }`}
               >
-                <X className="w-3.5 h-3.5" />
-                <span>{isEnglish ? 'Clear filter' : (isChinese ? '清除篩選' : 'Bỏ lọc thẻ')}</span>
+                {isEnglish ? 'All tags' : (isChinese ? '全部標籤' : 'Tất cả thẻ')}
+              </button>
+              {availableTags.map((tagObj) => {
+                const isSelected = activeTagSlug === tagObj.slug;
+                return (
+                  <button
+                    key={tagObj.slug}
+                    onClick={() => {
+                      if (isSelected) {
+                        handleClearTagFilter();
+                      } else {
+                        searchParams.set('tag', tagObj.slug);
+                        setSearchParams(searchParams);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      isSelected
+                        ? 'bg-tea-primary text-white font-bold shadow-2xs'
+                        : 'bg-white dark:bg-[#132018] text-gray-600 dark:text-gray-400 hover:text-tea-primary dark:hover:text-tea-mint border border-tea-border/60 dark:border-white/10 hover:border-tea-leaf/40 shadow-2xs'
+                    }`}
+                  >
+                    <span className={isSelected ? 'text-white' : 'text-tea-leaf dark:text-tea-mint font-bold'}>#</span>
+                    <span>{tagObj.name}</span>
+                    <span className="text-[10px] opacity-70">({tagObj.count})</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 4. ARTICLES GRID & ACTIVE FILTER SUMMARY */}
+      <section className="py-10 bg-[#FAF9F5] dark:bg-[#0B130E] transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Thanh hiển thị các điều kiện đang lọc (Active Filters Summary) */}
+          {isFiltering && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 px-5 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-dark dark:text-white text-xs mb-8 shadow-xs">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1.5 font-bold text-tea-primary dark:text-tea-mint mr-1">
+                  <Filter className="w-4 h-4" />
+                  <span>{isEnglish ? 'Active Filters:' : (isChinese ? '篩選條件:' : 'Đang lọc theo:')}</span>
+                </div>
+
+                {/* Danh mục */}
+                {selectedCategory !== 'all' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300 font-semibold text-xs">
+                    <span>{getNewsCategoryLabel(selectedCategory, isEnglish ? 'en' : (isChinese ? 'zh' : 'vi'))}</span>
+                    <button
+                      onClick={() => handleSelectCategory('all')}
+                      className="hover:text-red-500 cursor-pointer"
+                      title="Bỏ lọc danh mục"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                )}
+
+                {/* Thẻ Tag */}
+                {activeTag && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tea-leaf/15 dark:bg-tea-mint/15 border border-tea-leaf/30 dark:border-tea-mint/30 text-tea-primary dark:text-tea-mint font-semibold text-xs">
+                    <span>#{activeTagDisplayName || activeTag}</span>
+                    <button
+                      onClick={handleClearTagFilter}
+                      className="hover:text-red-500 cursor-pointer"
+                      title="Bỏ lọc thẻ"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                )}
+
+                {/* Từ khóa tìm kiếm */}
+                {searchQuery.trim() && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700/60 text-amber-800 dark:text-amber-300 font-semibold text-xs">
+                    <span>Từ khóa: "{searchQuery.trim()}"</span>
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="hover:text-red-500 cursor-pointer"
+                      title="Xóa từ khóa"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                )}
+
+                {/* Số lượng bài viết tìm thấy */}
+                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">
+                  ({filteredArticles.length} {isEnglish ? 'articles found' : (isChinese ? '篇文章' : 'bài viết phù hợp')})
+                </span>
+              </div>
+
+              {/* Nút đặt lại tất cả bộ lọc */}
+              <button
+                onClick={handleResetAllFilters}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-gray-500" />
+                <span>{isEnglish ? 'Reset all' : (isChinese ? '重置全部' : 'Đặt lại bộ lọc')}</span>
               </button>
             </div>
           )}
@@ -303,14 +506,16 @@ export default function News() {
 
           {filteredArticles.length === 0 && (
             <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#132018] rounded-3xl border border-tea-border dark:border-white/10 p-8 space-y-4">
-              <p>{isEnglish ? 'No articles found matching your search.' : (isChinese ? '查無符合搜尋條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí tìm kiếm.')}</p>
-              {activeTag && (
+              <p className="text-base font-medium">
+                {isEnglish ? 'No articles found matching your criteria.' : (isChinese ? '查無符合條件的文章。' : 'Không tìm thấy bài viết phù hợp với tiêu chí lọc.')}
+              </p>
+              {isFiltering && (
                 <button
-                  onClick={handleClearTagFilter}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tea-primary text-white text-xs font-bold shadow-tea-sm hover:bg-tea-emerald transition-all cursor-pointer"
+                  onClick={handleResetAllFilters}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-tea-primary text-white text-xs font-bold shadow-tea-sm hover:bg-tea-emerald transition-all cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
-                  <span>{isEnglish ? 'Remove tag filter' : (isChinese ? '清除標籤篩選' : 'Bỏ lọc theo thẻ')}</span>
+                  <RotateCcw className="w-4 h-4" />
+                  <span>{isEnglish ? 'Reset all filters' : (isChinese ? '清除所有篩選' : 'Đặt lại tất cả bộ lọc')}</span>
                 </button>
               )}
             </div>

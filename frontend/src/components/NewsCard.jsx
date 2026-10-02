@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getArticleImageUrl } from '../utils/slugify';
+import { getNewsCategoryLabel } from '../constants/categories';
 
 export default function NewsCard({ article }) {
   const { t, isChinese, isEnglish } = useLanguage();
@@ -20,8 +21,8 @@ export default function NewsCard({ article }) {
     : (isChinese ? (article.excerptZh || article.excerpt_zh || excerpt) : excerpt);
 
   const displayCategory = isEnglish
-    ? (article.categoryEn || article.category_en || category)
-    : (isChinese ? (article.categoryZh || article.category_zh || category) : category);
+    ? (article.categoryEn || article.category_en || getNewsCategoryLabel(category, 'en'))
+    : (isChinese ? (article.categoryZh || article.category_zh || getNewsCategoryLabel(category, 'zh')) : (article.categoryName || getNewsCategoryLabel(category, 'vi')));
 
   return (
     <motion.article

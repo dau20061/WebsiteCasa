@@ -22,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import ArticleAttachedProducts from '../components/ArticleAttachedProducts';
 import { resolveArticleProducts } from '../utils/articleProductsHelper';
 import { slugify } from '../utils/slugify';
+import { getNewsCategoryLabel } from '../constants/categories';
 
 export default function NewsDetail() {
   const { slug } = useParams();
@@ -97,7 +98,9 @@ export default function NewsDetail() {
   const displayTitle = isEnglish ? (article.titleEn || article.title) : ((isChinese && (article.titleZh || article.title_zh)) || article.title);
   const displayExcerpt = isEnglish ? (article.excerptEn || article.excerpt) : ((isChinese && (article.excerptZh || article.excerpt_zh)) || article.excerpt);
   const displayContent = isEnglish ? (article.contentEn || article.content) : ((isChinese && (article.contentZh || article.content_zh)) || article.content);
-  const displayCategory = isEnglish ? (article.categoryEn || article.category) : ((isChinese && (article.categoryZh || article.category_zh)) || article.category);
+  const displayCategory = isEnglish
+    ? (article.categoryEn || article.category_en || getNewsCategoryLabel(article.category, 'en'))
+    : (isChinese ? (article.categoryZh || article.category_zh || getNewsCategoryLabel(article.category, 'zh')) : (article.categoryName || getNewsCategoryLabel(article.category, 'vi')));
 
   const attachedProducts = resolveArticleProducts(article, allProducts);
 

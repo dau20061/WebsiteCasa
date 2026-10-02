@@ -17,9 +17,28 @@ export const NEWS_CATEGORIES = [
   { id: 'all', name: 'Tất cả bài viết', nameZh: '全部文章', nameEn: 'All Articles' },
   { id: 'xu-huong', name: 'Xu Hướng Đồ Uống', nameZh: '飲品市場趨勢', nameEn: 'Beverage Trends' },
   { id: 'cong-thuc', name: 'Công Thức Pha Chế', nameZh: '調飲專業配方', nameEn: 'Barista Recipes' },
-  { id: 'kien-thuc-tra', name: 'Kiến Thức Trà & R&D', nameZh: '製茶與研發知識', nameEn: 'Tea R&D Insights' },
-  { id: 'tin-cong-ty', name: 'Tin Tức Công Ty & Sự Kiện', nameZh: '企業最新動態', nameEn: 'Corporate News' },
+  { id: 'kien-thuc', aliases: ['kien-thuc-tra'], name: 'Kiến Thức Trà & R&D', nameZh: '製茶與研發知識', nameEn: 'Tea R&D Insights' },
+  { id: 'tin-doanh-nghiep', aliases: ['tin-cong-ty'], name: 'Tin Doanh Nghiệp', nameZh: '企業最新動態', nameEn: 'Corporate News' },
 ];
+
+export function getNewsCategoryLabel(category, lang = 'vi') {
+  if (!category) return lang === 'en' ? 'News' : (lang === 'zh' ? '資訊' : 'Tin tức');
+  const cat = String(category).trim().toLowerCase();
+
+  const map = {
+    'xu-huong': { vi: 'Xu Hướng Đồ Uống', zh: '飲品市場趨勢', en: 'Beverage Trends' },
+    'cong-thuc': { vi: 'Công Thức Pha Chế', zh: '調飲專業配方', en: 'Barista Recipes' },
+    'kien-thuc': { vi: 'Kiến Thức Trà & R&D', zh: '製茶與研發知識', en: 'Tea R&D Insights' },
+    'kien-thuc-tra': { vi: 'Kiến Thức Trà & R&D', zh: '製茶與研發知識', en: 'Tea R&D Insights' },
+    'tin-doanh-nghiep': { vi: 'Tin Doanh Nghiệp', zh: '企業最新動態', en: 'Corporate News' },
+    'tin-cong-ty': { vi: 'Tin Doanh Nghiệp', zh: '企業最新動態', en: 'Corporate News' },
+  };
+
+  if (map[cat]) {
+    return map[cat][lang] || map[cat].vi;
+  }
+  return category;
+}
 
 export const FAQ_CATEGORIES = [
   { id: 'all', name: 'Tất cả câu hỏi', nameZh: '全部問題', nameEn: 'All Questions' },
