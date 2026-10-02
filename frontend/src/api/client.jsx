@@ -125,11 +125,12 @@ export const aiApi = {
 };
 
 // ----------------------------------------------------------------------------
-// USERS API
+// USERS API (Endpoint: /user)
 // ----------------------------------------------------------------------------
 export const userApi = {
-  save: (data) => request('/users', { method: 'POST', body: data }),
-  delete: (uid) => request(`/users/${uid}`, { method: 'DELETE' }),
+  getAll: () => request('/user'),
+  save: (data) => request('/user', { method: 'POST', body: data }),
+  delete: (uid) => request(`/user/${uid}`, { method: 'DELETE' }),
 };
 
 export default {
@@ -142,5 +143,6 @@ export default {
   certifications: certificationApi,
   contacts: contactApi,
   ai: aiApi,
+  user: userApi,
   users: userApi,
 };

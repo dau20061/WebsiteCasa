@@ -1,7 +1,16 @@
 import { Router } from 'express';
-import { saveUser, deleteUser } from '../services/dbService.js';
+import { getUsers, saveUser, deleteUser } from '../services/dbService.js';
 
 const router = Router();
+
+router.get('/', async (req, res) => {
+  try {
+    const users = await getUsers();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 router.post('/', async (req, res) => {
   try {

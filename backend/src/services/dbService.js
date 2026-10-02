@@ -398,16 +398,30 @@ export async function deleteContact(contactId) {
 }
 
 // ============================================================================
-// USERS
+// USERS (Realtime Database node: 'user')
 // ============================================================================
-export async function saveUser(user) {
-  const cleanUid = user.uid || `user_${Date.now()}`;
-  const record = { ...user, uid: cleanUid, updatedAt: new Date().toISOString() };
+export async function getUsers() {
   try {
-    await set(ref(rtdb, `users/${cleanUid}`), record);
+    const snap = await get(ref(rtdb, 'user'));
+    if (snap.exists()) {
+      const val = snap.val();
+      return Object.keys(val).map((k) => ({ id: k, uid: k, ...val[k] }));
+    }
+  } catch (_) {}
+
+  const data = await restRtdb('user');
+  if (data && typeof data === 'object') {
+    return Object.keys(data).map((k) => ({ id: k, uid: k, ...data[k] }));
+  }
+  return [];
+}
+
+export async function saveUser(user) {
+  const cleanUid = user.uid || user.id || `user_${Date.now()}`;
+  const record = { ...user, id: cleanUid, uid: cleanUid, updatedAt: new Date().toISOString() };
+  try {
     await set(ref(rtdb, `user/${cleanUid}`), record);
   } catch (_) {
-    await restRtdb(`users/${cleanUid}`, 'PUT', record);
     await restRtdb(`user/${cleanUid}`, 'PUT', record);
   }
   return record;
@@ -415,10 +429,8 @@ export async function saveUser(user) {
 
 export async function deleteUser(uid) {
   try {
-    await remove(ref(rtdb, `users/${uid}`));
     await remove(ref(rtdb, `user/${uid}`));
   } catch (_) {
-    await restRtdb(`users/${uid}`, 'DELETE');
     await restRtdb(`user/${uid}`, 'DELETE');
   }
   return { success: true, uid };

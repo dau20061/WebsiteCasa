@@ -39,8 +39,8 @@ export async function loginWithEmail(email, password) {
         return null;
       };
 
-      // Thử cả 2 node "user" (số ít như trên hình) và "users" (số nhiều)
-      const usersData = (await fetchRtdbNode('user')) || (await fetchRtdbNode('users'));
+      // Lấy trực tiếp từ node chính "user" trên Realtime Database
+      const usersData = await fetchRtdbNode('user');
 
       if (usersData) {
         // Tìm user có email khớp (hỗ trợ cả admin@casate.com và admin@casatea...)
@@ -119,7 +119,7 @@ export async function getUserProfile(uid) {
     console.warn('Firestore getUserProfile:', err);
   }
 
-  // 2. Kiểm tra trong Realtime Database (cả node user và users)
+  // 2. Kiểm tra trong Realtime Database (node 'user')
   try {
     const checkRtdb = async (nodeName) => {
       try {
@@ -146,7 +146,7 @@ export async function getUserProfile(uid) {
       return null;
     };
 
-    const foundUser = (await checkRtdb('user')) || (await checkRtdb('users'));
+    const foundUser = await checkRtdb('user');
     if (foundUser) {
       return {
         uid: foundUser.uid || uid,

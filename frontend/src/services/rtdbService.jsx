@@ -645,14 +645,38 @@ export async function deleteRtdbContact(contactId) {
 }
 
 // ============================================================================
-// USERS
+// USERS (Realtime Database primary key: 'user')
 // ============================================================================
+export async function getRtdbUsers() {
+  try {
+    const directData = await fetchDirectRtdb('user');
+    if (directData && Array.isArray(directData) && directData.length > 0) {
+      const cleanUsers = directData.map((u) => ({
+        ...u,
+        uid: u.uid || u.id,
+      }));
+      try {
+        localStorage.setItem('casa_admin_users', JSON.stringify(cleanUsers));
+      } catch (_) {}
+      return cleanUsers;
+    }
+  } catch (directErr) {
+    console.warn('[Frontend Service] fetchDirectRtdb user error:', directErr);
+  }
+
+  try {
+    return await userApi.getAll();
+  } catch (err) {
+    console.warn('[Frontend Service] getRtdbUsers error:', err.message);
+    return [];
+  }
+}
+
 export async function saveRtdbUser(user) {
   const targetId = user.uid || user.id || `user_${Date.now()}`;
   const itemToSave = { ...user, id: targetId, uid: targetId };
 
   try {
-    await fetchDirectRtdb(`users/${targetId}`, 'PUT', itemToSave);
     await fetchDirectRtdb(`user/${targetId}`, 'PUT', itemToSave);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb save user error:', directErr);
@@ -668,8 +692,9 @@ export async function saveRtdbUser(user) {
 
 export async function deleteRtdbUser(uid) {
   try {
-    await fetchDirectRtdb(`users/${uid}`, 'DELETE');
     await fetchDirectRtdb(`user/${uid}`, 'DELETE');
+    // Dọn dẹp cả node users cũ nếu có tồn tại
+    await fetchDirectRtdb(`users/${uid}`, 'DELETE');
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb delete user error:', directErr);
   }

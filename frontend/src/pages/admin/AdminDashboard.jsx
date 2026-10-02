@@ -92,6 +92,7 @@ import {
   getRtdbContacts,
   saveRtdbContact,
   deleteRtdbContact,
+  getRtdbUsers,
   saveRtdbUser,
   deleteRtdbUser
 } from '../../services/rtdbService';
@@ -394,6 +395,9 @@ export default function AdminDashboard() {
     getRtdbContacts().then((res) => {
       if (res && res.length > 0) setContacts(res);
     });
+    getRtdbUsers().then((res) => {
+      if (Array.isArray(res) && res.length > 0) setUsersList(res);
+    });
   }, []);
   const [productSearch, setProductSearch] = useState('');
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
@@ -593,7 +597,7 @@ export default function AdminDashboard() {
       ? JSON.parse(saved)
       : [
           {
-            uid: userProfile?.uid || 'admin_super',
+            uid: userProfile?.uid || 'admin',
             email: userProfile?.email || 'admin@casate.com',
             displayName: userProfile?.displayName || 'Super Admin',
             role: ROLES.SUPER_ADMIN,

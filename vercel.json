@@ -66,6 +66,10 @@
       "destination": "/api/[...path].js?path=contacts/$1"
     },
     {
+      "source": "/api/user/(.+)",
+      "destination": "/api/[...path].js?path=user/$1"
+    },
+    {
       "source": "/api/users/(.+)",
       "destination": "/api/[...path].js?path=users/$1"
     },

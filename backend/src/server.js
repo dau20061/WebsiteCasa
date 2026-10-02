@@ -47,6 +47,7 @@ const routeList = [
   ['/certifications', certificationRoutes],
   ['/contacts', contactRoutes],
   ['/ai', aiRoutes],
+  ['/user', userRoutes],
   ['/users', userRoutes],
 ];
 
