@@ -45,7 +45,7 @@ export default function ProductCard({ product, onRequestSample }) {
       viewport={{ once: true, margin: '-50px' }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
-      className="group bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-leaf/25 dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 hover:border-tea-leaf/50 transition-all flex flex-col h-full"
+      className="group bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-leaf/60 dark:border-white/10 shadow-md hover:shadow-xl dark:hover:border-tea-mint/30 hover:border-tea-leaf transition-all flex flex-col h-full"
     >
       {/* Product Image Box */}
       <div className="relative h-60 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21]">
@@ -65,16 +65,10 @@ export default function ProductCard({ product, onRequestSample }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Top Badges */}
-        <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 pointer-events-none">
+        <div className="absolute top-3.5 left-3.5 pointer-events-none">
           <span className="px-3 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-tea-primary dark:text-tea-mint text-[11px] font-bold tracking-wide uppercase shadow-sm">
             {displayCategoryName}
           </span>
-          {displayBadge && (
-            <span className="px-3 py-1 rounded-full bg-tea-primary text-tea-mint text-[11px] font-bold tracking-wide shadow-sm flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              {displayBadge}
-            </span>
-          )}
         </div>
 
         {/* SKU Chip */}
@@ -84,28 +78,6 @@ export default function ProductCard({ product, onRequestSample }) {
           </span>
         </div>
 
-        {/* Shopee Buy Button / Contact Button Pill on Image */}
-        {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
-          <a
-            href={product.shopeeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-[#EE4D2D] text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105"
-          >
-            <ShoppingBag className="w-3.5 h-3.5 text-orange-400" />
-            <span>{isChinese ? '在蝦皮購買' : (isEnglish ? 'Buy on Shopee' : 'Mua trên Shopee')}</span>
-          </a>
-        ) : (
-          <Link
-            to={`/contact?product=${encodeURIComponent(displayName)}`}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-tea-primary text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
-          >
-            <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
-            <span>{isChinese ? '聯繫諮詢' : (isEnglish ? 'Contact Us' : 'Liên hệ tư vấn')}</span>
-          </Link>
-        )}
       </div>
 
       {/* Content */}

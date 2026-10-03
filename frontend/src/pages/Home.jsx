@@ -172,7 +172,7 @@ export default function Home() {
           {/* Docked 4-Column Luxury Feature Bar (Below the Banner, Clean & Symmetrical) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-10 max-w-6xl xl:max-w-7xl mx-auto">
             {/* Card 1: 3 Dòng Cốt Trà */}
-            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#132018]/80 border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-3.5 shadow-sm">
                 <Leaf className="w-6 h-6" />
               </div>
@@ -189,7 +189,7 @@ export default function Home() {
             </div>
 
             {/* Card 2: Túi Lọc Pyramid */}
-            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#132018]/80 border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-300 mb-3.5 shadow-sm">
                 <Award className="w-6 h-6" />
               </div>
@@ -206,7 +206,7 @@ export default function Home() {
             </div>
 
             {/* Card 3: Chiết xuất TDS > 2.8% */}
-            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#132018]/80 border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-tea-mint/30 dark:bg-tea-mint/20 flex items-center justify-center text-tea-emerald dark:text-tea-mint mb-3.5 shadow-sm">
                 <FlaskConical className="w-6 h-6" />
               </div>
@@ -223,7 +223,7 @@ export default function Home() {
             </div>
 
             {/* Card 4: Chứng nhận ISO & HACCP */}
-            <div className="p-5 rounded-2xl bg-white/80 dark:bg-[#132018]/80 border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 backdrop-blur-md">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#132018]/80 border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all hover:-translate-y-1 backdrop-blur-md">
               <div className="w-12 h-12 rounded-xl bg-blue-100/80 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-300 mb-3.5 shadow-sm">
                 <ShieldCheck className="w-6 h-6" />
               </div>
@@ -273,7 +273,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
                   whileHover={{ y: -6 }}
-                  className="p-8 rounded-3xl bg-tea-cream/70 dark:bg-[#132018] hover:bg-white dark:hover:bg-[#1A2C21] border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-lg transition-all group"
+                  className="p-8 rounded-3xl bg-white dark:bg-[#132018] hover:bg-white dark:hover:bg-[#1A2C21] border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all group"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-emerald dark:text-tea-mint group-hover:bg-tea-emerald group-hover:text-white transition-colors mb-6 shadow-sm">
                     <Icon className="w-7 h-7" />
@@ -593,7 +593,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-white dark:bg-[#132018] p-7 rounded-3xl border border-tea-leaf/30 dark:border-white/10 hover:border-tea-leaf/50 shadow-tea-sm flex flex-col justify-between"
+                className="bg-white dark:bg-[#132018] p-7 rounded-3xl border border-tea-leaf/65 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-lg flex flex-col justify-between"
               >
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic mb-6 font-normal">
                   "{(isEnglish && item.contentEn) || (isChinese && item.contentZh) || item.content}"

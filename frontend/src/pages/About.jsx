@@ -475,28 +475,28 @@ export default function About() {
 
               {/* 4 Key Stat Badges */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/35 dark:border-white/10 shadow-sm text-center">
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/60 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">21</span>
                   <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isEnglish ? 'Production Bases' : (isChinese ? '跨國生產基地' : 'Cơ Sở Sản Xuất')}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/35 dark:border-white/10 shadow-sm text-center">
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/60 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">04</span>
                   <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isEnglish ? 'Countries & Regions' : (isChinese ? '國家與地區' : 'Quốc Gia & Vùng')}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/35 dark:border-white/10 shadow-sm text-center">
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/60 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">08</span>
                   <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isEnglish ? 'Core Services' : (isChinese ? '核心服務項目' : 'Dịch Vụ Trọn Gói')}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/35 dark:border-white/10 shadow-sm text-center">
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#132018] border border-tea-leaf/60 dark:border-white/10 shadow-sm text-center">
                   <span className="text-2xl sm:text-3xl font-black text-tea-primary dark:text-tea-mint block">100%</span>
                   <span className="text-xs text-gray-700 dark:text-gray-300 font-bold mt-1 block">
                     {isEnglish ? 'Safety Inspection' : (isChinese ? '國際食安檢驗' : 'Kiểm Định An Toàn')}
@@ -576,7 +576,7 @@ export default function About() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: idx * 0.05 }}
-                    className="p-6 rounded-3xl bg-white dark:bg-[#132018] border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/60 shadow-tea-sm hover:shadow-tea-md transition-all hover:-translate-y-1 flex flex-col justify-between group"
+                    className="p-6 rounded-3xl bg-white dark:bg-[#132018] border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="w-12 h-12 rounded-2xl bg-tea-soft dark:bg-tea-green/20 flex items-center justify-center text-tea-primary dark:text-tea-mint mb-4 group-hover:scale-110 transition-transform shadow-sm">
@@ -599,7 +599,7 @@ export default function About() {
           </div>
 
           {/* 21 GLOBAL PRODUCTION BASES DIRECTORY */}
-          <div className="rounded-4xl p-6 sm:p-10 bg-white/90 dark:bg-[#132018]/90 border border-tea-leaf/30 dark:border-white/10 shadow-tea-md backdrop-blur-md">
+          <div className="rounded-4xl p-6 sm:p-10 bg-white/95 dark:bg-[#132018]/90 border border-tea-leaf/50 dark:border-white/10 shadow-lg backdrop-blur-md">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-tea-border/60 dark:border-white/10">
               <div>
                 <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-tea-leaf dark:text-tea-mint">
@@ -666,7 +666,7 @@ export default function About() {
                     {reg.bases.map((base) => (
                       <div
                         key={base.id}
-                        className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0E1711] border border-tea-leaf/25 dark:border-white/10 hover:border-tea-leaf/50 transition-all flex items-start gap-3.5 group"
+                        className="p-4 rounded-2xl bg-white dark:bg-[#0E1711] border border-tea-leaf/50 dark:border-white/10 hover:border-tea-leaf shadow-xs hover:shadow-sm transition-all flex items-start gap-3.5 group"
                       >
                         <div className="w-8 h-8 rounded-xl bg-tea-primary text-white dark:bg-tea-mint dark:text-tea-dark font-black text-xs flex items-center justify-center shrink-0 shadow-sm">
                           {base.id}
@@ -709,7 +709,7 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             {/* Tầm nhìn */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#132018] border border-tea-border dark:border-white/10 shadow-tea-sm space-y-4 transition-colors">
+            <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#132018] border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl space-y-4 transition-all">
               <div className="w-12 h-12 rounded-2xl bg-tea-soft dark:bg-[#1C2F23] flex items-center justify-center text-tea-emerald dark:text-tea-mint">
                 <Compass className="w-6 h-6" />
               </div>
@@ -726,7 +726,7 @@ export default function About() {
             </div>
 
             {/* Sứ mệnh */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#132018] border border-tea-border dark:border-white/10 shadow-tea-sm space-y-4 transition-colors">
+            <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#132018] border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl space-y-4 transition-all">
               <div className="w-12 h-12 rounded-2xl bg-tea-mint/30 dark:bg-[#1C2F23] flex items-center justify-center text-tea-emerald dark:text-tea-mint">
                 <Target className="w-6 h-6" />
               </div>
@@ -749,7 +749,7 @@ export default function About() {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/50 text-center space-y-2 transition-all">
+            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl text-center space-y-2 transition-all">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-tea-mist dark:bg-[#1C2F23] text-tea-emerald dark:text-tea-mint flex items-center justify-center font-bold text-lg">
                 01
               </div>
@@ -761,7 +761,7 @@ export default function About() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/50 text-center space-y-2 transition-all">
+            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl text-center space-y-2 transition-all">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-tea-mist dark:bg-[#1C2F23] text-tea-emerald dark:text-tea-mint flex items-center justify-center font-bold text-lg">
                 02
               </div>
@@ -773,7 +773,7 @@ export default function About() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/50 text-center space-y-2 transition-all">
+            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl text-center space-y-2 transition-all">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-tea-mist dark:bg-[#1C2F23] text-tea-emerald dark:text-tea-mint flex items-center justify-center font-bold text-lg">
                 03
               </div>
@@ -785,7 +785,7 @@ export default function About() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/50 text-center space-y-2 transition-all">
+            <div className="bg-white dark:bg-[#132018] p-6 rounded-3xl border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl text-center space-y-2 transition-all">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-tea-mist dark:bg-[#1C2F23] text-tea-emerald dark:text-tea-mint flex items-center justify-center font-bold text-lg">
                 04
               </div>
@@ -831,7 +831,7 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group relative flex flex-col bg-[#FAF9F5] dark:bg-[#132018] rounded-3xl border border-tea-leaf/30 dark:border-white/10 hover:border-tea-mint/60 shadow-tea-sm hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                className="group relative flex flex-col bg-white dark:bg-[#132018] rounded-3xl border border-tea-leaf/65 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden"
               >
                 {/* Certificate Document Thumbnail Preview */}
                 <div
@@ -993,7 +993,7 @@ export default function About() {
             {TEA_REGIONS.map((region, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-leaf/35 dark:border-white/10 hover:border-tea-leaf/50 shadow-tea-sm flex flex-col justify-between transition-all"
+                className="bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-leaf/70 dark:border-white/10 hover:border-tea-leaf shadow-md hover:shadow-xl flex flex-col justify-between transition-all"
               >
                 <div className="h-48 w-full overflow-hidden">
                   <img
