@@ -17,15 +17,13 @@ Allow: /about
 Allow: /contact
 Allow: /faq
 
-# Allow public API endpoints needed for client-side JavaScript rendering & Googlebot
-Allow: /api/
-Allow: /api/*
-
-# Disallow private administrative & restricted endpoints only
+# Disallow private administrative & api endpoints
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /403
+Disallow: /api/
 
 # Sitemap Location
-Sitemap: https://www.nguyenlieuphachecasa.com/sitemap.xml
 Sitemap: https://nguyenlieuphachecasa.com/sitemap.xml
+Sitemap: https://www.nguyenlieuphachecasa.com/sitemap.xml
+
