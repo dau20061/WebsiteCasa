@@ -1,14 +1,36 @@
 import WaveDivider from './WaveDivider';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { COMPANY_INFO } from '../constants/company';
 import logoImg from '../img/logo.png';
 import { useToast } from './Toast';
 import { useLanguage } from '../context/LanguageContext';
+import { getRtdbCategories } from '../services/rtdbService';
+import { PRODUCT_CATEGORIES } from '../constants/categories';
 
 export default function Footer() {
-  const { t, isChinese } = useLanguage();
+  const { t, isChinese, isEnglish } = useLanguage();
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('casa_admin_categories');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter((c) => c.active !== false && c.id !== 'all');
+        }
+      } catch (_) {}
+    }
+    return PRODUCT_CATEGORIES.filter((c) => c.active !== false && c.id !== 'all');
+  });
+
+  useEffect(() => {
+    getRtdbCategories().then((res) => {
+      if (Array.isArray(res) && res.length > 0) {
+        setCategories(res.filter((c) => c.active !== false && c.id !== 'all'));
+      }
+    });
+  }, []);
   const [email, setEmail] = useState('');
   const { showToast } = useToast();
 
@@ -146,30 +168,25 @@ export default function Footer() {
           {/* Col 4: Products Categories */}
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-tea-mint mb-4">
-              {t('footer_product_categories', 'Dòng Sản Phẩm B2B')}
+              {t('footer_product_categories', 'Danh Mục Nguyên Liệu')}
             </h3>
             <ul className="space-y-2.5 text-sm text-gray-300">
-              <li>
-                <Link to="/products?cat=tra-den" className="hover:text-tea-mint transition-colors">{isChinese ? '阿薩姆與 CTC 紅茶' : 'Trà Đen Assam & CTC'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=tra-oolong" className="hover:text-tea-mint transition-colors">{isChinese ? '八珍炭焙烏龍茶' : 'Trà Ô Long Nướng Bát Trân'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=tra-lai-xanh" className="hover:text-tea-mint transition-colors">{isChinese ? '雪花茉莉綠茶' : 'Lục Trà Lài Tuyết Hoa'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=tra-rang" className="hover:text-tea-mint transition-colors">{isChinese ? '京都焙茶 Hojicha' : 'Trà Rang Hojicha Kyoto'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=tra-trai-cay" className="hover:text-tea-mint transition-colors">{isChinese ? '格雷伯爵紅茶 Earl Grey' : 'Hồng Trà Bá Tước Earl Grey'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=bot-pha-che" className="hover:text-tea-mint transition-colors">{isChinese ? '非乳製植物植脂末' : 'Bột Béo Không Sữa Thực Vật'}</Link>
-              </li>
-              <li>
-                <Link to="/products?cat=bot-pha-che" className="hover:text-tea-mint transition-colors">{isChinese ? '起司奶蓋粉 Cheese Foam' : 'Bột Màng Sữa Cheese Foam'}</Link>
-              </li>
+              {categories.map((cat) => {
+                const catName = isEnglish
+                  ? (cat.nameEn || cat.name)
+                  : (isChinese ? (cat.nameZh || cat.name) : cat.name);
+                const catSlug = cat.slug || cat.id;
+                return (
+                  <li key={cat.id}>
+                    <Link
+                      to={`/products?cat=${catSlug}`}
+                      className="hover:text-tea-mint transition-colors inline-block"
+                    >
+                      {catName}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

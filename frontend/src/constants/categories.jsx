@@ -4,13 +4,15 @@
 // ============================================================================
 
 export const PRODUCT_CATEGORIES = [
-  { id: 'all', name: 'Tất cả sản phẩm', nameZh: '全部產品', nameEn: 'All Products', count: 12 },
-  { id: 'tra-den', name: 'Trà Đen (Black Tea)', nameZh: '商用紅茶系列', nameEn: 'Black Tea Series', count: 3 },
-  { id: 'tra-oolong', name: 'Trà Ô Long (Oolong)', nameZh: '高山烏龍系列', nameEn: 'Oolong Tea Series', count: 3 },
-  { id: 'tra-lai-xanh', name: 'Trà Lài & Trà Xanh', nameZh: '茉莉綠茶系列', nameEn: 'Jasmine & Green Tea', count: 2 },
-  { id: 'tra-rang', name: 'Trà Rang & Hojicha', nameZh: '烘焙焙茶系列', nameEn: 'Roasted Tea & Hojicha', count: 2 },
-  { id: 'tra-trai-cay', name: 'Nền Trà Trái Cây', nameZh: '特調果茶茶湯底', nameEn: 'Fruit Tea Base Series', count: 2 },
-  { id: 'bot-pha-che', name: 'Bột Pha Chế & Topping', nameZh: '專用調配粉末原料', nameEn: 'Beverage Powders & Mixes', count: 2 },
+  { id: 'all', name: 'Tất cả sản phẩm', nameZh: '全部產品', nameEn: 'All Products' },
+  { id: 'tra-cao-cap', name: 'Trà Cao Cấp', nameZh: '頂級嚴選茶品', nameEn: 'Premium Tea', order: 2, active: true },
+  { id: 'bot-pudding', name: 'Bột Pudding', nameZh: '特調布丁預拌粉', nameEn: 'Pudding Powder', order: 3, active: true },
+  { id: 'bot-tau-hu', name: 'Bột Tàu Hủ', nameZh: '特級手作豆花粉', nameEn: 'Tofu Pudding Powder', order: 4, active: true },
+  { id: 'bot-kem', name: 'Bột Kem', nameZh: '特級植脂末', nameEn: 'Creamer Powder', order: 5, active: true },
+  { id: 'syrup', name: 'Syrup', nameZh: '特級風味糖漿', nameEn: 'Syrup', order: 6, active: true },
+  { id: 'bot-kem-beo', name: 'Bột Kem Béo', nameZh: '特級植脂末', nameEn: 'Non-Dairy Creamer', order: 7, active: true },
+  { id: 'matcha', name: 'Matcha', nameZh: '日本特選抹茶與研磨茶粉', nameEn: 'Matcha Powder', order: 7, active: true },
+  { id: 'topping', name: 'Topping', nameZh: '特級調飲配料', nameEn: 'Topping', order: 8, active: true },
 ];
 
 export const NEWS_CATEGORIES = [
