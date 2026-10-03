@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Droplets, Flame, Wind, ShoppingBag, MessageCircle, Package } from 'lucide-react';
+import { ArrowRight, Sparkles, Droplets, Flame, Wind, ShoppingBag, MessageCircle, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getProductSlug, getProductImageUrl } from '../utils/slugify';
 
 export default function ProductCard({ product, onRequestSample }) {
   const { t, isChinese, isEnglish } = useLanguage();
-  const { id, name, sku, categoryName, shortDesc, image, tasteProfile } = product;
+  const { id, name, sku, categoryName, badge, shortDesc, image, tasteProfile, tags } = product;
   const productSlug = getProductSlug(product);
   const productUrl = `/products/${productSlug}`;
   const displayImageUrl = getProductImageUrl(product);
@@ -29,6 +29,10 @@ export default function ProductCard({ product, onRequestSample }) {
   const displayShortDesc = isEnglish
     ? ((isValidText(product.shortDescEn) && product.shortDescEn) || (isValidText(product.shortDesc_en) && product.shortDesc_en) || shortDesc)
     : (isChinese ? (product.shortDescZh || product.shortDesc_zh || shortDesc) : shortDesc);
+
+  const displayBadge = isEnglish
+    ? ((isValidText(product.badgeEn) && product.badgeEn) || (isValidText(product.badge_en) && product.badge_en) || badge)
+    : (isChinese ? (product.badgeZh || product.badge_zh || badge) : badge);
 
   const displayCategoryName = (isChinese || isEnglish)
     ? t(`cat_${product.category?.replace(/-/g, '_')}`, categoryName)
@@ -60,20 +64,47 @@ export default function ProductCard({ product, onRequestSample }) {
         {/* Overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Top Category Badge */}
-        <div className="absolute top-3.5 left-3.5 pointer-events-none">
+        {/* Top Badges */}
+        <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 pointer-events-none">
           <span className="px-3 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-tea-primary dark:text-tea-mint text-[11px] font-bold tracking-wide uppercase shadow-sm">
             {displayCategoryName}
           </span>
+          {displayBadge && (
+            <span className="px-3 py-1 rounded-full bg-tea-primary text-tea-mint text-[11px] font-bold tracking-wide shadow-sm flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              {displayBadge}
+            </span>
+          )}
         </div>
 
-        {/* SKU Chip (only if short and meaningful) */}
-        {sku && (
-          <div className="absolute bottom-3 left-3.5 pointer-events-none">
-            <span className="px-2.5 py-1 rounded-md bg-black/60 text-white/90 backdrop-blur-md text-[11px] font-mono font-medium max-w-[200px] truncate block">
-              {sku}
-            </span>
-          </div>
+        {/* SKU Chip */}
+        <div className="absolute bottom-3 left-3.5">
+          <span className="px-2.5 py-1 rounded-md bg-black/60 text-white/90 backdrop-blur-md text-[11px] font-mono font-medium">
+            {sku}
+          </span>
+        </div>
+
+        {/* Shopee Buy Button / Contact Button Pill on Image */}
+        {product.purchaseAction === 'shopee' && product.shopeeUrl ? (
+          <a
+            href={product.shopeeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-[#EE4D2D] text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-orange-400" />
+            <span>{isChinese ? '在蝦皮購買' : (isEnglish ? 'Buy on Shopee' : 'Mua trên Shopee')}</span>
+          </a>
+        ) : (
+          <Link
+            to={`/contact?product=${encodeURIComponent(displayName)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-3 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827]/85 hover:bg-tea-primary text-white text-[11px] font-bold backdrop-blur-md shadow-md border border-white/20 transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
+          >
+            <MessageCircle className="w-3.5 h-3.5 text-tea-mint" />
+            <span>{isChinese ? '聯繫諮詢' : (isEnglish ? 'Contact Us' : 'Liên hệ tư vấn')}</span>
+          </Link>
         )}
       </div>
 
@@ -152,7 +183,7 @@ export default function ProductCard({ product, onRequestSample }) {
               }`}
             >
               <span>{t('card_detail', 'Chi tiết')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </Link>
 
             {onRequestSample && (
@@ -172,3 +203,4 @@ export default function ProductCard({ product, onRequestSample }) {
     </motion.div>
   );
 }
+
