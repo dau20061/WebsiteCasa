@@ -3,18 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Search,
-  Filter,
   Sparkles,
   SlidersHorizontal,
   Package,
   X,
   Layers,
   ChevronRight,
-  Leaf,
-  Coffee,
-  Droplets,
-  Grid,
-  Sprout,
   RotateCcw
 } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
@@ -103,18 +97,6 @@ export default function Products() {
     }).length;
   };
 
-  // Helper chọn icon phù hợp cho từng danh mục
-  const getCategoryIcon = (catId) => {
-    const c = normCat(catId);
-    if (c === 'all') return Grid;
-    if (c.includes('tra') || c.includes('tea')) return Leaf;
-    if (c.includes('pudding') || c.includes('tauhu') || c.includes('kem')) return Sparkles;
-    if (c.includes('syrup') || c.includes('duong')) return Droplets;
-    if (c.includes('beo') || c.includes('cafe') || c.includes('coffee')) return Coffee;
-    if (c.includes('matcha')) return Sprout;
-    if (c.includes('topping')) return Layers;
-    return Package;
-  };
 
   // Filter & Search logic
   const filteredProducts = products.filter((product) => {
@@ -276,31 +258,19 @@ export default function Products() {
                   {/* Mục 1: Tất cả sản phẩm */}
                   {(() => {
                     const isAllActive = selectedCategory === 'all';
-                    const AllIcon = Grid;
                     const allCount = getCategoryCount('all');
                     return (
                       <button
                         onClick={() => handleCategoryChange('all')}
-                        className={`w-full p-3 rounded-2xl flex items-center justify-between text-xs font-bold transition-all group ${
+                        className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between text-xs font-bold transition-all group ${
                           isAllActive
                             ? 'bg-tea-primary text-white shadow-tea-sm dark:bg-tea-emerald'
                             : 'bg-transparent hover:bg-tea-soft/60 dark:hover:bg-[#1C2F23] text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint'
                         }`}
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all ${
-                              isAllActive
-                                ? 'bg-white/20 text-white'
-                                : 'bg-tea-soft/80 dark:bg-tea-green/20 text-tea-primary dark:text-tea-mint group-hover:scale-105'
-                            }`}
-                          >
-                            <AllIcon className="w-4 h-4" />
-                          </div>
-                          <span className="truncate text-left">
-                            {isEnglish ? 'All Products' : (isChinese ? '全部產品' : t('cat_all', 'Tất cả sản phẩm'))}
-                          </span>
-                        </div>
+                        <span className="truncate text-left">
+                          {isEnglish ? 'All Products' : (isChinese ? '全部產品' : t('cat_all', 'Tất cả sản phẩm'))}
+                        </span>
 
                         <div className="flex items-center gap-2 shrink-0">
                           <span
@@ -328,7 +298,6 @@ export default function Products() {
                   {activeCategoriesList.map((cat) => {
                     const isCatActive =
                       selectedCategory === cat.id || normCat(selectedCategory) === normCat(cat.id);
-                    const CatIcon = getCategoryIcon(cat.id);
                     const catCount = getCategoryCount(cat.id);
                     const catLabelKey = `cat_${cat.id.replace(/-/g, '_')}`;
                     const displayCatName = isEnglish
@@ -339,24 +308,13 @@ export default function Products() {
                       <button
                         key={cat.id}
                         onClick={() => handleCategoryChange(cat.id)}
-                        className={`w-full p-3 rounded-2xl flex items-center justify-between text-xs font-bold transition-all group ${
+                        className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between text-xs font-bold transition-all group ${
                           isCatActive
                             ? 'bg-tea-primary text-white shadow-tea-sm dark:bg-tea-emerald'
                             : 'bg-transparent hover:bg-tea-soft/60 dark:hover:bg-[#1C2F23] text-gray-700 dark:text-gray-300 hover:text-tea-primary dark:hover:text-tea-mint'
                         }`}
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all ${
-                              isCatActive
-                                ? 'bg-white/20 text-white'
-                                : 'bg-tea-soft/80 dark:bg-tea-green/20 text-tea-primary dark:text-tea-mint group-hover:scale-105'
-                            }`}
-                          >
-                            <CatIcon className="w-4 h-4" />
-                          </div>
-                          <span className="truncate text-left">{displayCatName}</span>
-                        </div>
+                        <span className="truncate text-left">{displayCatName}</span>
 
                         <div className="flex items-center gap-2 shrink-0">
                           <span
