@@ -331,7 +331,19 @@ export default function Home() {
               to="/products"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-[#132018] hover:bg-tea-primary dark:hover:bg-tea-green text-tea-dark dark:text-white hover:text-white text-xs font-bold border border-tea-border dark:border-white/10 shadow-tea-sm transition-all hover:shadow-tea-md whitespace-nowrap self-start md:self-auto"
             >
-              <span>{isEnglish ? 'View all 65+ products' : (isChinese ? '查看全部 65+ 款產品' : 'Xem tất cả 65+ sản phẩm')}</span>
+              <span>
+                {products.length > 0
+                  ? (isEnglish
+                      ? `View all ${products.length} products`
+                      : (isChinese
+                          ? `查看全部 ${products.length} 款產品`
+                          : `Xem tất cả ${products.length} sản phẩm`))
+                  : (isEnglish
+                      ? 'View all products'
+                      : (isChinese
+                          ? '查看全部產品'
+                          : 'Xem tất cả sản phẩm'))}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -344,31 +356,6 @@ export default function Home() {
                 onRequestSample={(p) => openSampleModal(p)}
               />
             ))}
-          </div>
-
-          {/* Quick Category Pills Bar */}
-          <div className="mt-12 p-6 rounded-3xl bg-white dark:bg-[#132018] border border-tea-border dark:border-white/10 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-tea-dark dark:text-white">
-              <Sparkles className="w-4 h-4 text-tea-leaf dark:text-tea-mint" />
-              <span>{isEnglish ? 'Browse by raw material category:' : (isChinese ? '依原料類別快速瀏覽：' : 'Khám phá theo nhóm nguyên liệu:')}</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Link to="/products?cat=tra-den" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isEnglish ? 'Assam Black Tea' : (isChinese ? '阿薩姆紅茶' : 'Trà Đen Assam')}
-              </Link>
-              <Link to="/products?cat=tra-oolong" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isEnglish ? 'Roasted Oolong Tea' : (isChinese ? '炭焙烏龍茶' : 'Trà Ô Long Nướng')}
-              </Link>
-              <Link to="/products?cat=tra-lai-xanh" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isEnglish ? 'Jasmine Green Tea' : (isChinese ? '茉莉綠茶' : 'Lục Trà Lài')}
-              </Link>
-              <Link to="/products?cat=tra-rang" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isEnglish ? 'Japanese Hojicha' : (isChinese ? '日式焙茶' : 'Hojicha Chuẩn Nhật')}
-              </Link>
-              <Link to="/products?cat=bot-pha-che" className="px-3.5 py-1.5 rounded-full bg-tea-cream dark:bg-[#1C2F23] hover:bg-tea-soft dark:hover:bg-[#253D2F] text-xs font-semibold text-gray-700 dark:text-gray-200 transition-colors">
-                {isEnglish ? 'Non-Dairy Creamer' : (isChinese ? '特級植脂末' : 'Bột Béo Thực Vật')}
-              </Link>
-            </div>
           </div>
         </div>
       </section>
