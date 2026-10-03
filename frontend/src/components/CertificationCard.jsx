@@ -29,7 +29,7 @@ export default function CertificationCard({ cert, onSelect }) {
       viewport={{ once: true }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="bg-white dark:bg-[#132018] rounded-3xl p-6 sm:p-7 border border-tea-border dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 transition-all flex flex-col justify-between group"
+      className="bg-white dark:bg-[#132018] rounded-3xl p-6 sm:p-7 border border-tea-leaf/25 dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 hover:border-tea-leaf/50 transition-all flex flex-col justify-between group"
     >
       <div>
         {/* Header with Icon and Badge */}

@@ -45,7 +45,7 @@ export default function ProductCard({ product, onRequestSample }) {
       viewport={{ once: true, margin: '-50px' }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
-      className="group bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-border dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 transition-all flex flex-col h-full"
+      className="group bg-white dark:bg-[#132018] rounded-3xl overflow-hidden border border-tea-leaf/25 dark:border-white/10 shadow-tea-sm hover:shadow-tea-lg dark:hover:border-tea-mint/30 hover:border-tea-leaf/50 transition-all flex flex-col h-full"
     >
       {/* Product Image Box */}
       <div className="relative h-60 w-full overflow-hidden bg-tea-mist dark:bg-[#1A2C21]">
