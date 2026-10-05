@@ -7,7 +7,6 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle2,
-  Clock,
   Box,
   Layers,
   AlertCircle,
@@ -207,16 +206,6 @@ export default function ProductDetail() {
             ? ['三層鋁箔真空鎖鮮包裝 1kg (10包/箱)', '出口標準 25kg 鍍銀專業專用編織袋']
             : ['Gói nhôm 3 lớp 1kg hút chân không (10 gói/thùng)', 'Bao tráng bạc chuyên dụng 25kg chuẩn xuất khẩu']));
 
-  const brewingGuide = product.brewingGuide || {
-    ratio: isEnglish ? '1:30 (35g tea / 1050ml water)' : (isChinese ? '1:30 (35g 茶葉 / 1050ml 純淨水)' : '1:30 (35g trà / 1050ml nước)'),
-    temp: '92°C - 95°C',
-    time: isEnglish ? '12 - 15 mins (covered brewing)' : (isChinese ? '12 - 15 分鐘 (密閉悶泡)' : '12 - 15 phút (ủ kín nhiệt)'),
-    tips: isEnglish
-      ? 'After filtering out tea leaves, immediately shock with 250g of clean ice to lock in aroma, maintain clear liquor, and preserve natural essential oils.'
-      : (isChinese
-        ? '過濾茶渣後立即加入 250g 潔淨冰塊進行降溫鎖香（冰震工藝），以保持茶湯清澈晶瑩並鎖住天然植物精油香氣。'
-        : 'Lọc bỏ bã xong sốc nhiệt ngay bằng 250g đá bi sạch để giữ màu nước trong sáng và khóa trọn hương thơm tinh dầu.')
-  };
 
   const rawSpecifications = Array.isArray(product.specifications) && product.specifications.length > 0
     ? product.specifications
@@ -561,78 +550,28 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Brewing Guide & Packaging Specs Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-10">
-          
-          {/* Barista Brewing Guide */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#132018] rounded-3xl p-6 sm:p-8 border border-tea-border dark:border-white/10 shadow-tea-sm space-y-6 transition-colors">
-            <div className="flex items-center gap-3 border-b border-gray-100 dark:border-white/10 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-tea-soft dark:bg-[#1C2F23] flex items-center justify-center text-tea-emerald dark:text-tea-mint">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-tea-dark dark:text-white">
-                  {isEnglish ? 'Barista SOP Standard Extraction Guide' : (isChinese ? '調茶師標準萃取 SOP 指南' : 'Hướng Dẫn Ủ Cốt Trà Chuẩn SOP Barista')}
-                </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                  {isEnglish ? 'Recommended extraction process from CASA R&D tea specialists' : (isChinese ? 'CASA 資深研發品茶師推薦最佳萃取參數' : 'Quy trình chiết xuất khuyến nghị từ chuyên gia CASA')}
-                </p>
-              </div>
+        {/* Packaging Specs & Quality Standards Section */}
+        <div className="mt-10 bg-white dark:bg-[#132018] rounded-3xl p-6 sm:p-8 border border-tea-border dark:border-white/10 shadow-tea-sm space-y-6 transition-colors">
+          <div className="flex items-center gap-3 border-b border-gray-100 dark:border-white/10 pb-4">
+            <div className="w-10 h-10 rounded-xl bg-tea-soft dark:bg-[#1C2F23] flex items-center justify-center text-tea-emerald dark:text-tea-mint">
+              <Box className="w-5 h-5" />
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
-                  {isEnglish ? 'WATER : TEA RATIO' : (isChinese ? '茶水比例 (茶 : 水)' : 'TỶ LỆ NƯỚC : TRÀ')}
-                </span>
-                <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.ratio}</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
-                  {isEnglish ? 'BREWING TEMP' : (isChinese ? '最佳浸泡水溫' : 'NHIỆT ĐỘ NƯỚC Ủ')}
-                </span>
-                <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.temp}</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
-                <span className="text-xs text-gray-600 dark:text-gray-400 block mb-1 font-semibold">
-                  {isEnglish ? 'BREW TIME' : (isChinese ? '悶泡萃取時間' : 'THỜI GIAN HÃM')}
-                </span>
-                <span className="text-base font-bold text-tea-dark dark:text-white block">{brewingGuide.time}</span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-tea-mist dark:bg-[#0B130E] border border-tea-leaf/20 dark:border-white/10 text-xs text-gray-800 dark:text-gray-200 space-y-1">
-              <strong className="text-tea-primary dark:text-tea-mint flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-tea-leaf" />
-                {isEnglish ? 'Master Barista Pro Tips:' : (isChinese ? 'Master Barista 調茶秘笈：' : 'Bí quyết từ Master Barista:')}
-              </strong>
-              <p className="leading-relaxed font-normal">{brewingGuide.tips}</p>
+            <div>
+              <h3 className="text-lg font-bold text-tea-dark dark:text-white">
+                {isEnglish ? 'Packaging & Quality Standards' : (isChinese ? '商用包裝規格與檢驗標準' : 'Quy Cách Đóng Gói & Tiêu Chuẩn')}
+              </h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                {isEnglish ? 'Industrial B2B standardized commercial specifications' : (isChinese ? '工業級 B2B 標準化出貨規格' : 'Quy cách B2B tiêu chuẩn công nghiệp')}
+              </p>
             </div>
           </div>
 
-          {/* Packaging & Lab Specs */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#132018] rounded-3xl p-6 sm:p-8 border border-tea-border dark:border-white/10 shadow-tea-sm space-y-5 transition-colors">
-            <div className="flex items-center gap-3 border-b border-gray-100 dark:border-white/10 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-tea-soft dark:bg-[#1C2F23] flex items-center justify-center text-tea-emerald dark:text-tea-mint">
-                <Box className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-tea-dark dark:text-white">
-                  {isEnglish ? 'Packaging & Quality Standards' : (isChinese ? '商用包裝規格與檢驗標準' : 'Quy Cách Đóng Gói & Tiêu Chuẩn')}
-                </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                  {isEnglish ? 'Industrial B2B standardized commercial specifications' : (isChinese ? '工業級 B2B 標準化出貨規格' : 'Quy cách B2B tiêu chuẩn công nghiệp')}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
+          <div className={`grid grid-cols-1 ${specifications.length > 0 ? 'md:grid-cols-2' : ''} gap-6`}>
+            <div className="space-y-3 p-5 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
               <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
                 {isEnglish ? 'Packaging Specifications:' : (isChinese ? '出貨包裝規格：' : 'Quy cách xuất hàng:')}
               </span>
-              <ul className="space-y-1.5 text-xs text-gray-800 dark:text-gray-200">
+              <ul className="space-y-2 text-xs text-gray-800 dark:text-gray-200">
                 {packaging.map((pack, i) => (
                   <li key={i} className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-tea-leaf shrink-0" />
@@ -643,15 +582,15 @@ export default function ProductDetail() {
             </div>
 
             {specifications.length > 0 && (
-              <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
+              <div className="space-y-3 p-5 rounded-2xl bg-[#FAF9F5] dark:bg-[#0B130E] border border-tea-border dark:border-white/10">
                 <span className="text-xs font-bold text-gray-700 dark:text-gray-200 block">
                   {isEnglish ? 'Laboratory Inspection Metrics:' : (isChinese ? '實驗室檢測技術指標：' : 'Chỉ tiêu kỹ thuật kiểm định:')}
                 </span>
-                <div className="space-y-1.5 text-xs">
+                <div className="space-y-2 text-xs">
                   {specifications.map((spec, i) => (
-                    <div key={i} className="flex justify-between text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-white/5 pb-1">
+                    <div key={i} className="flex justify-between text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-white/5 pb-1.5 last:border-0 last:pb-0">
                       <span>{spec.label}:</span>
-                      <strong className="text-tea-dark dark:text-white">{spec.value}</strong>
+                      <strong className="text-tea-dark dark:text-white font-semibold">{spec.value}</strong>
                     </div>
                   ))}
                 </div>
