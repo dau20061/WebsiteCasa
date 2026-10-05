@@ -78,6 +78,14 @@
       "destination": "/api/[...path].js?path=ai/$1"
     },
     {
+      "source": "/products/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/news/(.*)",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!assets/|api/|robots\\.txt|sitemap\\.xml|site\\.webmanifest|.*\\..*).*)",
       "destination": "/index.html"
     }
