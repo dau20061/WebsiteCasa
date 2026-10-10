@@ -43,14 +43,6 @@ async function fetchDirectRtdb(path, method = 'GET', data = null) {
       if (Array.isArray(result)) {
         result = result.filter(Boolean);
       }
-      if (path === 'products' && Array.isArray(result)) {
-        result.forEach((p) => {
-          if (p) {
-            delete p.imageData;
-            delete p.imageBase64;
-          }
-        });
-      }
       return result;
     }
   } catch (err) {
@@ -185,9 +177,15 @@ export async function getRtdbProducts() {
     const directData = await fetchDirectRtdb('products');
     if (directData !== null && Array.isArray(directData)) {
       try {
-        localStorage.setItem('casa_admin_products', JSON.stringify(directData));
+        // Chỉ lược bỏ imageData nặng khi ghi vào localStorage để không tràn quota 5MB của trình duyệt
+        const lightweight = directData.map((p) => {
+          if (!p) return p;
+          const { imageData, imageBase64, ...rest } = p;
+          return rest;
+        });
+        localStorage.setItem('casa_admin_products', JSON.stringify(lightweight));
       } catch (_) {}
-      return directData;
+      return directData; // directData VẪN GIỮ NGUYÊN imageData TRONG RAM CHO ỨNG DỤNG!
     }
   } catch (err) {
     console.warn('[Frontend Service] fetchDirectRtdb products error, trying Backend API:', err.message);
@@ -214,15 +212,16 @@ export async function saveRtdbProduct(product, isExplicitNew = null) {
   const targetId = product.id || `product_${Date.now()}`;
   const itemToSave = { ...product, id: targetId, updatedAt: new Date().toISOString() };
 
-  // 1. Luôn cập nhật localStorage ngay lập tức
+  // 1. Luôn cập nhật localStorage ngay lập tức (lược bỏ imageData để bảo vệ dung lượng)
   try {
     const saved = localStorage.getItem('casa_admin_products');
     let list = saved ? JSON.parse(saved) : [];
     const idx = list.findIndex((p) => String(p.id) === String(targetId));
+    const { imageData, imageBase64, ...lightItem } = itemToSave;
     if (idx >= 0) {
-      list[idx] = itemToSave;
+      list[idx] = lightItem;
     } else {
-      list.unshift(itemToSave);
+      list.unshift(lightItem);
     }
     localStorage.setItem('casa_admin_products', JSON.stringify(list));
   } catch (_) {}
@@ -236,7 +235,6 @@ export async function saveRtdbProduct(product, isExplicitNew = null) {
       try {
         const saved = localStorage.getItem('casa_admin_products');
         const list = saved ? JSON.parse(saved) : [];
-        // Nếu ID đã có trong danh sách thì là CẬP NHẬT (isNew = false)
         isNew = !list.some((p) => String(p.id) === String(targetId));
       } catch (_) {
         isNew = false;
@@ -245,8 +243,10 @@ export async function saveRtdbProduct(product, isExplicitNew = null) {
   }
 
   // 2. Ghi trực tiếp lên Firebase Realtime Database (0ms trễ)
+  // Nếu là cập nhật và itemToSave không mang imageData mới -> Dùng PATCH để giữ nguyên imageData đã có trên Firebase RTDB!
+  const method = (isNew || itemToSave.imageData) ? 'PUT' : 'PATCH';
   try {
-    await fetchDirectRtdb(`products/${targetId}`, 'PUT', itemToSave);
+    await fetchDirectRtdb(`products/${targetId}`, method, itemToSave);
   } catch (directErr) {
     console.warn('[Frontend Service] fetchDirectRtdb save product error:', directErr);
   }

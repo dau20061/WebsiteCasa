@@ -1036,6 +1036,8 @@ export default function AdminDashboard() {
         finalData.imageData = finalData.image;
         finalData.image = `https://www.nguyenlieuphachecasa.com/product-image/${targetSlug}.webp`;
         finalData.images = [finalData.image];
+      } else if (editingProduct && editingProduct.imageData && !finalData.imageData) {
+        finalData.imageData = editingProduct.imageData;
       }
 
       if (editingProduct) {
@@ -1044,6 +1046,7 @@ export default function AdminDashboard() {
         const updatedProd = {
           ...editingProduct,
           ...finalData,
+          imageData: finalData.imageData || editingProduct.imageData || undefined,
           slug: cleanSlug || editingProduct.slug || editingProduct.id,
           updatedAt: new Date().toISOString()
         };

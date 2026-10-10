@@ -137,9 +137,14 @@ export async function saveProduct(product) {
   const record = { ...product, id: cleanId, updatedAt: new Date().toISOString() };
   
   try {
-    await set(ref(rtdb, `products/${cleanId}`), record);
+    if (!record.imageData) {
+      await update(ref(rtdb, `products/${cleanId}`), record);
+    } else {
+      await set(ref(rtdb, `products/${cleanId}`), record);
+    }
   } catch (_) {
-    await restRtdb(`products/${cleanId}`, 'PUT', record);
+    const method = record.imageData ? 'PUT' : 'PATCH';
+    await restRtdb(`products/${cleanId}`, method, record);
   }
 
   // Cập nhật memory store
