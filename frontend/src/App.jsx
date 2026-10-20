@@ -3,12 +3,14 @@ import AppRoutes from './routes/AppRoutes';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ToastProvider } from './components/Toast';
+import PageTracker from './components/PageTracker';
 
 export default function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
         <ToastProvider>
+          <PageTracker />
           <AppRoutes />
         </ToastProvider>
       </LanguageProvider>
